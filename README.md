@@ -1,5 +1,25 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Otwarte Dane Transportowe (web)
+
+This app mirrors the Flutter UI/routes, but targets the web with Next.js App Router.
+
+### Routes
+
+All user-facing routes are locale-prefixed:
+
+- `/pl`, `/en` and `/de` (root `/` redirects to `/pl`)
+- `/[locale]/blog`, `/[locale]/blog/[id]`
+- `/[locale]/cases`, `/[locale]/cases/organizations/[id]`
+- `/[locale]/data`, `/[locale]/data/feeds/[id]`
+- `/[locale]/info`
+
+### Backend API
+
+Copy `.env.example` to `.env.local` and set:
+
+- `NEXT_PUBLIC_API_BASE_URL` (defaults to `http://localhost:8000`)
+
 ## Getting Started
 
 First, run the development server:

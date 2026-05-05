@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+html {
+  overflow-x: clip;
+  /** Zapobiega przesunięciu treści w poziomie przy otwieraniu Menu/Modal (schowany pasek przewijania). */
+  scrollbar-gutter: stable;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -20,7 +26,10 @@
 }
 
 body {
+  overflow-x: clip;
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
+    Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
