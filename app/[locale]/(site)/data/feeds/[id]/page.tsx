@@ -1,15 +1,12 @@
 import { notFound } from "next/navigation";
-import { MdDataset } from "react-icons/md";
 
-import {
-  FeedCatalogDetailBody,
-  type FeedDetailGroup,
-} from "@/components/FeedCatalogDetailBody";
-import { PageHeader } from "@/components/PageHeader";
-import { PageSection } from "@/components/PageSection";
+import { FeedCatalogDetailBody, type FeedDetailGroup } from "@/components/FeedCatalogDetailBody";
+import { FeedCatalogDetailHeader } from "@/components/FeedCatalogDetailHeader";
+import { AppPage } from "@/components/layout/AppPage";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalogOrganization } from "@/lib/api/dataCatalog";
+import { dataFeedDetail } from "@/lib/nav/breadcrumbTrails";
 import { text } from "@/lib/format";
 
 export default async function FeedCatalogDetailPage({
@@ -19,11 +16,13 @@ export default async function FeedCatalogDetailPage({
 }) {
   const { locale: rawLocale, id } = await params;
   if (!locales.includes(rawLocale as Locale)) notFound();
-  const dict = await getDictionary(rawLocale as Locale);
+  const locale = rawLocale as Locale;
+  const dict = await getDictionary(locale);
 
   const orgId = Number(id);
   if (!Number.isFinite(orgId)) notFound();
   const organization = await fetchFeedCatalogOrganization(orgId);
+  const orgLabel = text(organization.transport_organization);
 
   const feeds = organization.feeds ?? [];
 
@@ -60,20 +59,10 @@ export default async function FeedCatalogDetailPage({
     .filter((g) => g.rows.length);
 
   return (
-    <PageSection>
-      <PageHeader
-        title={text(organization.transport_organization)}
-        subtitle={`${dict.region}: ${text(organization.region)}`}
-        icon={<MdDataset size={28} aria-hidden />}
-      />
-      <FeedCatalogDetailBody
-        dict={dict}
-        website={text(organization.website)}
-        contact={text(organization.contact_email)}
-        phone={text(organization.phone_number)}
-        groups={groups}
-      />
-    </PageSection>
+    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataFeedDetail(locale, dict, orgId, orgLabel)}>
+      <FeedCatalogDetailHeader organization={organization} dict={dict} locale={locale} />
+      <FeedCatalogDetailBody dict={dict} groups={groups} />
+    </AppPage>
   );
 }
 

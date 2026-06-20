@@ -1,9 +1,9 @@
 /**
- * Blog API (`GET /api/blog/posts/`, `GET /api/blog/posts/:id/`) — pole `image`:
- * - `null` — brak okładki,
- * - **string** — zwykle **pełny URL absolutny** do pliku, np.
+ * Blog API (`GET /api/blog/posts/`, `GET /api/blog/posts/:id/`) - pole `image`:
+ * - `null` - brak okładki,
+ * - **string** - zwykle **pełny URL absolutny** do pliku, np.
  *   `http://localhost:8000/internal-media/blog/images/<nazwa>.jpg`
- *   (czasem może być ścieżka względna `/internal-media/...` — też obsługujemy).
+ *   (czasem może być ścieżka względna `/internal-media/...` - też obsługujemy).
  */
 export function blogCoverImageUrl(value: string | null | undefined): string | null {
   if (value == null) return null;
@@ -12,7 +12,7 @@ export function blogCoverImageUrl(value: string | null | undefined): string | nu
 }
 
 /**
- * Adres do `<img src>` — jeśli obraz jest pod `/internal-media/…` na backendzie,
+ * Adres do `<img src>` - jeśli obraz jest pod `/internal-media/…` na backendzie,
  * zwracamy ścieżkę na **tym samym hoście co Next**; `next.config` przekieruje rewrite na API.
  * Dzięki temu unikasz problemów z cookies / mixed content przy wyświetlaniu z frontu.
  */

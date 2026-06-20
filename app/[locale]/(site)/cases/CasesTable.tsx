@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,12 +9,20 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import Tooltip from "@mui/material/Tooltip";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
+import { MdEdit } from "react-icons/md";
 
 import { TableCard } from "@/components/TableCard";
 import { TableFilterSelect } from "@/components/TableFilterSelect";
+import type { Dictionary } from "@/i18n/getDictionary";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { hasHelperAccess } from "@/lib/auth/permissions";
+import { caseStatusLabel } from "@/lib/cases/statusChoices";
 import { text } from "@/lib/format";
+import { useTableSort } from "@/lib/ui/useTableSort";
+import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 import { TransportOrganizationListItem } from "@/lib/api/cases";
 
 type SortColumn = "organization" | "region";
@@ -25,27 +34,27 @@ export function CasesTable({
 }: {
   locale: string;
   organizations: TransportOrganizationListItem[];
-  dict: {
-    organizations: string;
-    region: string;
-    latestStatus: string;
-    providers: string;
-    all: string;
-  };
+  dict: Pick<
+    Dictionary,
+    "organizations" | "region" | "latestStatus" | "providers" | "all" | "actions" | "edit" | "caseStatusLabels"
+  >;
 }) {
+  const auth = useAuth();
+  const canManage =
+    auth.status === "authenticated" &&
+    hasHelperAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin });
   const [status, setStatus] = useState<string | "">("");
   const [provider, setProvider] = useState<string | "">("");
-  const [sortColumn, setSortColumn] = useState<SortColumn>("organization");
-  const [sortAscending, setSortAscending] = useState(true);
+  const { sortColumn, sortAscending, toggleSort } = useTableSort<SortColumn>("organization");
 
   const statuses = useMemo(() => {
     const set = new Set<string>();
     for (const org of organizations) {
-      const s = latestStatus(org);
+      const s = latestStatus(org, dict);
       if (s !== "-") set.add(s);
     }
     return [...set].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-  }, [organizations]);
+  }, [dict, organizations]);
 
   const providers = useMemo(() => {
     const set = new Set<string>();
@@ -57,7 +66,7 @@ export function CasesTable({
 
   const rows = useMemo(() => {
     const filtered = organizations.filter((org) => {
-      const matchesStatus = !status || latestStatus(org) === status;
+      const matchesStatus = !status || latestStatus(org, dict) === status;
       const matchesProvider =
         !provider || providerNames(org).some((p) => p === provider);
       return matchesStatus && matchesProvider;
@@ -77,32 +86,13 @@ export function CasesTable({
     });
 
     return sorted;
-  }, [organizations, provider, sortAscending, sortColumn, status]);
-
-  function toggleSort(col: SortColumn) {
-    if (sortColumn === col) setSortAscending((v) => !v);
-    else {
-      setSortColumn(col);
-      setSortAscending(true);
-    }
-  }
+  }, [dict, organizations, provider, sortAscending, sortColumn, status]);
 
   return (
     <TableCard>
       <Table size="small" sx={{ minWidth: 900 }}>
         <TableHead>
-          <TableRow
-            sx={(theme) => ({
-              bgcolor: theme.palette.grey[100],
-              "& th": {
-                fontWeight: 600,
-                fontSize: "0.8125rem",
-                letterSpacing: "0.02em",
-                color: "text.primary",
-                borderBottom: `2px solid ${theme.palette.divider}`,
-              },
-            })}
-          >
+          <TableRow sx={tableHeadRowSx}>
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "organization"}
@@ -189,17 +179,12 @@ export function CasesTable({
                 />
               </Box>
             </TableCell>
+            {canManage ? <TableCell sx={{ width: 96 }}>{dict.actions}</TableCell> : null}
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((org) => (
-            <TableRow
-              key={org.id}
-              hover
-              sx={(theme) => ({
-                "&:nth-of-type(even)": { bgcolor: theme.palette.grey[50] },
-              })}
-            >
+            <TableRow key={org.id} hover sx={tableZebraRowSx}>
               <TableCell>
                 <Link
                   component={NextLink}
@@ -212,8 +197,24 @@ export function CasesTable({
                 </Link>
               </TableCell>
               <TableCell>{text(org.region)}</TableCell>
-              <TableCell>{latestStatus(org)}</TableCell>
+              <TableCell>{latestStatus(org, dict)}</TableCell>
               <TableCell>{providerNames(org).join(", ")}</TableCell>
+              {canManage ? (
+                <TableCell>
+                  <Tooltip title={dict.edit}>
+                    <IconButton
+                      component={NextLink}
+                      href={`/${locale}/cases/organizations/${org.id}/edit`}
+                      prefetch={false}
+                      size="small"
+                      color="primary"
+                      aria-label={dict.edit}
+                    >
+                      <MdEdit size={20} aria-hidden />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              ) : null}
             </TableRow>
           ))}
         </TableBody>
@@ -228,8 +229,9 @@ function providerNames(org: TransportOrganizationListItem) {
   return names.length ? names : ["-"];
 }
 
-function latestStatus(org: TransportOrganizationListItem) {
+function latestStatus(org: TransportOrganizationListItem, dict: Pick<Dictionary, "caseStatusLabels">) {
   const s = org.latest_status ?? null;
   if (!s) return "-";
+  if (s.status) return caseStatusLabel(s.status, dict.caseStatusLabels);
   return text(s.status_display ?? s.status);
 }

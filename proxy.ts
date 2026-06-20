@@ -22,6 +22,18 @@ export function proxy(req: NextRequest) {
     (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
   );
 
+  if (localeInPath) {
+    const rest = pathname.slice(`/${localeInPath}`.length) || "/";
+    const protectedPaths = ["/data/queue"];
+    const isProtected = protectedPaths.some((p) => rest === p || rest.startsWith(`${p}/`));
+    if (isProtected && req.cookies.get("odt.auth")?.value !== "1") {
+      const url = req.nextUrl.clone();
+      url.pathname = `/${localeInPath}/login`;
+      url.searchParams.set("returnUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (!localeInPath) {
     const url = req.nextUrl.clone();
     url.pathname = `/pl${pathname === "/" ? "" : pathname}`;

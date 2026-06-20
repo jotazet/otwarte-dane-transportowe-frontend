@@ -17,6 +17,7 @@ import type { Dictionary } from "@/i18n/getDictionary";
 import type { Locale } from "@/i18n/locales";
 import { blogCoverImageSrc } from "@/lib/blogImage";
 import { formatDate, text } from "@/lib/format";
+import { blogExcerpt } from "@/lib/markdown";
 
 export function BlogPostCards({
   locale,
@@ -31,8 +32,7 @@ export function BlogPostCards({
     <Stack spacing={1}>
       {posts.map((post) => {
         const cover = blogCoverImageSrc(post.image);
-        const excerptStr =
-          text(post.content).slice(0, 220) + (text(post.content).length > 220 ? "…" : "");
+        const excerptStr = blogExcerpt(text(post.content));
 
         const thumb = cover ? (
           <Box
@@ -145,7 +145,6 @@ export function BlogPostCards({
                     color="text.secondary"
                     sx={(t) => ({
                       display: cover ? { xs: "none", sm: "block" } : "block",
-                      whiteSpace: "pre-wrap",
                       lineHeight: 1.55,
                       fontSize: `calc(${t.typography.body1.fontSize} * 1.06)`,
                     })}
@@ -161,7 +160,6 @@ export function BlogPostCards({
                     sx={(t) => ({
                       display: { xs: "block", sm: "none" },
                       order: 3,
-                      whiteSpace: "pre-wrap",
                       lineHeight: 1.55,
                       fontSize: `calc(${t.typography.body1.fontSize} * 1.06)`,
                       mt: { xs: 0.25 },

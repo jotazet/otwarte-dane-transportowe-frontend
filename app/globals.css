@@ -2,13 +2,22 @@
 
 html {
   overflow-x: clip;
-  /** Zapobiega przesunięciu treści w poziomie przy otwieraniu Menu/Modal (schowany pasek przewijania). */
-  scrollbar-gutter: stable;
+  width: 100%;
+  min-height: 100%;
+  background: var(--background);
+  color-scheme: light;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html[data-color-mode="light"] {
+  --background: #f8fafd;
+  --foreground: #202124;
+  color-scheme: light;
+}
+
+html[data-color-mode="dark"] {
+  --background: #121212;
+  --foreground: #e8eaed;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -18,15 +27,10 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   overflow-x: clip;
+  width: 100%;
+  min-height: 100%;
   margin: 0;
   background: var(--background);
   color: var(--foreground);

@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Roboto } from "next/font/google";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 
 import { ThemeRegistry } from "@/components/ThemeRegistry";
+import { dictPl } from "@/i18n/lang/pl";
+import type { Locale } from "@/i18n/locales";
+import { locales } from "@/i18n/locales";
+import { buildSiteFallbackMetadata } from "@/lib/seo/metadata";
+import { COLOR_MODE_STORAGE_KEY } from "@/lib/theme/colorMode";
 
 import "./globals.css";
 
@@ -14,37 +21,27 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: {
-    default: "Otwarte Dane Transportowe (ODT)",
-    template: "%s • Otwarte Dane Transportowe",
-  },
-  description:
-    "Otwarte Dane Transportowe (ODT) – katalog i status pozyskiwania oficjalnych danych transportu publicznego w Polsce. GTFS, GTFS-RT, NeTEx, SIRI. Dane z otwartego API.",
-  applicationName: "Otwarte Dane Transportowe",
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    siteName: "Otwarte Dane Transportowe",
-    locale: "pl_PL",
-    title: "Otwarte Dane Transportowe (ODT)",
-    description:
-      "Otwarte Dane Transportowe (ODT) – katalog i status pozyskiwania oficjalnych danych transportu publicznego w Polsce.",
-  },
-  twitter: {
-    card: "summary",
-    title: "Otwarte Dane Transportowe (ODT)",
-    description:
-      "Otwarte Dane Transportowe (ODT) – katalog i status pozyskiwania oficjalnych danych transportu publicznego w Polsce.",
-  },
+  ...buildSiteFallbackMetadata(dictPl),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const rawLocale = headersList.get("x-odt-locale") ?? "pl";
+  const lang = locales.includes(rawLocale as Locale) ? rawLocale : "pl";
+
   return (
-    <html lang="pl" className={`${roboto.variable} h-full`}>
+    <html lang={lang} className={`${roboto.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <InitColorSchemeScript
+          attribute='[data-color-mode="%s"]'
+          modeStorageKey={COLOR_MODE_STORAGE_KEY}
+          defaultMode="light"
+        />
+      </head>
       <body className="min-h-full antialiased">
         <ThemeRegistry>{children}</ThemeRegistry>
       </body>

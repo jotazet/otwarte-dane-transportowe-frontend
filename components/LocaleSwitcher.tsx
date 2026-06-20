@@ -1,12 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdLanguage } from "react-icons/md";
@@ -25,8 +23,6 @@ export function LocaleSwitcher({
   locale: Locale;
   languageLabel: string;
 }) {
-  const theme = useTheme();
-  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const pathname = usePathname() || "/";
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -84,33 +80,27 @@ export function LocaleSwitcher({
     </Menu>
   );
 
-  if (isMdUp) {
-    return (
-      <>
-        <Button
-          {...triggerProps}
-          variant="outlined"
-          size="small"
-          startIcon={<MdLanguage size={20} aria-hidden />}
-          sx={{ flexShrink: 0, textTransform: "none", fontWeight: 600 }}
-        >
-          {currentLabel}
-        </Button>
-        {menu}
-      </>
-    );
-  }
-
-  return (
-    <>
+  const trigger = (
+    <Tooltip title={`${languageLabel}: ${currentLabel}`}>
       <IconButton
         {...triggerProps}
-        color="primary"
+        color="inherit"
         size="large"
-        sx={{ flexShrink: 0 }}
+        sx={{
+          flexShrink: 0,
+          color: "text.primary",
+          borderRadius: 2,
+          "&:hover": { bgcolor: "action.hover" },
+        }}
       >
         <MdLanguage size={24} aria-hidden />
       </IconButton>
+    </Tooltip>
+  );
+
+  return (
+    <>
+      {trigger}
       {menu}
     </>
   );

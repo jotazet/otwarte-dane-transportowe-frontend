@@ -6,6 +6,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { MdOutlineSortByAlpha } from "react-icons/md";
 
+import { selectMenuPaperSx } from "@/lib/ui/selectMenu";
+
 type TableFilterSelectProps = {
   value: string;
   onChange: (next: string) => void;
@@ -14,7 +16,7 @@ type TableFilterSelectProps = {
   ariaLabel: string;
 };
 
-/** Ikona jak przy TableSortLabel — tuż obok nagłówka, bez ramki/szarego tła. */
+/** Ikona jak przy TableSortLabel - tuż obok nagłówka, bez ramki/szarego tła. */
 export function TableFilterSelect({
   value,
   onChange,
@@ -42,13 +44,11 @@ export function TableFilterSelect({
         aria-label={`${ariaLabel}: ${currentLabel}`}
         aria-haspopup="true"
         aria-expanded={open ? "true" : "false"}
-        color={value ? "primary" : "default"}
         sx={{
           p: 0.25,
           ml: 0.125,
           flexShrink: 0,
-          color: (theme) =>
-            value ? theme.palette.primary.main : theme.palette.action.active,
+          color: value ? "primary.main" : "text.secondary",
           "&:hover": {
             bgcolor: "action.hover",
           },
@@ -57,6 +57,7 @@ export function TableFilterSelect({
         <MdOutlineSortByAlpha
           size={18}
           aria-hidden
+          color="currentColor"
           style={{ display: "block", opacity: open ? 1 : 0.85 }}
         />
       </IconButton>
@@ -73,7 +74,7 @@ export function TableFilterSelect({
               borderRadius: "16px",
               mt: 0.75,
               minWidth: 200,
-              maxHeight: 320,
+              ...selectMenuPaperSx,
               border: 1,
               borderColor: "divider",
             },

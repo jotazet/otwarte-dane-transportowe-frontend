@@ -1,32 +1,72 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MdArticle } from "react-icons/md";
 
+import { BlogPagination } from "@/components/BlogPagination";
 import { BlogPostCards } from "@/components/BlogPostCards";
+import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
-import { PageSection } from "@/components/PageSection";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
-import { fetchBlogPosts } from "@/lib/api/blog";
+import { BLOG_LIST_PAGE_SIZE, blogListTotalPages, fetchBlogPosts } from "@/lib/api/blog";
+import { CreateActionButton } from "@/components/CreateActionButton";
+import { blogRoot } from "@/lib/nav/breadcrumbTrails";
+import { paths } from "@/lib/nav/routes";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export default async function BlogPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  if (!locales.includes(rawLocale as Locale)) return {};
+  const locale = rawLocale as Locale;
+  const dict = await getDictionary(locale);
+  return buildPageMetadata(locale, dict, {
+    title: dict.metaBlogTitle,
+    description: dict.metaBlogDescription,
+    path: "/blog",
+  });
+}
+
+export default async function BlogPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale: rawLocale } = await params;
+  const sp = await searchParams;
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const posts = await fetchBlogPosts();
+  const page = Math.max(1, Number(sp.page) || 1);
+  const { posts, next, count } = await fetchBlogPosts({ page, pageSize: BLOG_LIST_PAGE_SIZE });
+  const totalPages = blogListTotalPages(count, page, !!next);
 
   return (
-    <PageSection>
+    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogRoot(locale, dict)}>
       <PageHeader
         title={dict.blogTitle}
         subtitle={dict.blogSubtitle}
         icon={<MdArticle size={28} aria-hidden />}
+        actions={
+          <CreateActionButton roles={["Blogger", "Editor"]} href={paths(locale).blogNew} label={dict.createPost} />
+        }
       />
       <BlogPostCards locale={locale} dict={dict} posts={posts} />
-    </PageSection>
+      <BlogPagination
+        locale={locale}
+        page={page}
+        totalPages={totalPages}
+        labels={{
+          prev: dict.paginationPrev ?? "Poprzednia",
+          next: dict.paginationNext ?? "Następna",
+          page: dict.paginationPage ?? "Strona {n}",
+        }}
+      />
+    </AppPage>
   );
 }

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { MdApartment } from "react-icons/md";
 
 import { OrganizationDetailBody } from "@/components/OrganizationDetailBody";
-import { PageHeader } from "@/components/PageHeader";
-import { PageSection } from "@/components/PageSection";
+import { OrganizationDetailHeader } from "@/components/OrganizationDetailHeader";
+import { AppPage } from "@/components/layout/AppPage";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchTransportOrganization } from "@/lib/api/cases";
+import { casesOrganization } from "@/lib/nav/breadcrumbTrails";
 import { text } from "@/lib/format";
 
 export default async function OrganizationDetailPage({
@@ -16,20 +16,22 @@ export default async function OrganizationDetailPage({
 }) {
   const { locale: rawLocale, id } = await params;
   if (!locales.includes(rawLocale as Locale)) notFound();
-  const dict = await getDictionary(rawLocale as Locale);
+  const locale = rawLocale as Locale;
+  const dict = await getDictionary(locale);
 
   const orgId = Number(id);
   if (!Number.isFinite(orgId)) notFound();
   const organization = await fetchTransportOrganization(orgId);
+  const orgLabel = text(organization.transport_organization);
 
   return (
-    <PageSection>
-      <PageHeader
-        title={text(organization.transport_organization)}
-        subtitle={`${dict.region}: ${text(organization.region)}`}
-        icon={<MdApartment size={28} aria-hidden />}
-      />
-      <OrganizationDetailBody organization={organization} dict={dict} />
-    </PageSection>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={casesOrganization(locale, dict, orgId, orgLabel, { linkOrg: false })}
+    >
+      <OrganizationDetailHeader organization={organization} dict={dict} locale={locale} />
+      <OrganizationDetailBody organization={organization} dict={dict} locale={locale} />
+    </AppPage>
   );
 }

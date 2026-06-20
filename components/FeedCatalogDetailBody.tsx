@@ -1,8 +1,5 @@
 "use client";
 
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,6 +12,7 @@ import { DownloadActions } from "@/app/[locale]/(site)/data/feeds/[id]/DownloadA
 import { OriginalCell } from "@/components/OriginalCell";
 import { TableCard } from "@/components/TableCard";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { tableHeadRowSx } from "@/lib/ui/tableSx";
 
 export type FeedDetailRow = {
   type: string;
@@ -31,35 +29,13 @@ export type FeedDetailGroup = {
 
 export function FeedCatalogDetailBody({
   dict,
-  website,
-  contact,
-  phone,
   groups,
 }: {
   dict: Dictionary;
-  website: string;
-  contact: string;
-  phone: string;
   groups: FeedDetailGroup[];
 }) {
   return (
     <Stack spacing={3}>
-      <Card>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.website} value={website} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.contact} value={contact} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.phone} value={phone} />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
       {groups.length ? (
         <Stack spacing={3}>
           <Typography variant="h6">{dict.feedGroups}</Typography>
@@ -71,7 +47,7 @@ export function FeedCatalogDetailBody({
               <TableCard>
                 <Table size="small" sx={{ minWidth: 860 }}>
                   <TableHead>
-                    <TableRow sx={{ bgcolor: "grey.50" }}>
+                    <TableRow sx={tableHeadRowSx}>
                       <TableCell>{dict.feedTypes}</TableCell>
                       <TableCell sx={{ width: 120 }}>{dict.original}</TableCell>
                       <TableCell sx={{ width: 160 }}>{dict.interval}</TableCell>
@@ -107,17 +83,6 @@ export function FeedCatalogDetailBody({
           ))}
         </Stack>
       ) : null}
-    </Stack>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack spacing={0.5}>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-        {label}
-      </Typography>
-      <Typography variant="body2">{value}</Typography>
     </Stack>
   );
 }

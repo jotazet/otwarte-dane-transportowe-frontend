@@ -1,0 +1,176 @@
+"use client";
+
+import * as React from "react";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+
+import { MarkdownEditor } from "@/components/MarkdownEditor";
+import { FormActions } from "@/components/layout/FormActions";
+import type { Dictionary } from "@/i18n/getDictionary";
+import { useAuth } from "@/lib/auth/AuthContext";
+
+export function BlogPostForm({
+  locale,
+  dict,
+  postId,
+  initialTitle,
+  initialContent,
+  initialTags,
+  initialImage,
+}: {
+  locale: string;
+  dict: Dictionary;
+  postId?: number;
+  initialTitle?: string;
+  initialContent?: string;
+  initialTags?: string[];
+  initialImage?: string | null;
+}) {
+  const { apiJson, apiForm } = useAuth();
+  const router = useRouter();
+  const [title, setTitle] = React.useState(initialTitle ?? "");
+  const [content, setContent] = React.useState(initialContent ?? "");
+  const [tagsStr, setTagsStr] = React.useState((initialTags ?? []).join(", "));
+  const [imageUrl, setImageUrl] = React.useState(initialImage ?? "");
+  const [imageFile, setImageFile] = React.useState<File | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [pending, setPending] = React.useState(false);
+
+  function parseTags(): string[] {
+    const raw = tagsStr
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    return [...new Set(raw)].slice(0, 5).map((t) => t.slice(0, 16));
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+    try {
+      const tags = parseTags();
+      const trimmedTitle = title.trim().slice(0, 24);
+      let id: number;
+
+      if (imageFile) {
+        const form = new FormData();
+        form.append("title", trimmedTitle);
+        form.append("content", content);
+        tags.forEach((t) => form.append("tags", t));
+        form.append("image", imageFile);
+        if (postId == null) {
+          const created = await apiForm<{ id: number }>("POST", "/api/blog/posts/", form);
+          id = created.id;
+        } else {
+          await apiForm("PATCH", `/api/blog/posts/${postId}/`, form);
+          id = postId;
+        }
+      } else {
+        const body = {
+          title: trimmedTitle,
+          content,
+          tags,
+          image: imageUrl.trim() || null,
+        };
+        if (postId == null) {
+          const created = await apiJson<{ id: number }>("POST", "/api/blog/posts/", body);
+          id = created.id;
+        } else {
+          await apiJson("PATCH", `/api/blog/posts/${postId}/`, body);
+          id = postId;
+        }
+      }
+      router.replace(`/${locale}/blog/${id}`);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setPending(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+          {dict.blogPostFormHint}
+        </Typography>
+        {error ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        ) : null}
+        <Box component="form" onSubmit={submit} noValidate>
+          <Stack spacing={2}>
+            <TextField
+              label={dict.postTitle}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              slotProps={{ htmlInput: { maxLength: 24 } }}
+              helperText={`${title.length}/24`}
+              disabled={pending}
+            />
+            <TextField
+              label={dict.tags}
+              value={tagsStr}
+              onChange={(e) => setTagsStr(e.target.value)}
+              helperText={dict.blogTagsHint}
+              disabled={pending}
+            />
+            <TextField
+              label={dict.blogImageUrl}
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              disabled={pending || !!imageFile}
+              fullWidth
+            />
+            <Button variant="outlined" component="label" disabled={pending} sx={{ alignSelf: "flex-start" }}>
+              {dict.blogImageFile ?? dict.chooseFile}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+              />
+            </Button>
+            {imageFile ? (
+              <Typography variant="caption" color="text.secondary">
+                {imageFile.name}
+              </Typography>
+            ) : null}
+            <MarkdownEditor
+              id="blog-post-content"
+              label={dict.postContent}
+              value={content}
+              onChange={setContent}
+              disabled={pending}
+              helperText={dict.blogMarkdownHint}
+            />
+            <FormActions>
+              <Button type="submit" variant="contained" disabled={pending || !title.trim() || !content}>
+                {dict.save}
+              </Button>
+              <Button
+                component={NextLink}
+                href={postId != null ? `/${locale}/blog/${postId}` : `/${locale}/blog`}
+                prefetch={false}
+                disabled={pending}
+              >
+                {dict.cancel}
+              </Button>
+            </FormActions>
+          </Stack>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}

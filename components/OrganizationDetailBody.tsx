@@ -1,56 +1,81 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { MdAdd, MdDelete, MdEdit } from "react-icons/md";
 
+import { OrganizationProvidersPanel } from "@/components/OrganizationProvidersPanel";
 import { TableCard } from "@/components/TableCard";
 import type { TransportOrganizationDetail } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
-import { formatDate, text } from "@/lib/format";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { hasHelperAccess } from "@/lib/auth/permissions";
+import { caseStatusLabel } from "@/lib/cases/statusChoices";
+import { formatDateTime, text } from "@/lib/format";
+import { tableHeadRowSx } from "@/lib/ui/tableSx";
+
+type StatusRow = NonNullable<TransportOrganizationDetail["statuses"]>[number];
+
+function statusLabel(s: StatusRow, labels: Dictionary["caseStatusLabels"]) {
+  if (s.status) return caseStatusLabel(s.status, labels);
+  return text(s.status_display ?? s.status);
+}
 
 export function OrganizationDetailBody({
   organization,
   dict,
+  locale,
 }: {
   organization: TransportOrganizationDetail;
   dict: Dictionary;
+  locale: string;
 }) {
   const providers = organization.data_providers ?? [];
   const statuses = organization.statuses ?? [];
+  const auth = useAuth();
+  const router = useRouter();
+  const canManage =
+    auth.status === "authenticated" &&
+    hasHelperAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin });
+
+  async function deleteStatus(id: number) {
+    if (!confirm(dict.confirmDeleteStatus)) return;
+    try {
+      await auth.apiJson("DELETE", `/api/cases/case-statuses/${id}/`);
+      router.refresh();
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <Stack spacing={3}>
-      <Card>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.website} value={text(organization.website)} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.contact} value={text(organization.contact_email)} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Detail label={dict.phone} value={text(organization.phone_number)} />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {providers.length ? (
+      {canManage ? (
+        <OrganizationProvidersPanel
+          locale={locale}
+          dict={dict}
+          organizationId={organization.id}
+          linked={providers}
+        />
+      ) : providers.length ? (
         <Stack spacing={1.5}>
           <Typography variant="h6">{dict.providers}</Typography>
           <TableCard>
             <Table size="small" sx={{ minWidth: 720 }}>
               <TableHead>
-                <TableRow sx={{ bgcolor: "grey.50" }}>
+                <TableRow sx={tableHeadRowSx}>
                   <TableCell>{dict.providers}</TableCell>
                   <TableCell>{dict.website}</TableCell>
                   <TableCell>{dict.contact}</TableCell>
@@ -70,44 +95,96 @@ export function OrganizationDetailBody({
         </Stack>
       ) : null}
 
-      {statuses.length ? (
+      {(canManage || statuses.length > 0) && (
         <Stack spacing={1.5}>
-          <Typography variant="h6">{dict.caseStatuses}</Typography>
-          <TableCard>
-            <Table size="small" sx={{ minWidth: 620 }}>
-              <TableHead>
-                <TableRow sx={{ bgcolor: "grey.50" }}>
-                  <TableCell sx={{ width: 180 }}>{dict.latestStatus}</TableCell>
-                  <TableCell sx={{ width: 140 }}>{dict.updated}</TableCell>
-                  <TableCell>{dict.description}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {statuses.map((s, idx) => (
-                  <TableRow key={idx} hover>
-                    <TableCell sx={{ fontWeight: 600 }}>
-                      {text(s.status_display ?? s.status)}
-                    </TableCell>
-                    <TableCell>{formatDate(s.date)}</TableCell>
-                    <TableCell>{text(s.description)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            <Typography variant="h6" sx={{ flex: 1 }}>
+              {dict.caseStatuses}
+            </Typography>
+            {canManage ? (
+              <Tooltip title={dict.addStatus}>
+                <IconButton
+                  component={NextLink}
+                  href={`/${locale}/cases/organizations/${organization.id}/statuses/new`}
+                  prefetch={false}
+                  size="small"
+                  color="primary"
+                  aria-label={dict.addStatus}
+                >
+                  <MdAdd size={20} aria-hidden />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </Stack>
+          {statuses.length ? (
+            <Card variant="outlined">
+              <CardContent>
+                <Stack spacing={1.5}>
+                  {statuses.map((s, i) => (
+                    <Box
+                      key={s.id ?? i}
+                      sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 1.5,
+                        pl: 2,
+                        borderLeft: 2,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {statusLabel(s, dict.caseStatusLabels)}
+                        </Typography>
+                        {s.description ? (
+                          <Typography variant="body2" color="text.secondary">
+                            {s.description}
+                          </Typography>
+                        ) : null}
+                        {s.date ? (
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDateTime(s.date, locale)}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                      {canManage && s.id ? (
+                        <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
+                          <Tooltip title={dict.edit}>
+                            <IconButton
+                              component={NextLink}
+                              href={`/${locale}/cases/organizations/${organization.id}/statuses/${s.id}/edit`}
+                              prefetch={false}
+                              size="small"
+                              color="primary"
+                              aria-label={dict.edit}
+                            >
+                              <MdEdit size={18} aria-hidden />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={dict.delete}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              aria-label={dict.delete}
+                              onClick={() => void deleteStatus(s.id!)}
+                            >
+                              <MdDelete size={18} aria-hidden />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      ) : null}
+                    </Box>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          ) : canManage ? (
+            <Typography variant="body2" color="text.secondary">
+              {dict.noStatusesYet}
+            </Typography>
+          ) : null}
         </Stack>
-      ) : null}
-    </Stack>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack spacing={0.5}>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-        {label}
-      </Typography>
-      <Typography variant="body2">{value}</Typography>
+      )}
     </Stack>
   );
 }

@@ -1,13 +1,14 @@
 import { Locale } from "@/i18n/locales";
-import { dictDe } from "@/i18n/pl_en/de";
-import { dictEn } from "@/i18n/pl_en/en";
-import { dictPl } from "@/i18n/pl_en/pl";
+import type { Dictionary } from "@/i18n/dictionary";
+import { dictDe } from "@/i18n/lang/de";
+import { dictEn } from "@/i18n/lang/en";
+import { dictPl } from "@/i18n/lang/pl";
 
-export type Dictionary = Record<string, string>;
+export type { Dictionary } from "@/i18n/dictionary";
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
-  if (locale === "en") return dictEn as Dictionary;
-  if (locale === "de") return dictDe as Dictionary;
-  return dictPl as Dictionary;
+  if (locale === "en") return dictEn;
+  if (locale === "de") return dictDe;
+  return dictPl;
 }
 

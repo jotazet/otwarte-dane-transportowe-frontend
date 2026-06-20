@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,15 +9,21 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
-import { MdCancel, MdCheckCircle } from "react-icons/md";
+import { MdCancel, MdCheckCircle, MdEdit } from "react-icons/md";
 
 import { TableCard } from "@/components/TableCard";
 import { TableFilterSelect } from "@/components/TableFilterSelect";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { hasDataProviderAccess, hasHelperAccess } from "@/lib/auth/permissions";
+import { paths } from "@/lib/nav/routes";
 import { text } from "@/lib/format";
+import { useTableSort } from "@/lib/ui/useTableSort";
+import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 import { FeedCatalogOrganizationListItem } from "@/lib/api/dataCatalog";
 
 type SortColumn = "organization" | "region";
@@ -45,12 +52,22 @@ export function DataCatalogTable({
     realtimeFeeds: string;
     publicOrganization: string;
     all: string;
+    actions: string;
+    edit: string;
   };
 }) {
+  const auth = useAuth();
+  const p = paths(locale);
+  const userClaims =
+    auth.status === "authenticated"
+      ? { roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin }
+      : null;
+  const canManage =
+    userClaims &&
+    (hasDataProviderAccess(userClaims) || hasHelperAccess(userClaims));
   const [staticType, setStaticType] = useState<string | "">("");
   const [realtimeType, setRealtimeType] = useState<string | "">("");
-  const [sortColumn, setSortColumn] = useState<SortColumn>("organization");
-  const [sortAscending, setSortAscending] = useState(true);
+  const { sortColumn, sortAscending, toggleSort } = useTableSort<SortColumn>("organization");
 
   const staticTypes = useMemo(() => {
     const set = new Set<string>();
@@ -91,30 +108,11 @@ export function DataCatalogTable({
     });
   }, [organizations, realtimeType, sortAscending, sortColumn, staticType]);
 
-  function toggleSort(col: SortColumn) {
-    if (sortColumn === col) setSortAscending((v) => !v);
-    else {
-      setSortColumn(col);
-      setSortAscending(true);
-    }
-  }
-
   return (
     <TableCard>
       <Table size="small" sx={{ minWidth: 980 }}>
         <TableHead>
-          <TableRow
-            sx={(theme) => ({
-              bgcolor: theme.palette.grey[100],
-              "& th": {
-                fontWeight: 600,
-                fontSize: "0.8125rem",
-                letterSpacing: "0.02em",
-                color: "text.primary",
-                borderBottom: `2px solid ${theme.palette.divider}`,
-              },
-            })}
-          >
+          <TableRow sx={tableHeadRowSx}>
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "organization"}
@@ -202,17 +200,12 @@ export function DataCatalogTable({
               </Box>
             </TableCell>
             <TableCell>{dict.publicOrganization}</TableCell>
+            {canManage ? <TableCell sx={{ width: 96 }}>{dict.actions}</TableCell> : null}
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((org) => (
-            <TableRow
-              key={org.id}
-              hover
-              sx={(theme) => ({
-                "&:nth-of-type(even)": { bgcolor: theme.palette.grey[50] },
-              })}
-            >
+            <TableRow key={org.id} hover sx={tableZebraRowSx}>
               <TableCell>
                 <Link
                   component={NextLink}
@@ -230,6 +223,26 @@ export function DataCatalogTable({
               <TableCell>
                 <BoolCell value={org.is_public} />
               </TableCell>
+              {canManage ? (
+                <TableCell>
+                  <Tooltip title={dict.edit}>
+                    <IconButton
+                      component={NextLink}
+                      href={
+                        userClaims && hasHelperAccess(userClaims)
+                          ? `${p.queue}?organization=${org.id}`
+                          : `${p.mySubmissions}?organization=${org.id}`
+                      }
+                      prefetch={false}
+                      size="small"
+                      color="primary"
+                      aria-label={dict.edit}
+                    >
+                      <MdEdit size={20} aria-hidden />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              ) : null}
             </TableRow>
           ))}
         </TableBody>

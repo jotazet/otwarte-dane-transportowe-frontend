@@ -1,0 +1,34 @@
+import { notFound } from "next/navigation";
+import { MdPerson } from "react-icons/md";
+
+import { UserDetailBody } from "@/components/UserDetailBody";
+import { AppPage } from "@/components/layout/AppPage";
+import { PageHeader } from "@/components/PageHeader";
+import { resolvePageLocale } from "@/lib/i18n/resolvePageLocale";
+import { userDetail } from "@/lib/nav/breadcrumbTrails";
+
+export default async function UserDetailPage({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  const { locale, dict } = await resolvePageLocale(params);
+  const { id } = await params;
+  const userId = Number(id);
+  if (!Number.isFinite(userId)) notFound();
+
+  return (
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={userDetail(locale, dict, userId, `#${userId}`)}
+    >
+      <PageHeader
+        title={`${dict.users} #${userId}`}
+        subtitle={dict.usersDesc}
+        icon={<MdPerson size={28} aria-hidden />}
+      />
+      <UserDetailBody locale={locale} dict={dict} userId={userId} />
+    </AppPage>
+  );
+}

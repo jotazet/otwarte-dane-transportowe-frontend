@@ -1,12 +1,31 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MdDataset } from "react-icons/md";
 
 import { DataCatalogTable } from "@/app/[locale]/(site)/data/DataCatalogTable";
+import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
-import { PageSection } from "@/components/PageSection";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalog } from "@/lib/api/dataCatalog";
+import { dataCatalog } from "@/lib/nav/breadcrumbTrails";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  if (!locales.includes(rawLocale as Locale)) return {};
+  const locale = rawLocale as Locale;
+  const dict = await getDictionary(locale);
+  return buildPageMetadata(locale, dict, {
+    title: dict.metaDataTitle,
+    description: dict.metaDataDescription,
+    path: "/data",
+  });
+}
 
 export default async function DataPage({
   params,
@@ -20,7 +39,7 @@ export default async function DataPage({
   const organizations = await fetchFeedCatalog();
 
   return (
-    <PageSection>
+    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataCatalog(locale, dict)}>
       <PageHeader
         title={dict.dataTitle}
         subtitle={dict.dataSubtitle}
@@ -36,8 +55,10 @@ export default async function DataPage({
           realtimeFeeds: dict.realtimeFeeds,
           publicOrganization: dict.publicOrganization,
           all: dict.all,
+          actions: dict.actions,
+          edit: dict.edit,
         }}
       />
-    </PageSection>
+    </AppPage>
   );
 }
