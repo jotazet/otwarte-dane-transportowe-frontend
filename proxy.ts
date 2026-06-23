@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { locales, type Locale } from "@/i18n/locales";
+import { isLoginRequiredPath } from "@/lib/nav/protectedRoutes";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
@@ -24,9 +25,7 @@ export function proxy(req: NextRequest) {
 
   if (localeInPath) {
     const rest = pathname.slice(`/${localeInPath}`.length) || "/";
-    const protectedPaths = ["/data/queue"];
-    const isProtected = protectedPaths.some((p) => rest === p || rest.startsWith(`${p}/`));
-    if (isProtected && req.cookies.get("odt.auth")?.value !== "1") {
+    if (isLoginRequiredPath(rest) && req.cookies.get("odt.auth")?.value !== "1") {
       const url = req.nextUrl.clone();
       url.pathname = `/${localeInPath}/login`;
       url.searchParams.set("returnUrl", pathname);

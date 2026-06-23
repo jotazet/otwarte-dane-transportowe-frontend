@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
+import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormActions } from "@/components/layout/FormActions";
 import { FormSection } from "@/components/layout/FormSection";
@@ -26,10 +27,11 @@ import { StageBanner } from "@/components/layout/StageBanner";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
-import type { SubmissionHistoryEvent } from "@/lib/api/types";
+import type { FetchHealthFields, SubmissionHistoryEvent } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { hasHelperAccess } from "@/lib/auth/permissions";
+import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
 import { authTypeOptions } from "@/lib/data/authTypes";
 import {
@@ -40,7 +42,7 @@ import {
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 
-type StaticEntry = {
+type StaticEntry = FetchHealthFields & {
   id: number;
   url?: string | null;
   license?: string | null;
@@ -140,6 +142,25 @@ export function FeedSubmissionDetail({
   }
 
   const user = perms.user!;
+  const forbidden = !canViewSubmissionInContext(user, {
+    listContext,
+    submittedBy: row.submitted_by,
+  });
+
+  if (forbidden) {
+    return (
+      <SubmissionDetailAuthGate
+        locale={locale}
+        dict={dict}
+        error={error}
+        hasData
+        forbidden
+      >
+        <></>
+      </SubmissionDetailAuthGate>
+    );
+  }
+
   const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const isHelper = hasHelperAccess(user);
   const isDjangoAdmin = user.isDjangoAdmin;
@@ -311,6 +332,21 @@ export function FeedSubmissionDetail({
         />
       ) : null}
 
+      {showHelperPanel &&
+      row.current_stage >= 4 &&
+      row.static_entry?.id != null &&
+      (row.static_entry.hide_original || row.static_entry.fetch_status != null) ? (
+        <FeedFetchHealthPanel
+          locale={locale}
+          dict={dict}
+          kind="static"
+          entryId={row.static_entry.id}
+          title={dict.fetchHealthSection}
+          health={row.static_entry}
+          onChanged={() => void load()}
+        />
+      ) : null}
+
       {canEditMeta ? (
         <FormSection title={`${dict.name} / ${dict.note}`}>
           <Stack spacing={2}>
@@ -414,15 +450,16 @@ export function FeedSubmissionDetail({
                 disabled={sourceFieldsDisabled || limitedOnly}
               />
               {authType ? (
-                <TextField
+                <PasswordTextField
                   label={dict.authValue}
-                  type="password"
                   value={authValue}
                   onChange={(e) => setAuthValue(e.target.value)}
                   helperText={`${dict.authValueNewOnly} - ${dict.authValueHint}`}
                   autoComplete="new-password"
                   fullWidth
                   disabled={sourceFieldsDisabled || limitedOnly}
+                  showPasswordLabel={dict.showPassword}
+                  hidePasswordLabel={dict.hidePassword}
                 />
               ) : null}
               <Stack direction="row" spacing={2}>
@@ -479,13 +516,14 @@ export function FeedSubmissionDetail({
                 options={authTypeSelectOptions}
               />
               {authType ? (
-                <TextField
+                <PasswordTextField
                   label={dict.authValue}
-                  type="password"
                   value={authValue}
                   onChange={(e) => setAuthValue(e.target.value)}
                   helperText={dict.authValueNewOnly}
                   fullWidth
+                  showPasswordLabel={dict.showPassword}
+                  hidePasswordLabel={dict.hidePassword}
                 />
               ) : null}
               <FormActions>

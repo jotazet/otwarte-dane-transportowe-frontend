@@ -16,6 +16,7 @@ import NextLink from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MdLock } from "react-icons/md";
 
+import { PasswordTextField } from "@/components/PasswordTextField";
 import { OdtLogo } from "@/components/OdtLogo";
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -33,6 +34,8 @@ export function LoginView({
     backHome: string;
     invalidCredentials?: string;
     loginFailed?: string;
+    showPassword?: string;
+    hidePassword?: string;
   };
 }) {
   const auth = useAuth();
@@ -115,16 +118,17 @@ export function LoginView({
                     autoFocus
                     disabled={pending}
                   />
-                  <TextField
+                  <PasswordTextField
                     label={labels.password}
                     name="password"
-                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password"
                     fullWidth
                     required
                     disabled={pending}
+                    showPasswordLabel={labels.showPassword}
+                    hidePasswordLabel={labels.hidePassword}
                   />
                   <Button
                     type="submit"

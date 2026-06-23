@@ -7,8 +7,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
 
+import { PasswordTextField } from "@/components/PasswordTextField";
 import type { Dictionary } from "@/i18n/getDictionary";
 
 export function GeneratedPasswordDialog({
@@ -45,11 +45,13 @@ export function GeneratedPasswordDialog({
         <Alert severity="warning" sx={{ mb: 2 }}>
           {dict.generatedPasswordHint}
         </Alert>
-        <TextField
+        <PasswordTextField
           fullWidth
           label={dict.password}
           value={password ?? ""}
           slotProps={{ input: { readOnly: true } }}
+          showPasswordLabel={dict.showPassword}
+          hidePasswordLabel={dict.hidePassword}
         />
       </DialogContent>
       <DialogActions>

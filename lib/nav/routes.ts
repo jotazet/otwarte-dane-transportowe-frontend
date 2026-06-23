@@ -25,6 +25,7 @@ export function paths(locale: string) {
     queue: `${base}/data/queue`,
     queueFeed: (id: number) => `${base}/data/queue/feed/${id}`,
     queueRealtime: (id: number) => `${base}/data/queue/realtime/${id}`,
+    feedOps: `${base}/data/feed-ops`,
     info: `${base}/info`,
     users: `${base}/users`,
     usersNew: `${base}/users/new`,
@@ -51,7 +52,8 @@ export function navActiveHref(pathname: string, locale: string, candidates: stri
     if (href === `/${locale}/data`) {
       if (
         pathname.startsWith(`/${locale}/data/my-submissions`) ||
-        pathname.startsWith(`/${locale}/data/queue`)
+        pathname.startsWith(`/${locale}/data/queue`) ||
+        pathname.startsWith(`/${locale}/data/feed-ops`)
       ) {
         return false;
       }

@@ -1,10 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Alert from "@mui/material/Alert";
-import Link from "@mui/material/Link";
-import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 
+import { EmptyState } from "@/components/layout/EmptyState";
+import { ForbiddenState } from "@/components/layout/ForbiddenState";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -15,27 +15,48 @@ export function SubmissionDetailAuthGate({
   dict,
   error,
   hasData,
+  forbidden,
   children,
 }: {
   locale: string;
   dict: Dictionary;
   error: string | null;
   hasData: boolean;
+  forbidden?: boolean;
   children: ReactNode;
 }) {
   const auth = useAuth();
+  const pathname = usePathname() || "";
+  const loginHref =
+    pathname.startsWith(`/${locale}`)
+      ? paths(locale).login(pathname)
+      : paths(locale).login();
+
+  if (auth.status === "loading") {
+    return <LoadingBlock label={dict.loading} />;
+  }
 
   if (auth.status !== "authenticated") {
     return (
-      <Alert severity="info">
-        <Link component={NextLink} href={paths(locale).login()} prefetch={false}>
-          {dict.requiresLogin}
-        </Link>
-      </Alert>
+      <EmptyState
+        title={dict.requiresLogin}
+        actionLabel={dict.login}
+        actionHref={loginHref}
+      />
     );
   }
 
-  if (error && !hasData) return <Alert severity="error">{error}</Alert>;
+  if (forbidden) {
+    return (
+      <ForbiddenState
+        message={dict.forbidden}
+        loginHref={paths(locale).home}
+        loginLabel={dict.home ?? dict.login}
+      />
+    );
+  }
+
+  if (error && !hasData) return <ForbiddenState message={error} />;
   if (!hasData) return <LoadingBlock label={dict.loading} />;
 
   return <>{children}</>;

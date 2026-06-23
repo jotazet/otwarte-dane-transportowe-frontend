@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Autocomplete from "@mui/material/Autocomplete";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
@@ -18,12 +17,13 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { MdEdit } from "react-icons/md";
 
+import { TableCard } from "@/components/TableCard";
 import { getJson } from "@/lib/api/http";
 import type { DataProviderRecord } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
-import { mutedPanelSx, tableHeadRowSx } from "@/lib/ui/tableSx";
+import { tableHeadRowSx } from "@/lib/ui/tableSx";
 
 export function OrganizationProvidersPanel({
   locale,
@@ -114,7 +114,7 @@ export function OrganizationProvidersPanel({
       </Button>
 
       {linked.some((p) => p.id) ? (
-        <BorderedTable title={dict.linkedProviders}>
+        <TableCard>
           <Table size="small" sx={{ minWidth: 640 }}>
             <TableHead>
               <TableRow sx={tableHeadRowSx}>
@@ -150,33 +150,12 @@ export function OrganizationProvidersPanel({
               )}
             </TableBody>
           </Table>
-        </BorderedTable>
+        </TableCard>
       ) : (
         <Typography variant="body2" color="text.secondary">
           {dict.noLinkedProviders}
         </Typography>
       )}
     </Stack>
-  );
-}
-
-function BorderedTable({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <Box sx={{ borderRadius: 2, border: 1, borderColor: "divider", overflow: "hidden" }}>
-      <Box
-        sx={(theme) => ({
-          px: 2,
-          py: 1,
-          ...mutedPanelSx(theme),
-          borderBottom: 1,
-          borderColor: "divider",
-        })}
-      >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-          {title}
-        </Typography>
-      </Box>
-      {children}
-    </Box>
   );
 }

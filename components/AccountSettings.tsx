@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
+import { PasswordTextField } from "@/components/PasswordTextField";
 import { DetailField } from "@/components/layout/DetailField";
 import { FormSection } from "@/components/layout/FormSection";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
@@ -148,14 +149,15 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
         {emailError ? <Alert severity="error" sx={{ mb: 2 }}>{emailError}</Alert> : null}
         <Box component="form" onSubmit={submitEmail} noValidate>
           <Stack spacing={2}>
-            <TextField
-              type="password"
+            <PasswordTextField
               label={dict.currentPassword}
               value={emailPassword}
               onChange={(e) => setEmailPassword(e.target.value)}
               required
               disabled={emailPending}
               autoComplete="current-password"
+              showPasswordLabel={dict.showPassword}
+              hidePasswordLabel={dict.hidePassword}
             />
             <TextField
               type="email"
@@ -178,32 +180,35 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
         {passwordError ? <Alert severity="error" sx={{ mb: 2 }}>{passwordError}</Alert> : null}
         <Box component="form" onSubmit={submitPassword} noValidate>
           <Stack spacing={2}>
-            <TextField
-              type="password"
+            <PasswordTextField
               label={dict.currentPassword}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
               disabled={passwordPending}
               autoComplete="current-password"
+              showPasswordLabel={dict.showPassword}
+              hidePasswordLabel={dict.hidePassword}
             />
-            <TextField
-              type="password"
+            <PasswordTextField
               label={dict.newPassword}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
               disabled={passwordPending}
               autoComplete="new-password"
+              showPasswordLabel={dict.showPassword}
+              hidePasswordLabel={dict.hidePassword}
             />
-            <TextField
-              type="password"
+            <PasswordTextField
               label={dict.confirmPassword}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={passwordPending}
               autoComplete="new-password"
+              showPasswordLabel={dict.showPassword}
+              hidePasswordLabel={dict.hidePassword}
             />
             <Button type="submit" variant="contained" disabled={passwordPending}>
               {dict.save}

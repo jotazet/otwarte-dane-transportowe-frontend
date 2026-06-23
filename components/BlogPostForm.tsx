@@ -12,15 +12,18 @@ import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
+import { AccessGate } from "@/components/AccessGate";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { FormActions } from "@/components/layout/FormActions";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { usePermissions } from "@/lib/auth/usePermissions";
 
 export function BlogPostForm({
   locale,
   dict,
   postId,
+  authorId,
   initialTitle,
   initialContent,
   initialTags,
@@ -29,12 +32,14 @@ export function BlogPostForm({
   locale: string;
   dict: Dictionary;
   postId?: number;
+  authorId?: number;
   initialTitle?: string;
   initialContent?: string;
   initialTags?: string[];
   initialImage?: string | null;
 }) {
   const { apiJson, apiForm } = useAuth();
+  const perms = usePermissions();
   const router = useRouter();
   const [title, setTitle] = React.useState(initialTitle ?? "");
   const [content, setContent] = React.useState(initialContent ?? "");
@@ -98,6 +103,20 @@ export function BlogPostForm({
   }
 
   return (
+    <AccessGate
+      roles={["Blogger", "Editor"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
+      {postId != null && authorId != null && !perms.canBlogEditPost(authorId) ? (
+        <Alert severity="warning">{dict.forbidden}</Alert>
+      ) : (
     <Card>
       <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
@@ -172,5 +191,7 @@ export function BlogPostForm({
         </Box>
       </CardContent>
     </Card>
+      )}
+    </AccessGate>
   );
 }

@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 
+import { AccessGate } from "@/components/AccessGate";
 import { GeneratedPasswordDialog } from "@/components/GeneratedPasswordDialog";
 import { DetailField } from "@/components/layout/DetailField";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
@@ -111,13 +112,54 @@ export function UserDetailBody({
     }
   }
 
-  if (loading) return <LoadingBlock />;
+  if (loading) {
+    return (
+      <AccessGate
+        roles={["Admin"]}
+        mode="empty"
+        locale={locale}
+        dict={{
+          requiresLogin: dict.requiresLogin,
+          login: dict.login,
+          forbidden: dict.forbidden,
+          home: dict.home,
+        }}
+      >
+        <LoadingBlock />
+      </AccessGate>
+    );
+  }
 
   if (!user) {
-    return error ? <Alert severity="error">{error}</Alert> : null;
+    return (
+      <AccessGate
+        roles={["Admin"]}
+        mode="empty"
+        locale={locale}
+        dict={{
+          requiresLogin: dict.requiresLogin,
+          login: dict.login,
+          forbidden: dict.forbidden,
+          home: dict.home,
+        }}
+      >
+        {error ? <Alert severity="error">{error}</Alert> : null}
+      </AccessGate>
+    );
   }
 
   return (
+    <AccessGate
+      roles={["Admin"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
     <Stack spacing={3}>
       {error ? <Alert severity="error">{error}</Alert> : null}
 
@@ -195,5 +237,6 @@ export function UserDetailBody({
         dict={dict}
       />
     </Stack>
+    </AccessGate>
   );
 }

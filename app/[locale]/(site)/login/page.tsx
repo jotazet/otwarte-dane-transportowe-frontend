@@ -30,6 +30,8 @@ export default async function LoginPage({
           backHome: dict.backHome,
           invalidCredentials: dict.loginInvalid,
           loginFailed: dict.loginFailed,
+          showPassword: dict.showPassword,
+          hidePassword: dict.hidePassword,
         }}
       />
       </Suspense>

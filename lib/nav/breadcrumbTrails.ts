@@ -52,6 +52,10 @@ export function dataQueue(locale: string, dict: Dictionary): BreadcrumbItem[] {
   ];
 }
 
+export function dataFeedOps(locale: string, dict: Dictionary): BreadcrumbItem[] {
+  return [{ label: dict.feedOps }];
+}
+
 export function dataSubmissionDetail(
   locale: string,
   dict: Dictionary,

@@ -17,18 +17,17 @@ import Tabs from "@mui/material/Tabs";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import MuiLink from "@mui/material/Link";
-import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { MdAdd, MdDelete } from "react-icons/md";
 
+import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
+import { PasswordTextField } from "@/components/PasswordTextField";
 import { getJson } from "@/lib/api/http";
 import type { TransportOrganizationListItem } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { submissionDetailPath } from "@/lib/nav/routes";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { hasDataProviderAccess } from "@/lib/auth/permissions";
 import {
   hideOriginalOnAuthChange,
   isHideOriginalLockedByAuth,
@@ -193,8 +192,6 @@ export function DataSubmitForm({
 
   React.useEffect(() => {
     if (auth.status !== "authenticated") return;
-    if (!hasDataProviderAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin })) return;
-
     if (protocol === "gbfs" || rtOrgId === "") {
       setEligibleStatics([]);
       setEligibleError(null);
@@ -394,21 +391,18 @@ export function DataSubmitForm({
     return <LoadingBlock label={dict.loading} />;
   }
 
-  if (auth.status !== "authenticated") {
-    return (
-      <Alert severity="info">
-        {dict.requiresLogin} -{" "}
-        <MuiLink component={NextLink} href={`/${locale}/login`} prefetch={false} sx={{ fontWeight: 700 }}>
-          {dict.login}
-        </MuiLink>
-      </Alert>
-    );
-  }
-  if (!hasDataProviderAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin })) {
-    return <Alert severity="warning">{dict.forbidden}</Alert>;
-  }
-
   return (
+    <AccessGate
+      roles={["DataProvider"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
     <Card>
       <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
@@ -514,14 +508,15 @@ export function DataSubmitForm({
                     options={authTypeSelectOptions}
                   />
                   {staticAuthType ? (
-                    <TextField
+                    <PasswordTextField
                       label={dict.authValue}
-                      type="password"
                       value={staticAuthValue}
                       onChange={(e) => setStaticAuthValue(e.target.value)}
                       disabled={pending}
                       helperText={dict.authValueHint}
                       autoComplete="new-password"
+                      showPasswordLabel={dict.showPassword}
+                      hidePasswordLabel={dict.hidePassword}
                     />
                   ) : null}
                 </>
@@ -746,9 +741,8 @@ export function DataSubmitForm({
                       options={authTypeSelectOptions}
                     />
                     {ep.auth_type ? (
-                      <TextField
+                      <PasswordTextField
                         label={dict.authValue}
-                        type="password"
                         value={ep.auth_value}
                         onChange={(e) => {
                           const v = e.target.value;
@@ -758,6 +752,8 @@ export function DataSubmitForm({
                         helperText={dict.authValueHint}
                         sx={{ flex: 1 }}
                         autoComplete="new-password"
+                        showPasswordLabel={dict.showPassword}
+                        hidePasswordLabel={dict.hidePassword}
                       />
                     ) : null}
                   </Stack>
@@ -813,5 +809,6 @@ export function DataSubmitForm({
         )}
       </CardContent>
     </Card>
+    </AccessGate>
   );
 }

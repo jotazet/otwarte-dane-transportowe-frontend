@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 
+import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
 import { CrudFormActions } from "@/components/layout/CrudFormActions";
 import { CrudFormCard } from "@/components/layout/CrudFormCard";
@@ -79,6 +80,17 @@ export function CaseStatusForm({
   }
 
   return (
+    <AccessGate
+      roles={["Helper", "Admin"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
     <CrudFormCard error={error} onSubmit={save}>
       <Stack spacing={2}>
         <InlineSelect
@@ -107,5 +119,6 @@ export function CaseStatusForm({
         />
       </Stack>
     </CrudFormCard>
+    </AccessGate>
   );
 }

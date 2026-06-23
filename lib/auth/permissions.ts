@@ -151,6 +151,16 @@ export function canBlogEditPost(
   return false;
 }
 
+export function canViewSubmissionInContext(
+  user: Pick<AuthUserClaims, "roles" | "isDjangoAdmin" | "userId">,
+  ctx: { listContext: "my" | "queue"; submittedBy?: number | null },
+) {
+  if (user.isDjangoAdmin) return true;
+  if (ctx.listContext === "queue") return hasHelperAccess(user);
+  if (!hasDataProviderAccess(user)) return false;
+  return user.userId != null && ctx.submittedBy != null && user.userId === ctx.submittedBy;
+}
+
 export function canDeleteFeedSubmission(
   user: Pick<AuthUserClaims, "roles" | "isDjangoAdmin">,
   ctx: { isOwner: boolean; currentStage: number; isRejected: boolean },

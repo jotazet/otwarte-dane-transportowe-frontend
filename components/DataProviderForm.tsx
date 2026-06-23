@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 
+import { AccessGate } from "@/components/AccessGate";
 import { CrudFormActions } from "@/components/layout/CrudFormActions";
 import { CrudFormCard } from "@/components/layout/CrudFormCard";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -75,6 +76,17 @@ export function DataProviderForm({
   }
 
   return (
+    <AccessGate
+      roles={["Helper", "Admin"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
     <CrudFormCard error={error} onSubmit={save}>
       <Stack spacing={2}>
         <TextField label={dict.providerName} value={name} onChange={(e) => setName(e.target.value)} required disabled={pending} />
@@ -91,5 +103,6 @@ export function DataProviderForm({
         />
       </Stack>
     </CrudFormCard>
+    </AccessGate>
   );
 }

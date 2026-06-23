@@ -7,6 +7,29 @@ export function normalizeList<T>(data: ApiListResponse<T> | null | undefined): T
   return data.results ?? [];
 }
 
+/** DRF `PageNumberPagination` response shape. */
+export type PaginatedResponse<T> = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+};
+
+export type FetchStatus = "active" | "delayed" | "auto_paused" | "manual_paused";
+
+/** Proxy-fetch health fields exposed on static entries and realtime endpoints. */
+export type FetchHealthFields = {
+  fetch_status?: FetchStatus | null;
+  fetch_failure_count?: number | null;
+  next_fetch_after?: string | null;
+  fetch_paused_at?: string | null;
+  fetch_pause_reason?: string | null;
+  last_fetch_success_at?: string | null;
+  last_fetch_error_at?: string | null;
+  last_fetch_error_message?: string | null;
+  fetch_error_count_7d?: number | null;
+};
+
 export type SubmissionHistoryEvent = {
   event_type?: string;
   stage_before?: number | null;

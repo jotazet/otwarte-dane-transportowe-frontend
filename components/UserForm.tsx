@@ -12,6 +12,7 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 
+import { AccessGate } from "@/components/AccessGate";
 import { GeneratedPasswordDialog } from "@/components/GeneratedPasswordDialog";
 import { FormActions } from "@/components/layout/FormActions";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -150,6 +151,17 @@ export function UserForm({
   }
 
   return (
+    <AccessGate
+      roles={["Admin"]}
+      mode="empty"
+      locale={locale}
+      dict={{
+        requiresLogin: dict.requiresLogin,
+        login: dict.login,
+        forbidden: dict.forbidden,
+        home: dict.home,
+      }}
+    >
     <>
       {error ? (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -223,5 +235,6 @@ export function UserForm({
         dict={dict}
       />
     </>
+    </AccessGate>
   );
 }

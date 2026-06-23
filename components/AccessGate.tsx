@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 import { EmptyState } from "@/components/layout/EmptyState";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
@@ -39,6 +40,13 @@ export function AccessGate({
   forbiddenAlternateLabel?: string;
 }) {
   const auth = useAuth();
+  const pathname = usePathname() || "";
+  const loginHref =
+    locale && pathname.startsWith(`/${locale}`)
+      ? `/${locale}/login?returnUrl=${encodeURIComponent(pathname)}`
+      : locale
+        ? `/${locale}/login`
+        : "/login";
 
   if (auth.status === "loading") {
     if (mode === "hide") return null;
@@ -52,7 +60,7 @@ export function AccessGate({
         <EmptyState
           title={dict.requiresLogin}
           actionLabel={dict.login}
-          actionHref={`/${locale}/login`}
+          actionHref={loginHref}
         />
       );
     }

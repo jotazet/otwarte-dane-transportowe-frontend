@@ -10,26 +10,23 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
+import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
-import { TableCard } from "@/components/TableCard";
+import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
+import type { FetchHealthFields } from "@/lib/api/types";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { hasHelperAccess } from "@/lib/auth/permissions";
+import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
 import { authTypeOptions } from "@/lib/data/authTypes";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
@@ -46,9 +43,8 @@ import {
 } from "@/lib/data/intervalChoices";
 import { formatApiError } from "@/lib/formatApiError";
 import { text } from "@/lib/format";
-import { tableHeadRowSx } from "@/lib/ui/tableSx";
 
-type RtEndpoint = {
+type RtEndpoint = FetchHealthFields & {
   id?: number;
   endpoint_type?: string | null;
   url?: string | null;
@@ -264,6 +260,25 @@ export function RealtimeSubmissionDetail({
   }
 
   const user = perms.user!;
+  const forbidden = !canViewSubmissionInContext(user, {
+    listContext,
+    submittedBy: row.submitted_by,
+  });
+
+  if (forbidden) {
+    return (
+      <SubmissionDetailAuthGate
+        locale={locale}
+        dict={dict}
+        error={error}
+        hasData
+        forbidden
+      >
+        <></>
+      </SubmissionDetailAuthGate>
+    );
+  }
+
   const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const sourcePerms = perms.feedSource({
     isOwner,
@@ -334,6 +349,26 @@ export function RealtimeSubmissionDetail({
         />
       ) : null}
 
+      {showHelperPanel && row.current_stage >= 4
+        ? (row.endpoints ?? [])
+            .filter(
+              (ep) =>
+                typeof ep.id === "number" && (ep.hide_original || ep.fetch_status != null),
+            )
+            .map((ep) => (
+              <FeedFetchHealthPanel
+                key={`health-${ep.id}`}
+                locale={locale}
+                dict={dict}
+                kind="realtime"
+                entryId={ep.id as number}
+                title={`${dict.fetchHealthSection}${ep.endpoint_type ? ` · ${ep.endpoint_type}` : ""}`}
+                health={ep}
+                onChanged={() => void load()}
+              />
+            ))
+        : null}
+
       {!sourcePerms.canHelperReviewOnly && (isOwner || user.isDjangoAdmin) ? (
       <FormSection title={dict.endpoints}>
           <Stack spacing={2}>
@@ -398,9 +433,8 @@ export function RealtimeSubmissionDetail({
                   disabled={fieldsLocked}
                 />
                 {ep.auth_type ? (
-                  <TextField
+                  <PasswordTextField
                     label={dict.authValue}
-                    type="password"
                     value={ep.auth_value}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -409,6 +443,8 @@ export function RealtimeSubmissionDetail({
                     helperText={dict.authValueNewOnly + " - " + dict.authValueHint}
                     autoComplete="new-password"
                     disabled={fieldsLocked}
+                    showPasswordLabel={dict.showPassword}
+                    hidePasswordLabel={dict.hidePassword}
                   />
                 ) : null}
                 <Stack direction="row" spacing={2}>
@@ -454,31 +490,26 @@ export function RealtimeSubmissionDetail({
               </Button>
             )}
           </Stack>
-          {row.endpoints?.length ? (
-            <TableCard>
-              <Table size="small" sx={{ minWidth: 520, mt: 2 }}>
-                <TableHead>
-                  <TableRow sx={tableHeadRowSx}>
-                    <TableCell>{dict.feedTypes}</TableCell>
-                    <TableCell>{dict.downloadRealtime}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {(row.endpoints ?? []).map((ep) =>
-                    typeof ep.id === "number" ? (
-                      <TableRow key={ep.id} hover>
-                        <TableCell>{text(ep.endpoint_type)}</TableCell>
-                        <TableCell>
-                          <Button size="small" variant="outlined" onClick={() => void downloadRt(ep.id!)}>
-                            {dict.downloadRealtime}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ) : null,
-                  )}
-                </TableBody>
-              </Table>
-            </TableCard>
+          {row.static_submission && row.endpoints?.some((ep) => typeof ep.id === "number") ? (
+            <Stack spacing={1.5} sx={{ mt: 2 }}>
+              {(row.endpoints ?? []).map((ep) =>
+                typeof ep.id === "number" ? (
+                  <Stack
+                    key={ep.id}
+                    direction="row"
+                    spacing={2}
+                    sx={{ flexWrap: "wrap", gap: 1, alignItems: "center" }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {text(ep.endpoint_type)}
+                    </Typography>
+                    <Button size="small" variant="outlined" onClick={() => void downloadRt(ep.id!)}>
+                      {dict.downloadRealtime}
+                    </Button>
+                  </Stack>
+                ) : null,
+              )}
+            </Stack>
           ) : null}
       </FormSection>
       ) : null}

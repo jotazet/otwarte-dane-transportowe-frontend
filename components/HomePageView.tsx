@@ -20,8 +20,9 @@ import {
   MdAssignment,
   MdCloudUpload,
   MdDataset,
-  MdInfoOutline,
+  MdWbCloudy,
   MdManageAccounts,
+  MdMonitorHeart,
   MdRuleFolder,
   MdTrain,
 } from "react-icons/md";
@@ -77,7 +78,7 @@ function buildRoleCards(
       title: dict.myFeeds,
       body: dict.myFeedsSubtitle ?? dict.dataIntro,
       href: p.mySubmissions,
-      icon: <MdCloudUpload size={28} aria-hidden />,
+      icon: <MdWbCloudy size={28} aria-hidden />,
     });
     cards.push({
       key: "add-feed",
@@ -101,6 +102,15 @@ function buildRoleCards(
       body: dict.providersDesc,
       href: p.casesProviders,
       icon: <MdRuleFolder size={28} aria-hidden />,
+    });
+  }
+  if (hasHelperAccess(user) || hasAdminAccess(user)) {
+    cards.push({
+      key: "feed-ops",
+      title: dict.feedOps,
+      body: dict.feedOpsDesc,
+      href: p.feedOps,
+      icon: <MdMonitorHeart size={28} aria-hidden />,
     });
   }
   if (hasAdminAccess(user)) {
