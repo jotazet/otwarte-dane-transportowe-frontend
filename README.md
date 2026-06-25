@@ -20,6 +20,64 @@ Copy `.env.example` to `.env.local` and set:
 
 - `NEXT_PUBLIC_API_BASE_URL` (defaults to `http://localhost:8000`)
 
+## Wdrożenie produkcyjne (Docker Compose)
+
+Front uruchamiamy jedną komendą przez Docker Compose. Konfiguracja (adres API,
+adres frontu, port) jest trzymana w pliku `.env`.
+
+> Uwaga: zmienne `NEXT_PUBLIC_*` w Next.js są wstawiane do bundla podczas **builda**,
+> a nie przy starcie kontenera. Dlatego są przekazywane jako build args, a po każdej
+> ich zmianie konieczny jest **rebuild** (`--build`), nie sam restart.
+
+### 1. Konfiguracja
+
+```bash
+cp .env.example .env
+```
+
+Uzupełnij `.env`:
+
+- `NEXT_PUBLIC_API_BASE_URL` - publiczny adres API, np. `https://v2.api.odt.org.pl`
+- `NEXT_PUBLIC_SITE_URL` - publiczny adres frontu, np. `https://v2.odt.org.pl`
+- `FRONTEND_PORT` - port hosta (domyślnie `3000`)
+- `FRONTEND_BIND` - `127.0.0.1` gdy reverse-proxy jest na tym samym hoście (zalecane),
+  albo `0.0.0.0` do testów z LAN
+
+### 2. Build i start
+
+```bash
+docker compose up -d --build
+```
+
+### 3. Weryfikacja
+
+```bash
+# adres API powinien byc obecny w zbudowanym bundlu:
+docker exec odt-frontend sh -c "grep -rao 'v2.api.odt.org.pl' .next/ | head"
+# i NIE powinno byc domyslnego localhost:8000:
+docker exec odt-frontend sh -c "grep -rao 'http://localhost:8000' .next/ | head"
+# strona docelowa zwraca 200:
+curl -i http://localhost:3000/pl
+```
+
+### 4. Reverse-proxy + TLS
+
+Przed kontenerem postaw reverse-proxy (nginx/Caddy) kierujący domenę frontu na
+`127.0.0.1:${FRONTEND_PORT}` i przekazujący nagłówek `X-Forwarded-Proto: https`.
+
+### 5. Aktualizacje
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+### CORS (backend)
+
+Front woła API z przeglądarki, więc w konfiguracji backendu `OtwarteDaneTransportowe`
+dodaj origin frontu do `CORS_ALLOWED_ORIGINS` oraz `CSRF_TRUSTED_ORIGINS` - inaczej
+przeglądarka zablokuje zapytania mimo poprawnego endpointu.
+
 ## Getting Started
 
 First, run the development server:
