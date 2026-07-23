@@ -169,12 +169,13 @@ export function DataSubmitForm({
   const [rtEndpoints, setRtEndpoints] = React.useState<RtEndpointDraft[]>([emptyEndpoint("gtfs_rt")]);
 
   React.useEffect(() => {
-    if (staticSource === "file") {
+    if (staticSource !== "file") return;
+    void (async () => {
       setStaticHide(false);
       setStaticTime2Enabled(false);
       setStaticAuthType("");
       setStaticAuthValue("");
-    }
+    })();
   }, [staticSource]);
 
   React.useEffect(() => {
@@ -183,38 +184,40 @@ export function DataSubmitForm({
     const defaultEndpointType = String(options[0]);
     const isValidEndpointType = (value: string) => options.includes(value as never);
 
-    if (protocol === "gbfs") {
-      setRtEndpoints([emptyEndpoint("gbfs")]);
-      setRtStaticSubId("");
-    } else {
-      setRtEndpoints((prev) =>
-        prev.length
-          ? prev.map((e) => ({
-              ...e,
-              endpoint_type: isValidEndpointType(e.endpoint_type) ? e.endpoint_type : defaultEndpointType,
-            }))
-          : [emptyEndpoint(protocol)],
-      );
-    }
+    void (async () => {
+      if (protocol === "gbfs") {
+        setRtEndpoints([emptyEndpoint("gbfs")]);
+        setRtStaticSubId("");
+      } else {
+        setRtEndpoints((prev) =>
+          prev.length
+            ? prev.map((e) => ({
+                ...e,
+                endpoint_type: isValidEndpointType(e.endpoint_type) ? e.endpoint_type : defaultEndpointType,
+              }))
+            : [emptyEndpoint(protocol)],
+        );
+      }
+    })();
   }, [protocol]);
 
   React.useEffect(() => {
     if (auth.status !== "authenticated") return;
-    if (protocol === "gbfs" || rtOrgId === "") {
-      setEligibleStatics([]);
-      setEligibleError(null);
-      setEligibleLoading(false);
-      setRtStaticSubId("");
-      return;
-    }
-
-    const suffix = protocol === "gtfs_rt" ? "gtfs" : "netex";
     let cancelled = false;
-    setEligibleLoading(true);
-    setEligibleError(null);
-    setRtStaticSubId("");
 
-    (async () => {
+    void (async () => {
+      if (protocol === "gbfs" || rtOrgId === "") {
+        setEligibleStatics([]);
+        setEligibleError(null);
+        setEligibleLoading(false);
+        setRtStaticSubId("");
+        return;
+      }
+
+      const suffix = protocol === "gtfs_rt" ? "gtfs" : "netex";
+      setEligibleLoading(true);
+      setEligibleError(null);
+      setRtStaticSubId("");
       try {
         const path = `/api/data_manager/realtime-submissions/eligible-static-submissions/${rtOrgId}/${suffix}/`;
         const raw = await apiJson<EligibleStaticRow[] | { results?: EligibleStaticRow[] }>("GET", path);

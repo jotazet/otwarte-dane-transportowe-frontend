@@ -67,7 +67,9 @@ export function UsersHub({ locale, dict }: { locale: string; dict: Dictionary })
   }, [auth]);
 
   React.useEffect(() => {
-    void load();
+    void (async () => {
+      await load();
+    })();
   }, [load]);
 
   const roleOptions = React.useMemo(() => {

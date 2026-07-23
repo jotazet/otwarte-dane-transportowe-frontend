@@ -7,7 +7,9 @@ export function normalizeRoles(input: unknown): AppRole[] {
 
   const push = (v: unknown) => {
     if (typeof v === "string") list.push(v);
-    else if (v && typeof v === "object" && "name" in v && typeof (v as any).name === "string") list.push((v as any).name);
+    else if (v && typeof v === "object" && "name" in v && typeof (v as Record<string, unknown>).name === "string") {
+      list.push((v as Record<string, string>).name);
+    }
   };
 
   push(input);

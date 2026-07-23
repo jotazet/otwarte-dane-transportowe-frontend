@@ -61,7 +61,9 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
   }, [apiJson]);
 
   React.useEffect(() => {
-    void loadProfile();
+    void (async () => {
+      await loadProfile();
+    })();
   }, [loadProfile]);
 
   async function submitEmail(e: React.FormEvent) {

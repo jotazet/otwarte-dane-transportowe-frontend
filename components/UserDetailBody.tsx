@@ -78,7 +78,10 @@ export function UserDetailBody({
   }, [auth, userId]);
 
   React.useEffect(() => {
-    if (auth.status === "authenticated") void load();
+    if (auth.status !== "authenticated") return;
+    void (async () => {
+      await load();
+    })();
   }, [auth.status, load]);
 
   const isSelf = auth.status === "authenticated" && auth.user.userId === userId;

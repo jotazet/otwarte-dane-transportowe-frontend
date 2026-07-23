@@ -161,7 +161,9 @@ export function SubmissionsTableHub({
   }, [apiJson, auth.status, filterOrgId]);
 
   React.useEffect(() => {
-    void load();
+    void (async () => {
+      await load();
+    })();
   }, [load]);
 
   const allRows: UnifiedRow[] = React.useMemo(() => {

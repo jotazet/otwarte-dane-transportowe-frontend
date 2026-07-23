@@ -194,10 +194,19 @@ export function HomePageView({
     ? buildRoleCards(dict, p, { roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin })
     : [];
 
-  const motivationKey = React.useMemo(
-    () => HOME_MOTIVATION_KEYS[Math.floor(Math.random() * HOME_MOTIVATION_KEYS.length)],
-    [],
-  );
+  // Losowa wiadomość motywacyjna wybierana raz po zamontowaniu (Math.random poza renderem).
+  const [motivationKey, setMotivationKey] =
+    React.useState<(typeof HOME_MOTIVATION_KEYS)[number]>(HOME_MOTIVATION_KEYS[0]);
+  React.useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      if (cancelled) return;
+      setMotivationKey(HOME_MOTIVATION_KEYS[Math.floor(Math.random() * HOME_MOTIVATION_KEYS.length)]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const firstName = isAuthenticated ? auth.user.firstName?.trim() || null : null;
   const greeting = firstName
