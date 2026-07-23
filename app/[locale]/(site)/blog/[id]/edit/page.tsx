@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchBlogPost } from "@/lib/api/blog";
+import { loadOr404 } from "@/lib/api/loadOr404";
+import { parseNumericId } from "@/lib/nav/ids";
 import { blogEdit } from "@/lib/nav/breadcrumbTrails";
 import { text } from "@/lib/format";
 
@@ -19,10 +21,10 @@ export default async function BlogEditPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const postId = Number(id);
-  if (!Number.isFinite(postId)) notFound();
+  const postId = parseNumericId(id);
+  if (postId == null) notFound();
 
-  const post = await fetchBlogPost(postId);
+  const post = await loadOr404(fetchBlogPost(postId));
   const title = text(post.title) || `#${postId}`;
 
   return (

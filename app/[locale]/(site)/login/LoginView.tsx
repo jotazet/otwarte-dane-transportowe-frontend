@@ -32,8 +32,8 @@ export function LoginView({
     password: string;
     login: string;
     backHome: string;
-    invalidCredentials?: string;
-    loginFailed?: string;
+    invalidCredentials: string;
+    loginFailed: string;
     showPassword?: string;
     hidePassword?: string;
   };
@@ -64,9 +64,9 @@ export function LoginView({
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg === "INVALID_CREDENTIALS") {
-        setError(labels.invalidCredentials ?? "Nieprawidłowy login lub hasło.");
+        setError(labels.invalidCredentials);
       } else {
-        setError(labels.loginFailed ?? "Nie udało się zalogować.");
+        setError(labels.loginFailed);
       }
       setPending(false);
     }

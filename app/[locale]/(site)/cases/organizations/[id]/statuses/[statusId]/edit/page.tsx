@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchCaseStatus, fetchTransportOrganization } from "@/lib/api/cases";
+import { loadOr404 } from "@/lib/api/loadOr404";
+import { parseNumericId } from "@/lib/nav/ids";
 import { casesStatusEdit } from "@/lib/nav/breadcrumbTrails";
 import { text } from "@/lib/format";
 
@@ -19,14 +21,14 @@ export default async function StatusEditPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const orgId = Number(id);
-  const sid = Number(statusId);
-  if (!Number.isFinite(orgId) || !Number.isFinite(sid)) notFound();
+  const orgId = parseNumericId(id);
+  const sid = parseNumericId(statusId);
+  if (orgId == null || sid == null) notFound();
 
-  const statusRow = await fetchCaseStatus(sid);
+  const statusRow = await loadOr404(fetchCaseStatus(sid));
   if (statusRow.case !== orgId) notFound();
 
-  const org = await fetchTransportOrganization(orgId);
+  const org = await loadOr404(fetchTransportOrganization(orgId));
   const orgLabel = text(org.transport_organization);
 
   return (

@@ -6,6 +6,8 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
+import { renderRichText } from "@/lib/richText";
+
 export function SectionCard({
   icon,
   title,
@@ -17,8 +19,6 @@ export function SectionCard({
   description: string;
   trailing?: ReactNode;
 }) {
-  const descriptionHasHtml = /<\s*a\b/i.test(description);
-
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ p: 3 }}>
@@ -36,21 +36,16 @@ export function SectionCard({
             mt: 1,
             lineHeight: 1.45,
             "& a": {
-              color: "#1a73e8",
+              color: "primary.main",
               fontWeight: 500,
               textDecoration: "none",
             },
             "& a:hover": {
-              textDecoration: "none",
-              filter: "brightness(0.9)",
-            },
-            "& a:visited": {
-              color: "#1a73e8",
+              textDecoration: "underline",
             },
           }}
-          {...(descriptionHasHtml ? { dangerouslySetInnerHTML: { __html: description } } : {})}
         >
-          {descriptionHasHtml ? null : description}
+          {renderRichText(description)}
         </Typography>
         {trailing ? <Box sx={{ mt: 2.5 }}>{trailing}</Box> : null}
       </CardContent>

@@ -1,9 +1,7 @@
-@import "tailwindcss";
-
 html {
   overflow-x: clip;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   background: var(--background);
   color-scheme: light;
 }
@@ -20,13 +18,6 @@ html[data-color-mode="dark"] {
   color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 body {
   overflow-x: clip;
   width: 100%;
@@ -34,6 +25,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
-    Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--font-roboto), "Roboto", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

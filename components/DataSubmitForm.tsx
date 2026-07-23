@@ -9,8 +9,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
@@ -22,6 +20,7 @@ import { MdAdd, MdDelete } from "react-icons/md";
 
 import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
+import { SourceModeToggle } from "@/components/layout/SourceModeToggle";
 import { PasswordTextField } from "@/components/PasswordTextField";
 import { getJson } from "@/lib/api/http";
 import type { TransportOrganizationListItem } from "@/lib/api/cases";
@@ -53,6 +52,7 @@ type EligibleStaticRow = {
 };
 
 type RtEndpointDraft = {
+  uid: string;
   endpoint_type: string;
   url: string;
   interval: string;
@@ -61,6 +61,13 @@ type RtEndpointDraft = {
   auth_type: string;
   auth_value: string;
 };
+
+let endpointUidSeq = 0;
+/** Stabilny klucz React dla usuwalnych wierszy endpointów (nie używać indeksu tablicy). */
+function nextEndpointUid(): string {
+  endpointUidSeq += 1;
+  return `ep-${endpointUidSeq}`;
+}
 
 const DATA_TYPES = ["gtfs", "netex", "other"] as const;
 const PROTOCOLS = ["gtfs_rt", "siri", "gbfs"] as const;
@@ -86,6 +93,7 @@ function emptyEndpoint(protocol: ProtocolChoice): RtEndpointDraft {
   const options =
     protocol === "gtfs_rt" ? ENDPOINT_TYPES_GTFS_RT : protocol === "siri" ? ENDPOINT_TYPES_SIRI : ENDPOINT_TYPES_GBFS;
   return {
+    uid: nextEndpointUid(),
     endpoint_type: String(options[0]),
     url: "",
     interval: String(SOURCE_UPDATE_INTERVAL_DEFAULT),
@@ -451,18 +459,16 @@ export function DataSubmitForm({
 
               <Stack spacing={0.5}>
                 <Typography variant="subtitle2">{dict.staticSource}</Typography>
-                <RadioGroup
-                  row
+                <SourceModeToggle
                   value={staticSource}
-                  onChange={(e) => {
-                    const v = String(e.target.value) as "url" | "file";
+                  onChange={(v) => {
                     setStaticSource(v);
                     setError(null);
                   }}
-                >
-                  <FormControlLabel value="url" control={<Radio disabled={pending} />} label={dict.staticSourceUrl} />
-                  <FormControlLabel value="file" control={<Radio disabled={pending} />} label={dict.staticSourceFile} />
-                </RadioGroup>
+                  urlLabel={dict.staticSourceUrl}
+                  fileLabel={dict.staticSourceFile}
+                  disabled={pending}
+                />
               </Stack>
 
               {staticSource === "url" ? (
@@ -666,7 +672,7 @@ export function DataSubmitForm({
 
               <Typography variant="subtitle2">{dict.endpoints}</Typography>
               {rtEndpoints.map((ep, idx) => (
-                <Stack key={idx} spacing={1} sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
+                <Stack key={ep.uid} spacing={1} sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
                   <Stack direction={{ xs: "column", md: "row" }} spacing={1} sx={{ alignItems: { md: "center" } }}>
                     <InlineSelect
                       label={dict.feedTypes}

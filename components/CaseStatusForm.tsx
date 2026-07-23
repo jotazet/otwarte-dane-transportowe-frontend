@@ -9,6 +9,7 @@ import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
 import { CrudFormActions } from "@/components/layout/CrudFormActions";
 import { CrudFormCard } from "@/components/layout/CrudFormCard";
+import { useConfirm } from "@/components/layout/useConfirm";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
 import { CASE_STATUS_VALUES, caseStatusLabel } from "@/lib/cases/statusChoices";
@@ -33,6 +34,7 @@ export function CaseStatusForm({
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const cancelHref = paths(locale).casesOrg(organizationId);
   const [status, setStatus] = React.useState(initialStatus ?? "none");
   const [description, setDescription] = React.useState(initialDescription ?? "");
@@ -67,7 +69,7 @@ export function CaseStatusForm({
 
   async function remove() {
     if (statusId == null) return;
-    if (!confirm(dict.confirmDeleteStatus)) return;
+    if (!(await confirm(dict.confirmDeleteStatus, { confirmLabel: dict.delete }))) return;
     setPending(true);
     try {
       await apiJson("DELETE", casesPaths.caseStatus(statusId));
@@ -119,6 +121,7 @@ export function CaseStatusForm({
         />
       </Stack>
     </CrudFormCard>
+    {confirmDialog}
     </AccessGate>
   );
 }

@@ -6,6 +6,8 @@ import { AppPage } from "@/components/layout/AppPage";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalogOrganization } from "@/lib/api/dataCatalog";
+import { loadOr404 } from "@/lib/api/loadOr404";
+import { parseNumericId } from "@/lib/nav/ids";
 import { dataFeedDetail } from "@/lib/nav/breadcrumbTrails";
 import { text } from "@/lib/format";
 
@@ -19,9 +21,9 @@ export default async function FeedCatalogDetailPage({
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
 
-  const orgId = Number(id);
-  if (!Number.isFinite(orgId)) notFound();
-  const organization = await fetchFeedCatalogOrganization(orgId);
+  const orgId = parseNumericId(id);
+  if (orgId == null) notFound();
+  const organization = await loadOr404(fetchFeedCatalogOrganization(orgId));
   const orgLabel = text(organization.transport_organization);
 
   const feeds = organization.feeds ?? [];

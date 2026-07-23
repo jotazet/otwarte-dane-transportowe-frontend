@@ -2,13 +2,11 @@
 
 import * as React from "react";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Tab from "@mui/material/Tab";
@@ -24,6 +22,7 @@ import { FormActions } from "@/components/layout/FormActions";
 import { FormSection } from "@/components/layout/FormSection";
 import { HistoryTimeline } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
+import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -39,6 +38,7 @@ import {
   isHideOriginalLockedByAuth,
   resolveHideOriginal,
 } from "@/lib/data/hideOriginalAuth";
+import { downloadBlob } from "@/lib/download";
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 
@@ -81,6 +81,7 @@ export function FeedSubmissionDetail({
   listContext?: SubmissionListContext;
 }) {
   const auth = useAuth();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const perms = usePermissions();
   const router = useRouter();
   const [row, setRow] = React.useState<FeedDetail | null>(null);
@@ -103,35 +104,57 @@ export function FeedSubmissionDetail({
 
   const listHref = submissionListPath(locale, listContext);
 
+  const applyDetail = React.useCallback((d: FeedDetail) => {
+    setRow(d);
+    setSubName(d.name ?? "");
+    setSubNote(d.note ?? "");
+    const se = d.static_entry;
+    setUrl(se?.url ?? "");
+    setLicense(se?.license ?? "");
+    setDt1(se?.download_time_1 ?? "02:00:00");
+    const d2 = se?.download_time_2?.trim();
+    setDt2Enabled(!!d2);
+    setDt2(d2 ?? "14:00:00");
+    setIsOrig(se?.is_original !== false);
+    setHideOrig(!!se?.hide_original);
+    setAuthType(se?.auth_type ?? "");
+    setAuthValue("");
+    setStage(String(d.current_stage));
+    setRejectCause("");
+  }, []);
+
+  const authStatus = auth.status;
+  const apiJson = auth.apiJson;
+
+  // Reload po akcjach mutujących (komponent zamontowany — bez anulowania).
   const load = React.useCallback(async () => {
-    if (auth.status !== "authenticated") return;
+    if (authStatus !== "authenticated") return;
     setError(null);
     try {
-      const d = await auth.apiJson<FeedDetail>("GET", submissionsPaths.feedDetail(submissionId));
-      setRow(d);
-      setSubName(d.name ?? "");
-      setSubNote(d.note ?? "");
-      const se = d.static_entry;
-      setUrl(se?.url ?? "");
-      setLicense(se?.license ?? "");
-      setDt1(se?.download_time_1 ?? "02:00:00");
-      const d2 = se?.download_time_2?.trim();
-      setDt2Enabled(!!d2);
-      setDt2(d2 ?? "14:00:00");
-      setIsOrig(se?.is_original !== false);
-      setHideOrig(!!se?.hide_original);
-      setAuthType(se?.auth_type ?? "");
-      setAuthValue("");
-      setStage(String(d.current_stage));
-      setRejectCause("");
+      const d = await apiJson<FeedDetail>("GET", submissionsPaths.feedDetail(submissionId));
+      applyDetail(d);
     } catch (e) {
       setError(formatApiError(e));
     }
-  }, [auth, submissionId]);
+  }, [apiJson, authStatus, submissionId, applyDetail]);
 
+  // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`.
   React.useEffect(() => {
-    void load();
-  }, [load]);
+    if (authStatus !== "authenticated") return;
+    let cancelled = false;
+    (async () => {
+      setError(null);
+      try {
+        const d = await apiJson<FeedDetail>("GET", submissionsPaths.feedDetail(submissionId));
+        if (!cancelled) applyDetail(d);
+      } catch (e) {
+        if (!cancelled) setError(formatApiError(e));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiJson, authStatus, submissionId, applyDetail]);
 
   if (auth.status !== "authenticated" || !row) {
     return (
@@ -255,7 +278,7 @@ export function FeedSubmissionDetail({
 
   async function remove() {
     if (!row || !sourcePerms.canDelete) return;
-    if (!confirm(dict.confirmDeleteSubmission)) return;
+    if (!(await confirm(dict.confirmDeleteSubmission, { confirmLabel: dict.delete }))) return;
     try {
       await auth.apiJson("DELETE", submissionsPaths.feedDetail(row.id));
       router.replace(listHref);
@@ -271,11 +294,7 @@ export function FeedSubmissionDetail({
       const blob = await auth.apiBlob(
         submissionsPaths.feedDownloadStatic(row.id, row.static_entry.id),
       );
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `submission-${row.id}-static.zip`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      downloadBlob(blob, `submission-${row.id}-static.zip`);
     } catch (e) {
       setError(formatApiError(e));
     }
@@ -541,6 +560,7 @@ export function FeedSubmissionDetail({
           <HistoryTimeline events={row.history} title="" emptyLabel={dict.emptyListBody} locale={locale} />
         </FormSection>
       ) : null}
+      {confirmDialog}
     </Stack>
   );
 }

@@ -6,6 +6,7 @@ import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
+import { parseNumericId } from "@/lib/nav/ids";
 import { dataMySubmissionsNew } from "@/lib/nav/breadcrumbTrails";
 
 export default async function MySubmissionsNewPage({
@@ -20,8 +21,7 @@ export default async function MySubmissionsNewPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const orgNum = sp.organization != null && sp.organization !== "" ? Number(sp.organization) : NaN;
-  const initialOrganizationId = Number.isFinite(orgNum) ? orgNum : undefined;
+  const initialOrganizationId = parseNumericId(sp.organization) ?? undefined;
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataMySubmissionsNew(locale, dict)}>

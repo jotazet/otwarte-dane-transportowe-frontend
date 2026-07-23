@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { MdAdd, MdDelete, MdEdit } from "react-icons/md";
 
 import { OrganizationProvidersPanel } from "@/components/OrganizationProvidersPanel";
+import { useConfirm } from "@/components/layout/useConfirm";
 import { TableCard } from "@/components/TableCard";
 import type { TransportOrganizationDetail } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -46,12 +47,13 @@ export function OrganizationDetailBody({
   const statuses = organization.statuses ?? [];
   const auth = useAuth();
   const router = useRouter();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const canManage =
     auth.status === "authenticated" &&
     hasHelperAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin });
 
   async function deleteStatus(id: number) {
-    if (!confirm(dict.confirmDeleteStatus)) return;
+    if (!(await confirm(dict.confirmDeleteStatus, { confirmLabel: dict.delete }))) return;
     try {
       await auth.apiJson("DELETE", `/api/cases/case-statuses/${id}/`);
       router.refresh();
@@ -185,6 +187,7 @@ export function OrganizationDetailBody({
           ) : null}
         </Stack>
       )}
+      {confirmDialog}
     </Stack>
   );
 }

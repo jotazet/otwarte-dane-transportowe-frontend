@@ -17,6 +17,8 @@ import { AccessGate } from "@/components/AccessGate";
 import { FilteredTableEmpty } from "@/components/layout/FilteredTableEmpty";
 import { TableFilterHeaderCell } from "@/components/layout/TableFilterHeaderCell";
 import { TableCard } from "@/components/TableCard";
+import { getJson } from "@/lib/api/http";
+import type { TransportOrganizationListItem } from "@/lib/api/cases";
 import {
   submissionsPaths,
   buildListQuery,
@@ -25,6 +27,7 @@ import {
 import type { CombinedSubmissionsBundle, FeedSubmissionListItem, RealtimeSubmissionListItem } from "@/lib/api/types";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { text } from "@/lib/format";
 import { formatApiError } from "@/lib/formatApiError";
 import { paths, submissionDetailPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
@@ -110,6 +113,36 @@ export function SubmissionsTableHub({
   const [orgFilter, setOrgFilter] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("");
+  const [orgNameById, setOrgNameById] = React.useState<Map<number, string>>(new Map());
+
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = await getJson<
+          TransportOrganizationListItem[] | { results?: TransportOrganizationListItem[] }
+        >("/api/cases/transport-organizations/");
+        const list = Array.isArray(raw) ? raw : (raw.results ?? []);
+        if (cancelled) return;
+        const m = new Map<number, string>();
+        for (const o of list) m.set(o.id, `${text(o.transport_organization)} - ${text(o.region)}`);
+        setOrgNameById(m);
+      } catch {
+        // Fallback: pokazujemy surowe ID gdy lista organizacji jest niedostępna.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const orgLabel = React.useCallback(
+    (row: UnifiedRow) => {
+      const id = Number(row.transport_organization);
+      return orgNameById.get(id) ?? String(row.transport_organization);
+    },
+    [orgNameById],
+  );
 
   const load = React.useCallback(async () => {
     if (auth.status !== "authenticated") return;
@@ -152,10 +185,11 @@ export function SubmissionsTableHub({
   const orgOptions = React.useMemo(() => {
     const set = new Set<string>();
     for (const row of allRows) {
-      if (row.transport_organization) set.add(String(row.transport_organization));
+      const label = orgLabel(row);
+      if (label) set.add(label);
     }
     return [...set].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-  }, [allRows]);
+  }, [allRows, orgLabel]);
 
   const typeOptions = React.useMemo(() => {
     const set = new Set<string>();
@@ -171,12 +205,12 @@ export function SubmissionsTableHub({
 
   const rows = React.useMemo(() => {
     return allRows.filter((row) => {
-      if (orgFilter && String(row.transport_organization) !== orgFilter) return false;
+      if (orgFilter && orgLabel(row) !== orgFilter) return false;
       if (typeFilter && row.typeLabel !== typeFilter) return false;
       if (statusFilter && rowStatus(row, dict, listContext) !== statusFilter) return false;
       return true;
     });
-  }, [allRows, dict, listContext, orgFilter, statusFilter, typeFilter]);
+  }, [allRows, dict, listContext, orgFilter, orgLabel, statusFilter, typeFilter]);
 
   const emptyMessage = dict[config.emptyMessageKey] ?? dict.emptyListBody;
   const hasAnyData = allRows.length > 0;
@@ -252,7 +286,7 @@ export function SubmissionsTableHub({
                       {row.id}
                     </Link>
                   </TableCell>
-                  <TableCell>{row.transport_organization}</TableCell>
+                  <TableCell>{orgLabel(row)}</TableCell>
                   <TableCell>{row.typeLabel}</TableCell>
                   <TableCell>{row.current_stage_label}</TableCell>
                   <TableCell>

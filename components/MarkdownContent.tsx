@@ -53,7 +53,7 @@ export function MarkdownContent({ content }: { content: string }) {
           fontSize: "0.9em",
         },
         "& code": {
-          fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
           fontSize: "0.9em",
         },
         "& :not(pre) > code": {

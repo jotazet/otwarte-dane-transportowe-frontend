@@ -12,6 +12,7 @@ import NextLink from "next/link";
 import { MdArrowForward } from "react-icons/md";
 
 import { BlogPostListReactionSummary } from "@/components/BlogPostListReactionSummary";
+import { EmptyState } from "@/components/layout/EmptyState";
 import type { BlogPostListItem } from "@/lib/api/blog";
 import type { Dictionary } from "@/i18n/getDictionary";
 import type { Locale } from "@/i18n/locales";
@@ -28,6 +29,10 @@ export function BlogPostCards({
   dict: Dictionary;
   posts: BlogPostListItem[];
 }) {
+  if (!posts.length) {
+    return <EmptyState title={dict.blogNoPosts} />;
+  }
+
   return (
     <Stack spacing={1}>
       {posts.map((post) => {
@@ -49,7 +54,7 @@ export function BlogPostCards({
               maxHeight: { xs: 220 },
               borderRadius: 1,
               overflow: "hidden",
-              bgcolor: "grey.100",
+              bgcolor: "action.hover",
               textDecoration: "none",
               border: 1,
               borderColor: "divider",

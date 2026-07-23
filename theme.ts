@@ -1,5 +1,7 @@
 import { createTheme } from "@mui/material/styles";
 
+import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
+
 function paletteScheme(isLight: boolean) {
   return {
     palette: {
@@ -100,7 +102,7 @@ const sharedComponents = {
         transformOrigin: { vertical: "top", horizontal: "left" },
         slotProps: {
           paper: {
-            sx: { maxHeight: "min(280px, 40vh)", overflow: "auto" },
+            sx: { maxHeight: SELECT_MENU_MAX_HEIGHT, overflow: "auto" },
           },
         },
       },
@@ -116,7 +118,7 @@ const sharedComponents = {
       disablePortal: true,
       slotProps: {
         listbox: {
-          sx: { maxHeight: "min(280px, 40vh)", overflow: "auto" },
+          sx: { maxHeight: SELECT_MENU_MAX_HEIGHT, overflow: "auto" },
         },
       },
     },

@@ -1,5 +1,4 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { EmptyState } from "@/components/layout/EmptyState";
 
 export function FilteredTableEmpty({
   hasAnyData,
@@ -13,20 +12,5 @@ export function FilteredTableEmpty({
   noMatchMessage: string;
 }) {
   if (error) return null;
-  if (!hasAnyData) {
-    return (
-      <Box>
-        <Typography variant="body2" color="text.secondary">
-          {emptyMessage}
-        </Typography>
-      </Box>
-    );
-  }
-  return (
-    <Box>
-      <Typography variant="body2" color="text.secondary">
-        {noMatchMessage}
-      </Typography>
-    </Box>
-  );
+  return <EmptyState title={hasAnyData ? noMatchMessage : emptyMessage} />;
 }

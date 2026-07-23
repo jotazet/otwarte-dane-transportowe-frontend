@@ -14,7 +14,6 @@ export function isLoginRequiredPath(rest: string): boolean {
   if (path === "/cases/organizations/new") return true;
   if (/^\/cases\/organizations\/\d+\/edit$/.test(path)) return true;
   if (/^\/cases\/organizations\/\d+\/statuses\//.test(path)) return true;
-  if (path === "/cases/data-providers/new") return true;
-  if (/^\/cases\/data-providers\/\d+$/.test(path)) return true;
+  if (path === "/cases/data-providers" || path.startsWith("/cases/data-providers/")) return true;
   return false;
 }

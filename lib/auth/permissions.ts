@@ -53,9 +53,6 @@ export function claimsFromAccessToken(access: string, loginUsername?: string | n
     groups.some((g) => g.trim().toLowerCase() === "admin") || roleSetMutable.has("Admin");
 
   const uid = (payload as Record<string, unknown>)?.user_id;
-  if (roleSetMutable.size === 0 && !isDjangoAdmin && (uid === 1 || uid === "1")) {
-    roleSetMutable.add("Admin");
-  }
 
   const roleSet = roleSetMutable as RoleSet;
 

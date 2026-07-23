@@ -34,7 +34,7 @@ export default async function RootLayout({
   const lang = locales.includes(rawLocale as Locale) ? rawLocale : "pl";
 
   return (
-    <html lang={lang} className={`${roboto.variable} h-full`} suppressHydrationWarning>
+    <html lang={lang} className={roboto.variable} suppressHydrationWarning>
       <head>
         <InitColorSchemeScript
           attribute='[data-color-mode="%s"]'
@@ -42,7 +42,7 @@ export default async function RootLayout({
           defaultMode="light"
         />
       </head>
-      <body className="min-h-full antialiased">
+      <body>
         <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
