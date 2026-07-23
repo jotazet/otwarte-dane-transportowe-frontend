@@ -119,7 +119,7 @@ export function OrganizationDetailBody({
             ) : null}
           </Stack>
           {statuses.length ? (
-            <Card variant="outlined">
+            <Card>
               <CardContent>
                 <Stack spacing={1.5}>
                   {statuses.map((s, i) => (

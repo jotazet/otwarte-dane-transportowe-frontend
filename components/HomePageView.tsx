@@ -139,10 +139,7 @@ function OverviewCards({
     <Grid container spacing={2} sx={{ mt: 1 }}>
       {cards.map((c) => (
         <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={c.key ?? c.href}>
-          <Card
-            sx={{ height: "100%", ...(outlined ? { borderColor: "primary.light", borderWidth: 1 } : {}) }}
-            variant={outlined ? "outlined" : undefined}
-          >
+          <Card sx={{ height: "100%", ...(outlined ? { borderColor: "primary.light" } : {}) }}>
             <CardActionArea component={Link} href={c.href} sx={{ height: "100%", alignItems: "stretch" }}>
               <CardContent>
                 <Box sx={{ color: "primary.main" }}>{c.icon}</Box>

@@ -83,7 +83,7 @@ export function LoginView({
       }}
     >
       <Container maxWidth="sm">
-        <Card elevation={0} sx={{ border: 1, borderColor: "divider", borderRadius: 3, overflow: "hidden" }}>
+        <Card sx={{ overflow: "hidden" }}>
           <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Stack spacing={2.25}>
               <Stack spacing={1} sx={{ alignItems: "center", textAlign: "center" }}>

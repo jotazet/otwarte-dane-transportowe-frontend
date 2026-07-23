@@ -21,7 +21,7 @@ export function SectionCard({
 }) {
   return (
     <Card sx={{ height: "100%" }}>
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Box sx={{ color: "primary.main", display: "flex", "& svg": { fontSize: 32 } }}>
           {icon}
         </Box>

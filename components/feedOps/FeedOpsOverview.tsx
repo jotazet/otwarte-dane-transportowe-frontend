@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
@@ -37,17 +38,19 @@ function StatCard({
   );
   return (
     <Card
-      variant="outlined"
       sx={{
         height: "100%",
-        borderRadius: 1,
-        cursor: onClick ? "pointer" : undefined,
         transition: "border-color 0.15s",
         "&:hover": onClick ? { borderColor: "primary.main" } : undefined,
       }}
-      onClick={onClick}
     >
-      {content}
+      {onClick ? (
+        <CardActionArea onClick={onClick} sx={{ height: "100%", alignItems: "stretch" }}>
+          {content}
+        </CardActionArea>
+      ) : (
+        content
+      )}
     </Card>
   );
 }
