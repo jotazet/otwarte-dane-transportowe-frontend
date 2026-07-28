@@ -80,7 +80,9 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
   }, [apiJson, days, page, errorType, source]);
 
   React.useEffect(() => {
-    void load();
+    void (async () => {
+      await load();
+    })();
   }, [load]);
 
   const totalPages = Math.max(1, Math.ceil(count / FETCH_ERRORS_PAGE_SIZE));

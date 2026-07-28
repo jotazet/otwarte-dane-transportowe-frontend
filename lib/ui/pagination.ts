@@ -10,6 +10,8 @@ export function buildPageRange(
   boundaryCount = 1,
 ): Array<number | "ellipsis"> {
   if (total <= 1) return total === 1 ? [1] : [];
+  // Przytnij `current` do [1, total], aby strona poza zakresem nie gubiła środka zakresu.
+  current = Math.min(Math.max(current, 1), total);
 
   const range = (start: number, end: number) =>
     Array.from({ length: end - start + 1 }, (_, i) => start + i);

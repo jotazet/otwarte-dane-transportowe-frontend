@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchDataProvider } from "@/lib/api/cases";
+import { loadOr404 } from "@/lib/api/loadOr404";
+import { parseNumericId } from "@/lib/nav/ids";
 import { casesProviderDetail } from "@/lib/nav/breadcrumbTrails";
 
 export default async function DataProviderEditPage({
@@ -18,10 +20,10 @@ export default async function DataProviderEditPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const providerId = Number(id);
-  if (!Number.isFinite(providerId)) notFound();
+  const providerId = parseNumericId(id);
+  if (providerId == null) notFound();
 
-  const prov = await fetchDataProvider(providerId);
+  const prov = await loadOr404(fetchDataProvider(providerId));
   const label = prov.name?.trim() || `#${providerId}`;
 
   return (

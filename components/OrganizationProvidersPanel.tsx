@@ -45,7 +45,9 @@ export function OrganizationProvidersPanel({
   const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
-    setSelectedIds(linkedIds);
+    void (async () => {
+      setSelectedIds(linkedIds);
+    })();
   }, [linkedIds.join(",")]);
 
   React.useEffect(() => {

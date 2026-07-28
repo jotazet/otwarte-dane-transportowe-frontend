@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MdArticle } from "react-icons/md";
 
 import { BlogPagination } from "@/components/BlogPagination";
@@ -11,6 +11,7 @@ import { Locale, locales } from "@/i18n/locales";
 import { BLOG_LIST_PAGE_SIZE, blogListTotalPages, fetchBlogPosts } from "@/lib/api/blog";
 import { CreateActionButton } from "@/components/CreateActionButton";
 import { blogRoot } from "@/lib/nav/breadcrumbTrails";
+import { pageHref } from "@/lib/ui/pagination";
 import { paths } from "@/lib/nav/routes";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -42,9 +43,13 @@ export default async function BlogPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const page = Math.max(1, Number(sp.page) || 1);
+  const page = Math.max(1, Math.floor(Number(sp.page) || 1));
   const { posts, next, count } = await fetchBlogPosts({ page, pageSize: BLOG_LIST_PAGE_SIZE });
   const totalPages = blogListTotalPages(count, page, !!next);
+  // Strona poza zakresem (np. ?page=999) — przekieruj na ostatnią istniejącą stronę.
+  if (count != null && page > totalPages) {
+    redirect(pageHref(`/${locale}/blog`, totalPages));
+  }
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogRoot(locale, dict)}>
@@ -62,9 +67,9 @@ export default async function BlogPage({
         page={page}
         totalPages={totalPages}
         labels={{
-          prev: dict.paginationPrev ?? "Poprzednia",
-          next: dict.paginationNext ?? "Następna",
-          page: dict.paginationPage ?? "Strona {n}",
+          prev: dict.paginationPrev,
+          next: dict.paginationNext,
+          page: dict.paginationPage,
         }}
       />
     </AppPage>

@@ -32,8 +32,8 @@ export function LoginView({
     password: string;
     login: string;
     backHome: string;
-    invalidCredentials?: string;
-    loginFailed?: string;
+    invalidCredentials: string;
+    loginFailed: string;
     showPassword?: string;
     hidePassword?: string;
   };
@@ -64,9 +64,9 @@ export function LoginView({
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg === "INVALID_CREDENTIALS") {
-        setError(labels.invalidCredentials ?? "Nieprawidłowy login lub hasło.");
+        setError(labels.invalidCredentials);
       } else {
-        setError(labels.loginFailed ?? "Nie udało się zalogować.");
+        setError(labels.loginFailed);
       }
       setPending(false);
     }
@@ -83,7 +83,7 @@ export function LoginView({
       }}
     >
       <Container maxWidth="sm">
-        <Card elevation={0} sx={{ border: 1, borderColor: "divider", borderRadius: 3, overflow: "hidden" }}>
+        <Card sx={{ overflow: "hidden" }}>
           <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Stack spacing={2.25}>
               <Stack spacing={1} sx={{ alignItems: "center", textAlign: "center" }}>

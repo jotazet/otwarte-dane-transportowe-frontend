@@ -4,9 +4,8 @@ type ListResponse = unknown[] | { results?: unknown[] };
 
 function normalizeList(value: ListResponse): unknown[] {
   if (Array.isArray(value)) return value;
-  if (value && typeof value === "object" && Array.isArray((value as any).results)) {
-    return (value as any).results;
-  }
+  const results = (value as { results?: unknown[] } | null)?.results;
+  if (Array.isArray(results)) return results;
   return [];
 }
 

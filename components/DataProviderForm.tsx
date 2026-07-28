@@ -8,10 +8,12 @@ import { useRouter } from "next/navigation";
 import { AccessGate } from "@/components/AccessGate";
 import { CrudFormActions } from "@/components/layout/CrudFormActions";
 import { CrudFormCard } from "@/components/layout/CrudFormCard";
+import { useConfirm } from "@/components/layout/useConfirm";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { formatApiError } from "@/lib/formatApiError";
+import { isValidEmail, isValidUrl } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
 export function DataProviderForm({
@@ -31,6 +33,7 @@ export function DataProviderForm({
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const listHref = paths(locale).casesProviders;
   const [name, setName] = React.useState(initial?.name ?? "");
   const [website, setWebsite] = React.useState(initial?.website ?? "");
@@ -41,6 +44,14 @@ export function DataProviderForm({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (website.trim() && !isValidUrl(website.trim())) {
+      setError(dict.invalidUrl);
+      return;
+    }
+    if (email.trim() && !isValidEmail(email.trim())) {
+      setError(dict.invalidEmail);
+      return;
+    }
     setPending(true);
     try {
       const body = {
@@ -63,7 +74,7 @@ export function DataProviderForm({
 
   async function remove() {
     if (providerId == null) return;
-    if (!confirm(dict.confirmDeleteProvider)) return;
+    if (!(await confirm(dict.confirmDeleteProvider, { confirmLabel: dict.delete }))) return;
     setPending(true);
     try {
       await apiJson("DELETE", casesPaths.dataProvider(providerId));
@@ -103,6 +114,7 @@ export function DataProviderForm({
         />
       </Stack>
     </CrudFormCard>
+    {confirmDialog}
     </AccessGate>
   );
 }

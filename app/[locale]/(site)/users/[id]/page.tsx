@@ -5,6 +5,7 @@ import { UserDetailBody } from "@/components/UserDetailBody";
 import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
 import { resolvePageLocale } from "@/lib/i18n/resolvePageLocale";
+import { parseNumericId } from "@/lib/nav/ids";
 import { userDetail } from "@/lib/nav/breadcrumbTrails";
 
 export default async function UserDetailPage({
@@ -14,8 +15,8 @@ export default async function UserDetailPage({
 }) {
   const { locale, dict } = await resolvePageLocale(params);
   const { id } = await params;
-  const userId = Number(id);
-  if (!Number.isFinite(userId)) notFound();
+  const userId = parseNumericId(id);
+  if (userId == null) notFound();
 
   return (
     <AppPage

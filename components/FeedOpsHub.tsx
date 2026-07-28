@@ -49,7 +49,9 @@ export function FeedOpsHub({
   const [feedsReloadKey, setFeedsReloadKey] = React.useState(0);
 
   React.useEffect(() => {
-    setTab(parseTab(searchParams.get("tab") ?? initialTab));
+    void (async () => {
+      setTab(parseTab(searchParams.get("tab") ?? initialTab));
+    })();
   }, [initialTab, searchParams]);
 
   const changeTab = React.useCallback(
@@ -83,7 +85,10 @@ export function FeedOpsHub({
   }, [apiJson, authStatus]);
 
   React.useEffect(() => {
-    if (tab === "overview") void loadOverview();
+    if (tab !== "overview") return;
+    void (async () => {
+      await loadOverview();
+    })();
   }, [tab, loadOverview]);
 
   const reloadFeeds = React.useCallback(() => {

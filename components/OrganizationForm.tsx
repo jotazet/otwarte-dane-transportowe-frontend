@@ -10,10 +10,12 @@ import { useRouter } from "next/navigation";
 import { AccessGate } from "@/components/AccessGate";
 import { CrudFormActions } from "@/components/layout/CrudFormActions";
 import { CrudFormCard } from "@/components/layout/CrudFormCard";
+import { useConfirm } from "@/components/layout/useConfirm";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { formatApiError } from "@/lib/formatApiError";
+import { isValidEmail, isValidUrl } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
 export function OrganizationForm({
@@ -36,6 +38,7 @@ export function OrganizationForm({
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const p = paths(locale);
   const cancelHref = orgId != null ? p.casesOrg(orgId) : p.cases;
   const [region, setRegion] = React.useState(initial?.region ?? "");
@@ -50,6 +53,14 @@ export function OrganizationForm({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (website.trim() && !isValidUrl(website.trim())) {
+      setError(dict.invalidUrl);
+      return;
+    }
+    if (contactEmail.trim() && !isValidEmail(contactEmail.trim())) {
+      setError(dict.invalidEmail);
+      return;
+    }
     setPending(true);
     try {
       const body = {
@@ -78,7 +89,7 @@ export function OrganizationForm({
 
   async function remove() {
     if (orgId == null) return;
-    if (!confirm(dict.confirmDeleteOrganization)) return;
+    if (!(await confirm(dict.confirmDeleteOrganization, { confirmLabel: dict.delete }))) return;
     setPending(true);
     try {
       await apiJson("DELETE", casesPaths.organization(orgId));
@@ -159,6 +170,7 @@ export function OrganizationForm({
         />
       </Stack>
     </CrudFormCard>
+    {confirmDialog}
     </AccessGate>
   );
 }

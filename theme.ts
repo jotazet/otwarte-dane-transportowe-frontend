@@ -1,5 +1,7 @@
 import { createTheme } from "@mui/material/styles";
 
+import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
+
 function paletteScheme(isLight: boolean) {
   return {
     palette: {
@@ -100,7 +102,7 @@ const sharedComponents = {
         transformOrigin: { vertical: "top", horizontal: "left" },
         slotProps: {
           paper: {
-            sx: { maxHeight: "min(280px, 40vh)", overflow: "auto" },
+            sx: { maxHeight: SELECT_MENU_MAX_HEIGHT, overflow: "auto" },
           },
         },
       },
@@ -116,7 +118,7 @@ const sharedComponents = {
       disablePortal: true,
       slotProps: {
         listbox: {
-          sx: { maxHeight: "min(280px, 40vh)", overflow: "auto" },
+          sx: { maxHeight: SELECT_MENU_MAX_HEIGHT, overflow: "auto" },
         },
       },
     },
@@ -149,6 +151,12 @@ const sharedComponents = {
       },
     },
   },
+  // Wyłączenie animacji przejść (spójne, natychmiastowe UI).
+  MuiGrow: { defaultProps: { timeout: 0 } },
+  MuiFade: { defaultProps: { timeout: 0 } },
+  MuiZoom: { defaultProps: { timeout: 0 } },
+  MuiSlide: { defaultProps: { timeout: 0 } },
+  MuiCollapse: { defaultProps: { timeout: 0 } },
 } as const;
 
 /** Google-style blue aligned with Flutter `AppTheme` (`#1A73E8`). */
@@ -166,10 +174,3 @@ export const appTheme = createTheme({
   typography: sharedTypography,
   components: sharedComponents,
 });
-
-(appTheme.components as any) ??= {};
-(appTheme.components as any).MuiGrow = { defaultProps: { timeout: 0 } };
-(appTheme.components as any).MuiFade = { defaultProps: { timeout: 0 } };
-(appTheme.components as any).MuiZoom = { defaultProps: { timeout: 0 } };
-(appTheme.components as any).MuiSlide = { defaultProps: { timeout: 0 } };
-(appTheme.components as any).MuiCollapse = { defaultProps: { timeout: 0 } };

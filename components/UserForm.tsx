@@ -28,6 +28,7 @@ import {
 } from "@/lib/api/users";
 import type { AppRole } from "@/lib/auth/roles";
 import { formatRole } from "@/lib/auth/roleLabels";
+import { isValidEmail } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
 export function UserForm({
@@ -67,6 +68,7 @@ export function UserForm({
   const [pending, setPending] = React.useState(false);
   const [generatedPassword, setGeneratedPassword] = React.useState<string | null>(null);
   const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
+  const [createdUserId, setCreatedUserId] = React.useState<number | null>(null);
 
   function toggleRole(role: AppRole) {
     setRoles((prev) => {
@@ -108,6 +110,10 @@ export function UserForm({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!isValidEmail(email.trim())) {
+      setError(dict.invalidEmail);
+      return;
+    }
     setPending(true);
     try {
       const rolesList = [...roles];
@@ -132,11 +138,16 @@ export function UserForm({
         };
         const created = await apiJson<UserWithGeneratedPassword>("POST", USERS_BASE, body);
         if (created.generated_password) {
+          // Nie nawigujemy od razu — dialog z hasłem musi pozostać do zamknięcia,
+          // inaczej jednorazowe hasło przepada wraz z przeładowaniem trasy.
+          setCreatedUserId(created.id);
           setGeneratedPassword(created.generated_password);
           setPasswordDialogOpen(true);
+          setPending(false);
+        } else {
+          router.replace(p.user(created.id));
+          router.refresh();
         }
-        router.replace(p.user(created.id));
-        router.refresh();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -147,7 +158,10 @@ export function UserForm({
   function closePasswordDialog() {
     setPasswordDialogOpen(false);
     setGeneratedPassword(null);
-    if (!isEdit) router.refresh();
+    if (!isEdit && createdUserId != null) {
+      router.replace(p.user(createdUserId));
+      router.refresh();
+    }
   }
 
   return (

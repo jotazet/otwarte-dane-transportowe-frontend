@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { AccessGate } from "@/components/AccessGate";
 import { GeneratedPasswordDialog } from "@/components/GeneratedPasswordDialog";
 import { DetailField } from "@/components/layout/DetailField";
+import { useConfirm } from "@/components/layout/useConfirm";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import { UserForm } from "@/components/UserForm";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -54,6 +55,7 @@ export function UserDetailBody({
   const auth = useAuth();
   const router = useRouter();
   const p = paths(locale);
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const [user, setUser] = React.useState<UserDetail | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -76,13 +78,16 @@ export function UserDetailBody({
   }, [auth, userId]);
 
   React.useEffect(() => {
-    if (auth.status === "authenticated") void load();
+    if (auth.status !== "authenticated") return;
+    void (async () => {
+      await load();
+    })();
   }, [auth.status, load]);
 
   const isSelf = auth.status === "authenticated" && auth.user.userId === userId;
 
   async function resetPassword() {
-    if (!confirm(dict.confirmResetPassword)) return;
+    if (!(await confirm(dict.confirmResetPassword, { danger: false }))) return;
     setPending(true);
     setError(null);
     try {
@@ -99,7 +104,7 @@ export function UserDetailBody({
   }
 
   async function remove() {
-    if (!confirm(dict.confirmDeleteUser)) return;
+    if (!(await confirm(dict.confirmDeleteUser, { confirmLabel: dict.delete }))) return;
     setPending(true);
     setError(null);
     try {
@@ -144,6 +149,7 @@ export function UserDetailBody({
         }}
       >
         {error ? <Alert severity="error">{error}</Alert> : null}
+        {confirmDialog}
       </AccessGate>
     );
   }
@@ -236,6 +242,7 @@ export function UserDetailBody({
         }}
         dict={dict}
       />
+      {confirmDialog}
     </Stack>
     </AccessGate>
   );

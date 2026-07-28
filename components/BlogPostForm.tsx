@@ -49,6 +49,27 @@ export function BlogPostForm({
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+  function onImageFileChange(file: File | null) {
+    if (!file) {
+      setImageFile(null);
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setError(dict.invalidFileType);
+      setImageFile(null);
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError(dict.fileTooLarge);
+      setImageFile(null);
+      return;
+    }
+    setError(null);
+    setImageFile(file);
+  }
+
   function parseTags(): string[] {
     const raw = tagsStr
       .split(",")
@@ -158,7 +179,7 @@ export function BlogPostForm({
                 type="file"
                 accept="image/*"
                 hidden
-                onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => onImageFileChange(e.target.files?.[0] ?? null)}
               />
             </Button>
             {imageFile ? (

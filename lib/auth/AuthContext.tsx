@@ -2,7 +2,13 @@
 
 import * as React from "react";
 
-import { ApiError, formatApiErrorResponse, postJson } from "@/lib/api/http";
+import {
+  ApiError,
+  fetchWithTimeout,
+  formatApiErrorResponse,
+  postJson,
+  UPLOAD_TIMEOUT_MS,
+} from "@/lib/api/http";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
@@ -41,14 +47,18 @@ const STORAGE_KEY = "odt.jwt";
 const USERNAME_KEY = "odt.username";
 const AUTH_COOKIE = "odt.auth";
 
+function secureCookieSuffix() {
+  return typeof location !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
+}
+
 function setAuthCookieFlag() {
   if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${secureCookieSuffix()}`;
 }
 
 function clearAuthCookieFlag() {
   if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax${secureCookieSuffix()}`;
 }
 
 function readStoredTokens(): Tokens | null {
@@ -221,10 +231,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
 
-      let res = await fetch(url, buildInit(tokens.access));
+      let res = await fetchWithTimeout(url, buildInit(tokens.access));
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetch(url, buildInit(next.access));
+        if (next) res = await fetchWithTimeout(url, buildInit(next.access));
       }
       if (!res.ok) {
         const msg = await formatApiErrorResponse(res);
@@ -254,10 +264,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
 
-      let res = await fetch(url, buildInit(tokens.access));
+      let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetch(url, buildInit(next.access));
+        if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
         const msg = await formatApiErrorResponse(res);
@@ -283,10 +293,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
 
-      let res = await fetch(url, buildInit(tokens.access));
+      let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetch(url, buildInit(next.access));
+        if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
         const msg = await formatApiErrorResponse(res);

@@ -25,7 +25,10 @@ export function GeneratedPasswordDialog({
   const [copied, setCopied] = React.useState(false);
 
   React.useEffect(() => {
-    if (!open) setCopied(false);
+    if (open) return;
+    void (async () => {
+      setCopied(false);
+    })();
   }, [open]);
 
   async function copy() {

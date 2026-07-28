@@ -93,8 +93,3 @@ export function AccessGate({
 
   return <>{children}</>;
 }
-
-/** @deprecated Use AccessGate */
-export function RoleGate(props: { roles: AppRole[]; children: ReactNode }) {
-  return <AccessGate roles={props.roles} mode="hide">{props.children}</AccessGate>;
-}

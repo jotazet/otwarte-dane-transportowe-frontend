@@ -31,7 +31,9 @@ export function decodeJwt(token: string): JwtPayload | null {
 export function isJwtExpired(token: string, skewSeconds = 30) {
   const payload = decodeJwt(token);
   const exp = typeof payload?.exp === "number" ? payload.exp : null;
-  if (!exp) return false;
+  // Brak/niepoprawny `exp` traktujemy jako wygasły (bezpieczna wartość domyślna) —
+  // wymusza odświeżenie/wylogowanie zamiast bezterminowego zaufania do tokenu.
+  if (!exp) return true;
   const now = Math.floor(Date.now() / 1000);
   return exp <= now + skewSeconds;
 }

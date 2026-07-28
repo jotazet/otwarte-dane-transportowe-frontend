@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdCheck, MdContentCopy, MdFileDownload } from "react-icons/md";
 
 export function DownloadActions({
@@ -15,12 +15,20 @@ export function DownloadActions({
   labels: { downloadFile: string; copyLink: string; openLinkError: string };
 }) {
   const [copied, setCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopied(false), 1200);
     } catch {
       // ignore
     }

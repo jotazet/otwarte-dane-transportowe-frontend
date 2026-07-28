@@ -7,7 +7,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
@@ -19,11 +18,13 @@ import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
 import { StageBanner } from "@/components/layout/StageBanner";
+import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
 import type { FetchHealthFields } from "@/lib/api/types";
+import { downloadBlob } from "@/lib/download";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
@@ -97,6 +98,7 @@ export function RealtimeSubmissionDetail({
   const auth = useAuth();
   const perms = usePermissions();
   const router = useRouter();
+  const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const [row, setRow] = React.useState<RtDetail | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -107,37 +109,60 @@ export function RealtimeSubmissionDetail({
   const [license, setLicense] = React.useState("");
   const [endpointsDraft, setEndpointsDraft] = React.useState<EndpointDraft[]>([]);
 
+  const applyDetail = React.useCallback((d: RtDetail) => {
+    setRow(d);
+    setStage(String(d.current_stage));
+    setRejectCause("");
+    setName(d.name ?? "");
+    setNote(d.note ?? "");
+    setLicense(d.license ?? "");
+    setEndpointsDraft(
+      (d.endpoints ?? []).map((ep) => ({
+        id: typeof ep.id === "number" ? ep.id : undefined,
+        endpoint_type: String(ep.endpoint_type ?? ""),
+        url: String(ep.url ?? ""),
+        interval: typeof ep.interval === "number" ? String(ep.interval) : "60",
+        is_original: ep.is_original !== false,
+        hide_original: !!ep.hide_original,
+        auth_type: ep.auth_type ?? "",
+        auth_value: "",
+      })),
+    );
+  }, []);
+
+  const authStatus = auth.status;
+  const apiJson = auth.apiJson;
+
+  // Reload po akcjach mutujących (komponent zamontowany — bez anulowania).
   const load = React.useCallback(async () => {
-    if (auth.status !== "authenticated") return;
+    if (authStatus !== "authenticated") return;
     setError(null);
     try {
-      const d = await auth.apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
-      setRow(d);
-      setStage(String(d.current_stage));
-      setRejectCause("");
-      setName(d.name ?? "");
-      setNote(d.note ?? "");
-      setLicense(d.license ?? "");
-      setEndpointsDraft(
-        (d.endpoints ?? []).map((ep) => ({
-          id: typeof ep.id === "number" ? ep.id : undefined,
-          endpoint_type: String(ep.endpoint_type ?? ""),
-          url: String(ep.url ?? ""),
-          interval: typeof ep.interval === "number" ? String(ep.interval) : "60",
-          is_original: ep.is_original !== false,
-          hide_original: !!ep.hide_original,
-          auth_type: ep.auth_type ?? "",
-          auth_value: "",
-        })),
-      );
+      const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
+      applyDetail(d);
     } catch (e) {
       setError(formatApiError(e));
     }
-  }, [auth, submissionId]);
+  }, [apiJson, authStatus, submissionId, applyDetail]);
 
+  // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`
+  // chroniącą przed setState po unmount i nadpisaniem nowszej odpowiedzi starszą.
   React.useEffect(() => {
-    void load();
-  }, [load]);
+    if (authStatus !== "authenticated") return;
+    let cancelled = false;
+    (async () => {
+      setError(null);
+      try {
+        const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
+        if (!cancelled) applyDetail(d);
+      } catch (e) {
+        if (!cancelled) setError(formatApiError(e));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiJson, authStatus, submissionId, applyDetail]);
 
   const listHref = submissionListPath(locale, listContext);
 
@@ -222,7 +247,7 @@ export function RealtimeSubmissionDetail({
 
   async function remove() {
     if (!row) return;
-    if (!confirm(dict.confirmDeleteSubmission)) return;
+    if (!(await confirm(dict.confirmDeleteSubmission, { confirmLabel: dict.delete }))) return;
     try {
       await auth.apiJson("DELETE", submissionsPaths.realtimeDetail(row.id));
       router.replace(listHref);
@@ -241,11 +266,7 @@ export function RealtimeSubmissionDetail({
       const blob = await auth.apiBlob(
         submissionsPaths.realtimeDownload(row.static_submission, epPk),
       );
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `submission-${row.id}-rt-${epPk}.zip`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      downloadBlob(blob, `submission-${row.id}-rt-${epPk}.zip`);
     } catch (e) {
       setError(formatApiError(e));
     }
@@ -513,6 +534,7 @@ export function RealtimeSubmissionDetail({
           ) : null}
       </FormSection>
       ) : null}
+      {confirmDialog}
     </Stack>
   );
 }

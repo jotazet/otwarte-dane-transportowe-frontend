@@ -94,11 +94,13 @@ export function pauseFetchPath(source: FetchErrorSource, id: number, action: "pa
 
 type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
-/** Loads all pages (for overview stats). */
+/** Loads all pages (for overview stats). Twardy limit stron chroni przed zapętleniem. */
+const MAX_PROXY_FEED_PAGES = 100;
+
 export async function fetchAllProxyFeeds(apiJson: ApiJson): Promise<ProxyFeedListItem[]> {
   const all: ProxyFeedListItem[] = [];
   let page = 1;
-  for (;;) {
+  while (page <= MAX_PROXY_FEED_PAGES) {
     const data = await apiJson<PaginatedResponse<ProxyFeedListItem>>(
       "GET",
       `${feedOpsPaths.proxyFeeds}${buildProxyFeedsQuery({ page, pageSize: 100 })}`,

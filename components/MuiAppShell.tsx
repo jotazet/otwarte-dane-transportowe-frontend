@@ -170,7 +170,9 @@ function MuiAppShellInner({
     }) as const;
 
   React.useLayoutEffect(() => {
+    // Pomiar layoutu przed paintem — synchroniczny setState jest tu zamierzony (unika migotania).
     if (auth.status === "loading") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCompactActionsReady(false);
     }
 

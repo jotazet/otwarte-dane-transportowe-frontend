@@ -29,7 +29,10 @@ export function PauseFetchDialog({
   const [reason, setReason] = React.useState("");
 
   React.useEffect(() => {
-    if (open) setReason("");
+    if (!open) return;
+    void (async () => {
+      setReason("");
+    })();
   }, [open]);
 
   return (

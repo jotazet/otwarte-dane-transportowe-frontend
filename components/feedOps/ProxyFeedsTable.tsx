@@ -93,7 +93,9 @@ export function ProxyFeedsTable({
   }, [apiJson, page]);
 
   React.useEffect(() => {
-    void load();
+    void (async () => {
+      await load();
+    })();
   }, [load, reloadKey]);
 
   const sourceLabel = React.useCallback(

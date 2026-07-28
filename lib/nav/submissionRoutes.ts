@@ -1,3 +1,4 @@
+import { parseNumericId } from "@/lib/nav/ids";
 import type { SubmissionListContext } from "@/lib/nav/routes";
 
 export type SubmissionRouteContext = "my-submissions" | "queue";
@@ -10,8 +11,8 @@ export function parseSubmissionRouteParams(
 ): { listContext: SubmissionListContext; kind: SubmissionRouteKind; submissionId: number } | null {
   if (context !== "my-submissions" && context !== "queue") return null;
   if (kind !== "feed" && kind !== "realtime") return null;
-  const submissionId = Number(id);
-  if (!Number.isFinite(submissionId)) return null;
+  const submissionId = parseNumericId(id);
+  if (submissionId == null) return null;
   return {
     listContext: context === "queue" ? "queue" : "my",
     kind,
