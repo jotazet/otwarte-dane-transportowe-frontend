@@ -66,3 +66,21 @@ export async function reactToPost(postId: number, reaction: string | null) {
   await postJson<void>(`/api/blog/reactions/${postId}/`, { reaction });
 }
 
+/**
+ * Reakcje bieżącego odwiedzającego dla podanych postów.
+ *
+ * MUSI być wywoływane z przeglądarki. Backend rozpoznaje odwiedzającego po
+ * jego adresie IP, więc wywołanie server-side (SSR) opisywałoby serwer
+ * frontendu — identycznie dla wszystkich. Z tego samego powodu nie wolno
+ * używać pola `your_reaction` z odpowiedzi pobranej w komponencie serwerowym.
+ *
+ * Zwraca mapę `{ "<postId>": "<reaction>" }`; brak klucza = brak reakcji.
+ */
+export async function fetchMyReactions(
+  postIds: number[],
+): Promise<Record<string, string>> {
+  if (!postIds.length) return {};
+  const q = new URLSearchParams({ post_ids: postIds.join(",") });
+  return await getJson<Record<string, string>>(`/api/blog/reactions/mine/?${q}`);
+}
+

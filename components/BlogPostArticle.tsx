@@ -168,7 +168,6 @@ export function BlogPostArticle({
         <ReactionPanel
           postId={postId}
           initialSummary={post.reactions_summary}
-          initialYourReaction={post.your_reaction}
           label={dict.reactions}
         />
 

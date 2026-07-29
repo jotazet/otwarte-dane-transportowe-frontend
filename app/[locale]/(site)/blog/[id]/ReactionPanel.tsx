@@ -4,41 +4,59 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { reactToPost } from "@/lib/api/blog";
+import { fetchMyReactions, reactToPost } from "@/lib/api/blog";
 import { blogReactionOrder, reactionMdIcons } from "@/lib/reactionIcons";
 
 export function ReactionPanel({
   postId,
   initialSummary,
-  initialYourReaction,
   label,
 }: {
   postId: number;
   initialSummary: Record<string, number> | null | undefined;
-  initialYourReaction: string | null | undefined;
   label: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [saving, setSaving] = useState(false);
+  // Which reaction is MINE has to be read in the browser: this page is
+  // rendered server-side and the API identifies visitors by IP, so an SSR
+  // value would describe the frontend server — the same for every visitor.
+  const [yourReaction, setYourReaction] = useState<string | null>(null);
 
-  const summary = initialSummary ?? {};
-  const yourReaction = initialYourReaction ?? null;
+  useEffect(() => {
+    let active = true;
+    fetchMyReactions([postId])
+      .then((mine) => {
+        if (active) setYourReaction(mine[String(postId)] ?? null);
+      })
+      .catch(() => {
+        // Non-critical: leave nothing selected if the lookup fails.
+      });
+    return () => {
+      active = false;
+    };
+  }, [postId]);
 
   const counts = useMemo(() => {
+    const summary = initialSummary ?? {};
     const out: Record<string, number> = {};
     for (const key of blogReactionOrder) out[key] = Number(summary[key] ?? 0);
     return out;
-  }, [summary]);
+  }, [initialSummary]);
 
   async function setReaction(next: string | null) {
+    const previous = yourReaction;
     setSaving(true);
+    setYourReaction(next); // optimistic
     try {
       await reactToPost(postId, next);
-      startTransition(() => router.refresh());
+      startTransition(() => router.refresh()); // refresh the global counts
+    } catch {
+      setYourReaction(previous); // e.g. daily limit reached (429)
     } finally {
       setSaving(false);
     }
