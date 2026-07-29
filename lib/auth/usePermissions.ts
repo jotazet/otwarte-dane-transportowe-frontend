@@ -57,13 +57,7 @@ export function usePermissions() {
         canEditFullSource: canProviderEditFullSource(full),
         canAdminSourceOnStage2Plus: canAdminEditSourceOnPublishedStages(full),
         canHelperReviewOnly: canHelperReviewOnly(full),
-        canDelete: user
-          ? canDeleteFeedSubmission(user, {
-              isOwner: ctx.isOwner,
-              currentStage: ctx.currentStage,
-              isRejected: ctx.isRejected,
-            })
-          : false,
+        canDelete: user ? canDeleteFeedSubmission(user) : false,
       };
     },
   };

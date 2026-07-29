@@ -9,7 +9,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { BLOG_LIST_PAGE_SIZE, blogListTotalPages, fetchBlogPosts } from "@/lib/api/blog";
+import { loadOrError } from "@/lib/api/loadOr404";
 import { CreateActionButton } from "@/components/CreateActionButton";
+import { PageLoadErrorAlert } from "@/components/PageLoadErrorAlert";
 import { blogRoot } from "@/lib/nav/breadcrumbTrails";
 import { pageHref } from "@/lib/ui/pagination";
 import { paths } from "@/lib/nav/routes";
@@ -44,10 +46,10 @@ export default async function BlogPage({
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
   const page = Math.max(1, Math.floor(Number(sp.page) || 1));
-  const { posts, next, count } = await fetchBlogPosts({ page, pageSize: BLOG_LIST_PAGE_SIZE });
-  const totalPages = blogListTotalPages(count, page, !!next);
+  const { data: list } = await loadOrError(fetchBlogPosts({ page, pageSize: BLOG_LIST_PAGE_SIZE }));
+  const totalPages = list ? blogListTotalPages(list.count, page, !!list.next) : 1;
   // Strona poza zakresem (np. ?page=999) — przekieruj na ostatnią istniejącą stronę.
-  if (count != null && page > totalPages) {
+  if (list && list.count != null && page > totalPages) {
     redirect(pageHref(`/${locale}/blog`, totalPages));
   }
 
@@ -61,17 +63,23 @@ export default async function BlogPage({
           <CreateActionButton roles={["Blogger", "Editor"]} href={paths(locale).blogNew} label={dict.createPost} />
         }
       />
-      <BlogPostCards locale={locale} dict={dict} posts={posts} />
-      <BlogPagination
-        locale={locale}
-        page={page}
-        totalPages={totalPages}
-        labels={{
-          prev: dict.paginationPrev,
-          next: dict.paginationNext,
-          page: dict.paginationPage,
-        }}
-      />
+      {list === null ? (
+        <PageLoadErrorAlert body={dict.pageErrorBody} retryLabel={dict.tryAgain} />
+      ) : (
+        <>
+          <BlogPostCards locale={locale} dict={dict} posts={list.posts} />
+          <BlogPagination
+            locale={locale}
+            page={page}
+            totalPages={totalPages}
+            labels={{
+              prev: dict.paginationPrev,
+              next: dict.paginationNext,
+              page: dict.paginationPage,
+            }}
+          />
+        </>
+      )}
     </AppPage>
   );
 }

@@ -1,13 +1,5 @@
 import { getJson } from "@/lib/api/http";
-
-type ListResponse = unknown[] | { results?: unknown[] };
-
-function normalizeList(value: ListResponse): unknown[] {
-  if (Array.isArray(value)) return value;
-  const results = (value as { results?: unknown[] } | null)?.results;
-  if (Array.isArray(results)) return results;
-  return [];
-}
+import { fetchAllPages } from "@/lib/api/types";
 
 export type FeedCatalogOrganizationListItem = {
   id: number;
@@ -51,8 +43,10 @@ export type FeedCatalogOrganizationDetail = FeedCatalogOrganizationListItem & {
 export async function fetchFeedCatalog(): Promise<
   FeedCatalogOrganizationListItem[]
 > {
-  const json = await getJson<ListResponse>("/api/data_manager/feeds/");
-  return normalizeList(json) as FeedCatalogOrganizationListItem[];
+  return await fetchAllPages<FeedCatalogOrganizationListItem>(
+    (p) => getJson(p),
+    "/api/data_manager/feeds/",
+  );
 }
 
 export async function fetchFeedCatalogOrganization(

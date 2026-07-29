@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchTransportOrganizations } from "@/lib/api/cases";
+import { loadOrError } from "@/lib/api/loadOr404";
+import { PageLoadErrorAlert } from "@/components/PageLoadErrorAlert";
 import { casesRoot } from "@/lib/nav/breadcrumbTrails";
 import { paths } from "@/lib/nav/routes";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -38,7 +40,7 @@ export default async function CasesPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const organizations = await fetchTransportOrganizations();
+  const { data: organizations } = await loadOrError(fetchTransportOrganizations());
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesRoot(locale, dict)}>
@@ -48,6 +50,9 @@ export default async function CasesPage({
         icon={<MdRuleFolder size={28} aria-hidden />}
         actions={<CreateActionButton roles={["Helper"]} href={paths(locale).casesOrgNew} label={dict.addOrganization} />}
       />
+      {organizations === null ? (
+        <PageLoadErrorAlert body={dict.pageErrorBody} retryLabel={dict.tryAgain} />
+      ) : (
       <CasesTable
         locale={locale}
         organizations={organizations}
@@ -62,6 +67,7 @@ export default async function CasesPage({
           caseStatusLabels: dict.caseStatusLabels,
         }}
       />
+      )}
     </AppPage>
   );
 }

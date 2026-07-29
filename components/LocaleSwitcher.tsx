@@ -11,8 +11,15 @@ import { MdLanguage } from "react-icons/md";
 
 import type { Locale } from "@/i18n/locales";
 
+const LOCALE_LABELS: Record<Locale, string> = {
+  pl: "Polski",
+  en: "English",
+  de: "Deutsch",
+  bg: "Български",
+};
+
 function hrefForLocale(pathname: string, target: Locale) {
-  const withoutLocale = pathname.replace(/^\/(pl|en|de)(\/|$)/, "/");
+  const withoutLocale = pathname.replace(/^\/(pl|en|de|bg)(\/|$)/, "/");
   return `/${target}${withoutLocale === "/" ? "" : withoutLocale}`;
 }
 
@@ -27,7 +34,7 @@ export function LocaleSwitcher({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const currentLabel = locale === "pl" ? "Polski" : locale === "de" ? "Deutsch" : "English";
+  const currentLabel = LOCALE_LABELS[locale] ?? "English";
 
   const triggerProps = {
     "aria-label": `${languageLabel}: ${currentLabel}`,
@@ -76,6 +83,14 @@ export function LocaleSwitcher({
         selected={locale === "de"}
       >
         Deutsch
+      </MenuItem>
+      <MenuItem
+        component={Link}
+        href={hrefForLocale(pathname, "bg")}
+        onClick={() => setAnchorEl(null)}
+        selected={locale === "bg"}
+      >
+        Български
       </MenuItem>
     </Menu>
   );

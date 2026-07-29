@@ -17,3 +17,16 @@ export async function loadOr404<T>(promise: Promise<T>): Promise<T> {
     throw e;
   }
 }
+
+/**
+ * Wariant dla stron listowych: zamiast wywalać całą stronę do `error.tsx`,
+ * zwraca `{ data: null }` przy awarii API (timeout, brak połączenia, 5xx),
+ * żeby strona mogła wyrenderować nagłówek i inline'owy komunikat błędu.
+ */
+export async function loadOrError<T>(promise: Promise<T>): Promise<{ data: T | null }> {
+  try {
+    return { data: await promise };
+  } catch {
+    return { data: null };
+  }
+}

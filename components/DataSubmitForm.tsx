@@ -41,7 +41,7 @@ import {
 } from "@/lib/data/intervalChoices";
 import { text } from "@/lib/format";
 
-type OrgListResponse = TransportOrganizationListItem[] | { results?: TransportOrganizationListItem[] };
+import { fetchAllPages } from "@/lib/api/types";
 
 type EligibleStaticRow = {
   id: number;
@@ -127,8 +127,10 @@ export function DataSubmitForm({
     let cancelled = false;
     (async () => {
       try {
-        const raw = await getJson<OrgListResponse>("/api/cases/transport-organizations/");
-        const list = Array.isArray(raw) ? raw : (raw.results ?? []);
+        const list = await fetchAllPages<TransportOrganizationListItem>(
+          (path) => getJson(path),
+          "/api/cases/transport-organizations/",
+        );
         if (!cancelled) setOrgs(list);
       } catch {
         if (!cancelled) setOrgs([]);
@@ -220,8 +222,7 @@ export function DataSubmitForm({
       setRtStaticSubId("");
       try {
         const path = `/api/data_manager/realtime-submissions/eligible-static-submissions/${rtOrgId}/${suffix}/`;
-        const raw = await apiJson<EligibleStaticRow[] | { results?: EligibleStaticRow[] }>("GET", path);
-        const list = Array.isArray(raw) ? raw : (raw.results ?? []);
+        const list = await fetchAllPages<EligibleStaticRow>((p) => apiJson("GET", p), path);
         if (!cancelled) {
           setEligibleStatics(list);
           if (list.length === 1) setRtStaticSubId(list[0].id);

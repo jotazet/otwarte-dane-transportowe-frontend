@@ -24,7 +24,8 @@ export const dictEn: Dictionary = {
   publicEndpoint: "Public endpoint",
   requiresLogin: "Requires login",
   blogTitle: "Blog",
-  blogSubtitle: "News, guides and announcements loaded directly from the blog API.",
+  blogSubtitle:
+    "News, thoughts and announcements about transport, data and more. Add reactions - and if you have your own thoughts and want to become an author, get in touch!",
   blogNoPosts: "No blog posts yet.",
   casesTitle: "Cases and organizations",
   casesSubtitle:
@@ -80,15 +81,14 @@ export const dictEn: Dictionary = {
     "The legal basis that enables access to data is the <a href='https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20210001641' target='_blank' rel='noopener noreferrer'>Act of 11 August 2021 on open data and the re-use of public sector information</a>.",
   supportTitle: "Great sites",
   supportDesc:
-    "In Poland, besides ODT, there are a few data sites worth checking out: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>.",
+    "Besides ODT, there are a few data sites worth checking out: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>, <a href='https://gtfs.livetransport.eu/' target='_blank' rel='noopener noreferrer'>gtfs.livetransport.eu</a>.",
   aboutMeTitle: "About me",
   aboutMeDesc:
-        "My name is Jakub Zydroń. I'm interested in public transportation and the analysis and processing of data related to it. In addition to my studies, I work at an organization that deals with public transportation, and in my free time, I work on transportation-related projects.",
+    "My name is Jakub Zydroń. I am interested in and work in public transport. I deal with the analysis and processing of transport-related data.",
   apiErrorTitle: "Could not load data",
-  apiErrorBody:
-    "Check that the backend is running and API_BASE_URL points to the correct address.",
+  apiErrorBody: "The server is not responding!",
   emptyListTitle: "No data",
-  emptyListBody: "The API responded successfully, but the list is empty.",
+  emptyListBody: "No data",
   tableNoFilterMatches: "No rows match the selected filters.",
   latestStatus: "Latest status",
   region: "Region",
@@ -249,7 +249,7 @@ export const dictEn: Dictionary = {
   postContent: "Post body",
   blogMarkdownHint: "Markdown supported (headings, lists, links, code, etc.).",
   staticSubmissionId: "Static submission ID",
-  staticSubmissionIdHint: "Optional - link realtime to an existing static submission.",
+  staticSubmissionIdHint: "Optional - if the realtime concerns the same package as an existing static submission.",
   yes: "Yes",
   no: "No",
   hideOriginal: "Hide original URL",
@@ -379,7 +379,7 @@ export const dictEn: Dictionary = {
   metaSiteDescription:
     "Catalog of GTFS, GTFS-RT and NeTEx feeds from public transport operators in Poland. Open transport data, acquisition statuses, feed links and API.",
   metaKeywords:
-    "GTFS, GTFS Poland, NeTEx, open data, transport data, public transport, GTFS-RT, SIRI, GBFS",
+    "GTFS, GTFS Poland, NeTEx, NeTEx Poland, open data, transport data, public transport, GTFS-RT, SIRI, GBFS",
   metaHomeTitle: "GTFS Poland – open public transport data",
   metaHomeDescription:
     "GTFS and NeTEx catalog in Poland. Browse static and realtime feeds and check open transport data acquisition statuses.",
@@ -394,5 +394,5 @@ export const dictEn: Dictionary = {
     "Check open GTFS and NeTEx data acquisition statuses for transport organizations in Poland - public and private.",
   metaBlogTitle: "Blog on public transport and open data",
   metaBlogDescription:
-    "News and articles on public transport, GTFS, NeTEx and open transport data in Poland.",
+    "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",
 };

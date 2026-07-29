@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -27,6 +28,7 @@ import { canBlogEditPost } from "@/lib/auth/permissions";
 import { paths } from "@/lib/nav/routes";
 import { blogCoverImageSrc } from "@/lib/blogImage";
 import { formatDate, text } from "@/lib/format";
+import { formatApiError } from "@/lib/formatApiError";
 import { mutedPanelSx } from "@/lib/ui/tableSx";
 
 export function BlogPostArticle({
@@ -51,16 +53,20 @@ export function BlogPostArticle({
         auth.user.roles.has("Blogger")));
   const [delOpen, setDelOpen] = React.useState(false);
   const [delPending, setDelPending] = React.useState(false);
+  const [delError, setDelError] = React.useState<string | null>(null);
 
   async function confirmDelete() {
     setDelPending(true);
+    setDelError(null);
     try {
       await auth.apiJson("DELETE", `/api/blog/posts/${postId}/`);
+      setDelOpen(false);
       router.replace(`/${locale}/blog`);
       router.refresh();
+    } catch (err) {
+      setDelError(formatApiError(err));
     } finally {
       setDelPending(false);
-      setDelOpen(false);
     }
   }
 
@@ -86,7 +92,10 @@ export function BlogPostArticle({
                 size="small"
                 color="error"
                 aria-label={dict.delete}
-                onClick={() => setDelOpen(true)}
+                onClick={() => {
+                  setDelError(null);
+                  setDelOpen(true);
+                }}
               >
                 <MdDelete size={20} aria-hidden />
               </IconButton>
@@ -169,6 +178,11 @@ export function BlogPostArticle({
             <Typography variant="body2" color="text.secondary">
               {text(post.title)}
             </Typography>
+            {delError ? (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {delError}
+              </Alert>
+            ) : null}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDelOpen(false)} disabled={delPending}>

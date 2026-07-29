@@ -10,6 +10,7 @@ const OG_LOCALES: Record<Locale, string> = {
   pl: "pl_PL",
   en: "en_GB",
   de: "de_DE",
+  bg: "bg_BG",
 };
 
 export function siteUrl(path: string, locale: Locale): string {

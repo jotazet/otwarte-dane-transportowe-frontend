@@ -7,6 +7,32 @@ export function normalizeList<T>(data: ApiListResponse<T> | null | undefined): T
   return data.results ?? [];
 }
 
+type GetJsonFn = <T>(path: string) => Promise<T>;
+
+/** Twardy limit stron chroni przed zapętleniem przy błędnym `next`. */
+const FETCH_ALL_MAX_PAGES = 100;
+
+/**
+ * Pobiera wszystkie strony paginowanej listy DRF. Numer strony liczony lokalnie
+ * (nie nawigujemy po URL z `next` — unika rozjazdu originów za reverse-proxy);
+ * `next` służy wyłącznie jako warunek stopu.
+ */
+export async function fetchAllPages<T>(
+  get: GetJsonFn,
+  basePath: string,
+  pageSize = 200,
+): Promise<T[]> {
+  const all: T[] = [];
+  const sep = basePath.includes("?") ? "&" : "?";
+  for (let page = 1; page <= FETCH_ALL_MAX_PAGES; page++) {
+    const data = await get<ApiListResponse<T>>(`${basePath}${sep}page=${page}&page_size=${pageSize}`);
+    if (Array.isArray(data)) return data;
+    all.push(...(data.results ?? []));
+    if (!data.next) break;
+  }
+  return all;
+}
+
 /** DRF `PageNumberPagination` response shape. */
 export type PaginatedResponse<T> = {
   count: number;

@@ -1,4 +1,4 @@
-import type { FetchHealthFields, PaginatedResponse } from "@/lib/api/types";
+import { fetchAllPages, type FetchHealthFields } from "@/lib/api/types";
 
 export const feedOpsPaths = {
   proxyFeeds: "/api/data_manager/proxy-feeds/",
@@ -94,20 +94,11 @@ export function pauseFetchPath(source: FetchErrorSource, id: number, action: "pa
 
 type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
-/** Loads all pages (for overview stats). Twardy limit stron chroni przed zapętleniem. */
-const MAX_PROXY_FEED_PAGES = 100;
-
+/** Loads all pages (for overview stats). */
 export async function fetchAllProxyFeeds(apiJson: ApiJson): Promise<ProxyFeedListItem[]> {
-  const all: ProxyFeedListItem[] = [];
-  let page = 1;
-  while (page <= MAX_PROXY_FEED_PAGES) {
-    const data = await apiJson<PaginatedResponse<ProxyFeedListItem>>(
-      "GET",
-      `${feedOpsPaths.proxyFeeds}${buildProxyFeedsQuery({ page, pageSize: 100 })}`,
-    );
-    all.push(...(data.results ?? []));
-    if (!data.next) break;
-    page += 1;
-  }
-  return all;
+  return await fetchAllPages<ProxyFeedListItem>(
+    (p) => apiJson("GET", p),
+    feedOpsPaths.proxyFeeds,
+    100,
+  );
 }

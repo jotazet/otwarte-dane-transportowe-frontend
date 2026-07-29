@@ -34,29 +34,51 @@ export async function fetchWithTimeout(
   }
 }
 
-/** Czytelny komunikat z treści odpowiedzi JSON (DRF: `detail`, błędy pól). */
+/**
+ * Spłaszcza wartość błędu DRF do listy linii. Zagnieżdżone błędy pól dostają
+ * kropkowaną ścieżkę (np. `static_entry.file: Uploaded GTFS file is not a ZIP archive.`).
+ */
+function flattenErrorValue(prefix: string, value: unknown, out: string[]): void {
+  if (value == null) return;
+  if (Array.isArray(value)) {
+    const strings = value.filter((x): x is string => typeof x === "string");
+    if (strings.length) out.push(prefix ? `${prefix}: ${strings.join(", ")}` : strings.join(", "));
+    for (const x of value) {
+      if (x != null && typeof x === "object") flattenErrorValue(prefix, x, out);
+    }
+    return;
+  }
+  if (typeof value === "object") {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      flattenErrorValue(prefix ? `${prefix}.${k}` : k, v, out);
+    }
+    return;
+  }
+  out.push(prefix ? `${prefix}: ${String(value)}` : String(value));
+}
+
+/** Czytelny komunikat z treści odpowiedzi JSON (DRF: `detail`, błędy pól, tablice top-level). */
 export async function formatApiErrorResponse(res: Response): Promise<string> {
   const raw = await res.text().catch(() => "");
   const generic = `HTTP ${res.status}`;
   if (!raw) return generic;
-  let j: Record<string, unknown>;
+  let j: unknown;
   try {
-    j = JSON.parse(raw) as Record<string, unknown>;
+    j = JSON.parse(raw);
   } catch {
     // Body nie jest JSON-em (np. strona błędu HTML / stack trace) — nie ujawniamy go użytkownikowi.
     return generic;
   }
-  if (typeof j.detail === "string") return j.detail;
-  if (Array.isArray(j.detail)) {
-    return j.detail.map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join("; ");
+  if (typeof j === "string") return j;
+  if (j != null && !Array.isArray(j) && typeof j === "object") {
+    const detail = (j as Record<string, unknown>).detail;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) {
+      return detail.map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join("; ");
+    }
   }
   const lines: string[] = [];
-  for (const [k, v] of Object.entries(j)) {
-    if (v == null) continue;
-    if (Array.isArray(v)) lines.push(`${k}: ${v.map(String).join(", ")}`);
-    else if (typeof v === "object") lines.push(`${k}: ${JSON.stringify(v)}`);
-    else lines.push(`${k}: ${String(v)}`);
-  }
+  flattenErrorValue("", j, lines);
   return lines.length ? lines.join("\n") : generic;
 }
 

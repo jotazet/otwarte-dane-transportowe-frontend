@@ -8,6 +8,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalog } from "@/lib/api/dataCatalog";
+import { loadOrError } from "@/lib/api/loadOr404";
+import { PageLoadErrorAlert } from "@/components/PageLoadErrorAlert";
 import { dataCatalog } from "@/lib/nav/breadcrumbTrails";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -36,7 +38,7 @@ export default async function DataPage({
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
   const dict = await getDictionary(locale);
-  const organizations = await fetchFeedCatalog();
+  const { data: organizations } = await loadOrError(fetchFeedCatalog());
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataCatalog(locale, dict)}>
@@ -45,6 +47,9 @@ export default async function DataPage({
         subtitle={dict.dataSubtitle}
         icon={<MdDataset size={28} aria-hidden />}
       />
+      {organizations === null ? (
+        <PageLoadErrorAlert body={dict.pageErrorBody} retryLabel={dict.tryAgain} />
+      ) : (
       <DataCatalogTable
         locale={locale}
         organizations={organizations}
@@ -59,6 +64,7 @@ export default async function DataPage({
           edit: dict.edit,
         }}
       />
+      )}
     </AppPage>
   );
 }

@@ -24,7 +24,7 @@ import {
   buildListQuery,
   parseCombinedSubmissions,
 } from "@/lib/api/submissions";
-import type { CombinedSubmissionsBundle, FeedSubmissionListItem, RealtimeSubmissionListItem } from "@/lib/api/types";
+import { fetchAllPages, type CombinedSubmissionsBundle, type FeedSubmissionListItem, type RealtimeSubmissionListItem } from "@/lib/api/types";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
@@ -119,10 +119,10 @@ export function SubmissionsTableHub({
     let cancelled = false;
     (async () => {
       try {
-        const raw = await getJson<
-          TransportOrganizationListItem[] | { results?: TransportOrganizationListItem[] }
-        >("/api/cases/transport-organizations/");
-        const list = Array.isArray(raw) ? raw : (raw.results ?? []);
+        const list = await fetchAllPages<TransportOrganizationListItem>(
+          (path) => getJson(path),
+          "/api/cases/transport-organizations/",
+        );
         if (cancelled) return;
         const m = new Map<number, string>();
         for (const o of list) m.set(o.id, `${text(o.transport_organization)} - ${text(o.region)}`);

@@ -81,10 +81,10 @@ export const dictPl = {
     "Podstawa prawna, która umożliwia dostęp do danych to <a href='https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20210001641' target='_blank' rel='noopener noreferrer'>ustawa z dnia 11 sierpnia 2021 r. o otwartych danych i ponownym wykorzystywaniu informacji sektora publicznego</a>.",
   supportTitle: "Super stronki",
   supportDesc:
-    "W Polsce, oprócz ODT, istnieje kilka stron z danymi, które warto sprawdzić: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>.",
+    "Oprócz ODT, istnieje kilka stron z danymi, które warto sprawdzić: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>, <a href='https://gtfs.livetransport.eu/' target='_blank' rel='noopener noreferrer'>gtfs.livetransport.eu</a>.",
   aboutMeTitle: "O mnie",
   aboutMeDesc:
-    "Nazywam się Jakub Zydroń. Interesuję się transportem publicznym oraz analizą i przetwarzaniem danych z nim związanych. Na co dzień oprócz studiowania pracuję w instytucji zajmującej się transportem publicznym, w wolnym czasie natomiast realizuję projekty związane z transportem.",
+    "Nazywam się Jakub Zydroń. Interesuję się oraz pracuję w transporcie publicznym. Zajmuję się analizą i przetwarzaniem danych z nim związanych.",
   apiErrorTitle: "Nie udało się pobrać danych",
   apiErrorBody: "Serwer nie odpowiada!",
   emptyListTitle: "Brak danych",

@@ -1,5 +1,5 @@
 import { getJson } from "@/lib/api/http";
-import { normalizeList, type ApiListResponse } from "@/lib/api/types";
+import { fetchAllPages } from "@/lib/api/types";
 
 export const casesPaths = {
   organizations: "/api/cases/transport-organizations/",
@@ -55,8 +55,7 @@ export type DataProviderRecord = {
 export async function fetchTransportOrganizations(): Promise<
   TransportOrganizationListItem[]
 > {
-  const json = await getJson<ApiListResponse<TransportOrganizationListItem>>(casesPaths.organizations);
-  return normalizeList(json) as TransportOrganizationListItem[];
+  return await fetchAllPages<TransportOrganizationListItem>((p) => getJson(p), casesPaths.organizations);
 }
 
 export async function fetchTransportOrganization(
@@ -66,8 +65,7 @@ export async function fetchTransportOrganization(
 }
 
 export async function fetchDataProviders(): Promise<DataProviderRecord[]> {
-  const json = await getJson<ApiListResponse<DataProviderRecord>>(casesPaths.dataProviders);
-  return normalizeList(json);
+  return await fetchAllPages<DataProviderRecord>((p) => getJson(p), casesPaths.dataProviders);
 }
 
 export async function fetchDataProvider(id: number): Promise<DataProviderRecord> {

@@ -76,7 +76,7 @@ export const dictDe: Dictionary = {
     "GTFS-RT-, SIRI- und GBFS-Endpoints, gruppiert nach Verkehrsorganisationen.",
   openDataTitle: "Offene Daten",
   openDataDesc:
-    "Die Offenheit der Daten ist für Fahrgäste, Städte und Bauträger von Bedeutung, da sie die Entwicklung von SIP sowie das Bewusstsein für die in einer bestimmten Region verfügbaren Verkehrsmittel fördert.",
+    "Die Offenheit der Daten ist für Fahrgäste, Städte und Entwickler von Bedeutung, da sie die Entwicklung von Fahrgastinformationssystemen sowie das Bewusstsein für die in einer bestimmten Region verfügbaren Verkehrsmittel fördert.",
   standardsTitle: "Standards",
   standardsDesc:
     "ODT unterstützt statische und dynamische Feeds, u. a.: <a href='https://gtfs.org' target='_blank' rel='noopener noreferrer'>GTFS</a>, <a href='https://gtfs.org/documentation/realtime/reference/' target='_blank' rel='noopener noreferrer'>GTFS-RT</a>, <a href='https://transmodel-cen.eu' target='_blank' rel='noopener noreferrer'>NeTEx</a>, <a href='https://transmodel-cen.eu/index.php/siri/' target='_blank' rel='noopener noreferrer'>SIRI</a> und <a href='https://gbfs.org' target='_blank' rel='noopener noreferrer'>GBFS</a>.",
@@ -88,10 +88,10 @@ export const dictDe: Dictionary = {
     "Die Rechtsgrundlage, die den Zugang zu Daten ermöglicht, ist das <a href='https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20210001641' target='_blank' rel='noopener noreferrer'>Gesetz vom 11. August 2021 über offene Daten und die Weiterverwendung von Informationen des öffentlichen Sektors</a>.",
   supportTitle: "Coole Seiten",
   supportDesc:
-    "In Polen gibt es neben ODT einige Datenseiten, die sich lohnen: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>.",
+    "Neben ODT gibt es einige Datenseiten, die sich lohnen: <a href='https://gtfs.kasznia.net/' target='_blank' rel='noopener noreferrer'>gtfs.kasznia.net</a>, <a href='https://files.girlc.at/gtfs' target='_blank' rel='noopener noreferrer'>files.girlc.at/gtfs</a>, <a href='https://mkuran.pl/gtfs/' target='_blank' rel='noopener noreferrer'>mkuran.pl/gtfs</a>, <a href='https://cdn.zbiorkom.live/gtfs/' target='_blank' rel='noopener noreferrer'>cdn.zbiorkom.live/gtfs</a>, <a href='https://gtfs.livetransport.eu/' target='_blank' rel='noopener noreferrer'>gtfs.livetransport.eu</a>.",
   aboutMeTitle: "Über mich",
   aboutMeDesc:
-    "Mein Name ist Jakub Zydroń. Ich interessiere mich für den öffentlichen Nahverkehr sowie für die Analyse und Verarbeitung der damit verbundenen Daten. Neben meinem Studium arbeite ich täglich bei einer Einrichtung, die sich mit dem öffentlichen Nahverkehr befasst, und in meiner Freizeit realisiere ich Projekte im Bereich Verkehr.",
+    "Mein Name ist Jakub Zydroń. Ich interessiere mich für den öffentlichen Verkehr und arbeite in diesem Bereich. Ich beschäftige mich mit der Analyse und Verarbeitung der damit verbundenen Daten.",
   apiErrorTitle: "Daten konnten nicht geladen werden",
   apiErrorBody: "Der Server antwortet nicht!",
   emptyListTitle: "Keine Daten",
@@ -146,7 +146,7 @@ export const dictDe: Dictionary = {
   pageNotFoundTitle: "Seite nicht gefunden",
   pageNotFoundBody: "Die gesuchte Seite oder Ressource existiert nicht oder wurde verschoben.",
   pageErrorTitle: "Etwas ist schiefgelaufen",
-  pageErrorBody: "Diese Seite konnte nicht geladen werden. Bitte versuchen Sie es gleich noch einmal.",
+  pageErrorBody: "Diese Seite konnte nicht geladen werden. Bitte versuche es gleich noch einmal.",
   tryAgain: "Erneut versuchen",
   addFeed: "Feed hinzufügen",
   myFeeds: "Meine Feeds",
@@ -261,10 +261,10 @@ export const dictDe: Dictionary = {
   yes: "Ja",
   no: "Nein",
   hideOriginal: "Original-URL verbergen",
-  myFeedsSubtitle: "Ihre statischen und Realtime-Feed-Einreichungen.",
+  myFeedsSubtitle: "Deine statischen und Realtime-Feed-Einreichungen.",
   blogManage: "Blog-Panel",
   blogManageSubtitle: "Blogbeiträge erstellen, bearbeiten und veröffentlichen.",
-  blogManageIntro: "Liste der Beiträge zum Bearbeiten.",
+  blogManageIntro: "Liste der Beiträge zum Bearbeiten und Veröffentlichen.",
   fixAndResubmit: "Quelle korrigieren und erneut einreichen",
   authConfigured: "Zugangsdaten gesetzt",
   adminSourceEditTab: "Quellenbearbeitung",
@@ -287,11 +287,11 @@ export const dictDe: Dictionary = {
   homeMotivation1: "Viel Erfolg bei neuen Herausforderungen!",
   homeMotivation2: "Schöne Arbeit!",
   homeMotivation3: "Einen schönen Tag!",
-  homeMotivation4: "Viel Erfolg bei Ihren Projekten!",
+  homeMotivation4: "Viel Erfolg bei deinen Projekten!",
   homeMotivation5: "Viel Spaß beim Entdecken der Daten!",
-  homeCreatePostHint: "Schreiben Sie einen interessanten Beitrag.",
+  homeCreatePostHint: "Schreib einen interessanten Beitrag.",
   back: "Zurück",
-  homeRolePanel: "Ihr Bereich",
+  homeRolePanel: "Dein Bereich",
   paginationPrev: "Vorherige Seite",
   paginationNext: "Nächste Seite",
   paginationPage: "Seite {n}",
@@ -356,7 +356,7 @@ export const dictDe: Dictionary = {
   fetchPause: "Pausieren",
   fetchResume: "Fortsetzen",
   fetchPauseDialogTitle: "Abruf pausieren",
-  fetchPauseDialogHint: "Der Abruf dieses Feeds bleibt pausiert, bis Sie ihn manuell fortsetzen.",
+  fetchPauseDialogHint: "Der Abruf dieses Feeds bleibt pausiert, bis du ihn manuell fortsetzt.",
   fetchPauseReasonLabel: "Grund (optional)",
   fetchErrorsHint: "Abruffehler über alle Proxy-Feeds.",
   fetchErrorsDays: "Zeitraum (Tage)",
@@ -387,7 +387,7 @@ export const dictDe: Dictionary = {
   metaSiteDescription:
     "Katalog von GTFS-, GTFS-RT- und NeTEx-Feeds von Betreibern des öffentlichen Verkehrs in Polen. Offene Verkehrsdaten, Beschaffungsstatus, Feed-Links und API.",
   metaKeywords:
-    "GTFS, GTFS Polen, NeTEx, offene Daten, Verkehrsdaten, öffentlicher Verkehr, GTFS-RT, SIRI, GBFS",
+    "GTFS, GTFS Polen, NeTEx, NeTEx Polen, offene Daten, Verkehrsdaten, öffentlicher Verkehr, GTFS-RT, SIRI, GBFS",
   metaHomeTitle: "GTFS Polen – offene Verkehrsdaten",
   metaHomeDescription:
     "GTFS- und NeTEx-Katalog in Polen. Durchsuche statische und Realtime-Feeds und prüfe den Status der Beschaffung offener Verkehrsdaten.",
@@ -402,5 +402,5 @@ export const dictDe: Dictionary = {
     "Prüfe den Status der Beschaffung offener GTFS- und NeTEx-Daten für Verkehrsorganisationen in Polen - öffentliche und private.",
   metaBlogTitle: "Blog über öffentlichen Verkehr und offene Daten",
   metaBlogDescription:
-    "Neuigkeiten und Artikel über öffentlichen Verkehr, GTFS, NeTEx und offene Verkehrsdaten in Polen.",
+    "Neuigkeiten, Gedanken und Mitteilungen über öffentlichen Verkehr, GTFS, NeTEx und offene Verkehrsdaten in Polen.",
 };

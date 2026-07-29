@@ -158,10 +158,7 @@ export function canViewSubmissionInContext(
   return user.userId != null && ctx.submittedBy != null && user.userId === ctx.submittedBy;
 }
 
-export function canDeleteFeedSubmission(
-  user: Pick<AuthUserClaims, "roles" | "isDjangoAdmin">,
-  ctx: { isOwner: boolean; currentStage: number; isRejected: boolean },
-) {
-  if (user.isDjangoAdmin) return true;
-  return ctx.isOwner && ctx.currentStage <= 1 && !ctx.isRejected;
+/** Backend (07.2026): DELETE zgłoszeń wyłącznie dla roli Admin — właściciel nie może usuwać nawet na etapie 1. */
+export function canDeleteFeedSubmission(user: Pick<AuthUserClaims, "isDjangoAdmin">) {
+  return user.isDjangoAdmin;
 }

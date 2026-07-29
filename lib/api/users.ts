@@ -1,5 +1,3 @@
-import type { ApiListResponse } from "@/lib/api/types";
-import { normalizeList } from "@/lib/api/types";
 import type { AppRole } from "@/lib/auth/roles";
 
 export const USERS_BASE = "/api/users/";
@@ -67,7 +65,3 @@ export type ChangePasswordBody = {
   current_password: string;
   new_password: string;
 };
-
-export function normalizeUserList(data: ApiListResponse<UserRecord> | null | undefined): UserRecord[] {
-  return normalizeList(data);
-}

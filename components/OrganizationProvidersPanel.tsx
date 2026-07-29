@@ -20,6 +20,7 @@ import { MdEdit } from "react-icons/md";
 import { TableCard } from "@/components/TableCard";
 import { getJson } from "@/lib/api/http";
 import type { DataProviderRecord } from "@/lib/api/cases";
+import { fetchAllPages } from "@/lib/api/types";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
@@ -54,9 +55,10 @@ export function OrganizationProvidersPanel({
     let cancelled = false;
     (async () => {
       try {
-        type List = DataProviderRecord[] | { results?: DataProviderRecord[] };
-        const raw = await getJson<List>("/api/cases/data-providers/");
-        const list = Array.isArray(raw) ? raw : (raw.results ?? []);
+        const list = await fetchAllPages<DataProviderRecord>(
+          (path) => getJson(path),
+          "/api/cases/data-providers/",
+        );
         if (!cancelled) setAllProviders(list);
       } catch {
         if (!cancelled) setAllProviders([]);

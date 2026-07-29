@@ -22,8 +22,8 @@ import { TableFilterSelect } from "@/components/TableFilterSelect";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasAdminAccess } from "@/lib/auth/permissions";
-import type { ApiListResponse } from "@/lib/api/types";
-import { USERS_BASE, normalizeUserList, type UserRecord } from "@/lib/api/users";
+import { fetchAllPages } from "@/lib/api/types";
+import { USERS_BASE, type UserRecord } from "@/lib/api/users";
 import { formatRole, formatRoles as formatRoleList } from "@/lib/auth/roleLabels";
 import { paths } from "@/lib/nav/routes";
 import { text } from "@/lib/format";
@@ -56,8 +56,8 @@ export function UsersHub({ locale, dict }: { locale: string; dict: Dictionary })
     setLoading(true);
     setError(null);
     try {
-      const json = await auth.apiJson<ApiListResponse<UserRecord>>("GET", USERS_BASE);
-      setUsers(normalizeUserList(json));
+      const list = await fetchAllPages<UserRecord>((p) => auth.apiJson("GET", p), USERS_BASE);
+      setUsers(list);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setUsers([]);
