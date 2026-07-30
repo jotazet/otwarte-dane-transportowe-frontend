@@ -347,7 +347,6 @@ export function DataSubmitForm({
         form.set("static_entry.is_original", staticOriginal ? "true" : "false");
         form.set("static_entry.hide_original", "false");
         if (staticLicense.trim()) form.set("static_entry.license", staticLicense.trim());
-        form.set("static_entry.download_time_1", dt1);
         form.set("static_entry.file", staticFile!);
 
         created = await apiForm<{ id: number }>("POST", "/api/data_manager/feed-submissions/", form);

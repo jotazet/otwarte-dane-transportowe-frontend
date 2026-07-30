@@ -45,6 +45,7 @@ import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes
 type StaticEntry = FetchHealthFields & {
   id: number;
   url?: string | null;
+  file?: string | null;
   license?: string | null;
   download_time_1?: string | null;
   download_time_2?: string | null;
@@ -187,6 +188,7 @@ export function FeedSubmissionDetail({
   const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const isHelper = hasHelperAccess(user);
   const isDjangoAdmin = user.isDjangoAdmin;
+  const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
 
   const sourceCtx = {
     isOwner,
@@ -228,7 +230,8 @@ export function FeedSubmissionDetail({
       const static_entry: Record<string, unknown> = {};
       if (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
         static_entry.license = license.trim() || null;
-        if (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource) {
+        // Godziny pobierania dotyczą tylko feedów z URL — backend odrzuca je dla wpisów plikowych.
+        if (!isFileEntry && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
           static_entry.download_time_1 = dt1.trim() || "02:00:00";
           static_entry.download_time_2 = dt2Enabled && dt2.trim() ? dt2.trim() : null;
         }
@@ -412,44 +415,49 @@ export function FeedSubmissionDetail({
                 disabled={sourceFieldsDisabled || limitedOnly}
                 helperText={dict.feedUrlHint}
               />
-              <TextField
-                label={dict.downloadTime1Utc}
-                value={dt1}
-                onChange={(e) => setDt1(e.target.value)}
-                disabled={sourceFieldsDisabled || !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)}
-              />
-              {dt2Enabled ? (
+              {/* Godziny pobierania dotyczą tylko feedów z URL — dla wpisów plikowych backend ich zabrania. */}
+              {!isFileEntry ? (
                 <>
                   <TextField
-                    label={dict.downloadTime2UtcOptional}
-                    value={dt2}
-                    onChange={(e) => setDt2(e.target.value)}
+                    label={dict.downloadTime1Utc}
+                    value={dt1}
+                    onChange={(e) => setDt1(e.target.value)}
                     disabled={sourceFieldsDisabled || !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)}
                   />
-                  <Button
-                    type="button"
-                    variant="text"
-                    onClick={() => {
-                      setDt2Enabled(false);
-                      setDt2("");
-                    }}
-                    disabled={sourceFieldsDisabled || limitedOnly}
-                    sx={{ alignSelf: "flex-start", textTransform: "none" }}
-                  >
-                    {dict.removeSecondDownloadTime}
-                  </Button>
+                  {dt2Enabled ? (
+                    <>
+                      <TextField
+                        label={dict.downloadTime2UtcOptional}
+                        value={dt2}
+                        onChange={(e) => setDt2(e.target.value)}
+                        disabled={sourceFieldsDisabled || !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)}
+                      />
+                      <Button
+                        type="button"
+                        variant="text"
+                        onClick={() => {
+                          setDt2Enabled(false);
+                          setDt2("");
+                        }}
+                        disabled={sourceFieldsDisabled || limitedOnly}
+                        sx={{ alignSelf: "flex-start", textTransform: "none" }}
+                      >
+                        {dict.removeSecondDownloadTime}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="text"
+                      onClick={() => setDt2Enabled(true)}
+                      disabled={sourceFieldsDisabled || limitedOnly}
+                      sx={{ alignSelf: "flex-start", textTransform: "none" }}
+                    >
+                      {dict.addSecondDownloadTime}
+                    </Button>
+                  )}
                 </>
-              ) : (
-                <Button
-                  type="button"
-                  variant="text"
-                  onClick={() => setDt2Enabled(true)}
-                  disabled={sourceFieldsDisabled || limitedOnly}
-                  sx={{ alignSelf: "flex-start", textTransform: "none" }}
-                >
-                  {dict.addSecondDownloadTime}
-                </Button>
-              )}
+              ) : null}
               <TextField
                 label={dict.license}
                 value={license}
