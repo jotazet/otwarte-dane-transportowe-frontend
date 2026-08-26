@@ -1,5 +1,5 @@
 import { getJson, postJson } from "@/lib/api/http";
-import { normalizeList, type ApiListResponse } from "@/lib/api/types";
+import { fetchAllPages, normalizeList, type ApiListResponse } from "@/lib/api/types";
 
 export type BlogPostListItem = {
   id: number;
@@ -56,6 +56,20 @@ export async function fetchBlogPosts(options?: {
     next: meta && typeof meta === "object" && "next" in meta ? (meta.next as string | null) : null,
     previous: meta && typeof meta === "object" && "previous" in meta ? (meta.previous as string | null) : null,
   };
+}
+
+/**
+ * Wszystkie posty, bez paginacji — używane przez sitemapę.
+ * `revalidate` przekazujemy dalej, żeby trasa sitemapy nie stawała się dynamiczna
+ * przez domyślne `cache: "no-store"` w `getJson`.
+ */
+export async function fetchAllBlogPosts(opts?: {
+  revalidate?: number;
+}): Promise<BlogPostListItem[]> {
+  return await fetchAllPages<BlogPostListItem>(
+    (p) => getJson(p, opts),
+    "/api/blog/posts/",
+  );
 }
 
 export async function fetchBlogPost(id: number): Promise<BlogPost> {

@@ -52,10 +52,13 @@ export type DataProviderRecord = {
   contact_email?: string | null;
 };
 
-export async function fetchTransportOrganizations(): Promise<
-  TransportOrganizationListItem[]
-> {
-  return await fetchAllPages<TransportOrganizationListItem>((p) => getJson(p), casesPaths.organizations);
+export async function fetchTransportOrganizations(opts?: {
+  revalidate?: number;
+}): Promise<TransportOrganizationListItem[]> {
+  return await fetchAllPages<TransportOrganizationListItem>(
+    (p) => getJson(p, opts),
+    casesPaths.organizations,
+  );
 }
 
 export async function fetchTransportOrganization(

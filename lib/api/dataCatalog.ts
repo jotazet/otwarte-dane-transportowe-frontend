@@ -40,11 +40,11 @@ export type FeedCatalogOrganizationDetail = FeedCatalogOrganizationListItem & {
   feeds?: FeedCatalogFeed[];
 };
 
-export async function fetchFeedCatalog(): Promise<
-  FeedCatalogOrganizationListItem[]
-> {
+export async function fetchFeedCatalog(opts?: {
+  revalidate?: number;
+}): Promise<FeedCatalogOrganizationListItem[]> {
   return await fetchAllPages<FeedCatalogOrganizationListItem>(
-    (p) => getJson(p),
+    (p) => getJson(p, opts),
     "/api/data_manager/feeds/",
   );
 }
