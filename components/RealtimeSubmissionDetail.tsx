@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
+import { HistoryTimeline, type HistoryTimelineEvent } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
@@ -72,7 +73,7 @@ type RtDetail = {
   endpoints?: RtEndpoint[];
   submitted_by?: number;
   submitted_by_username?: string | null;
-  history?: { event_type?: string; created_at?: string }[];
+  history?: HistoryTimelineEvent[];
 };
 
 type EndpointDraft = {
@@ -582,6 +583,18 @@ export function RealtimeSubmissionDetail({
               )}
             </Stack>
           ) : null}
+        </FormSection>
+      ) : null}
+
+      {row.history?.length ? (
+        <FormSection title={dict.historyTitle}>
+          <HistoryTimeline
+            events={row.history}
+            title=""
+            emptyLabel={dict.emptyListBody}
+            locale={locale}
+            dict={dict}
+          />
         </FormSection>
       ) : null}
       {confirmDialog}

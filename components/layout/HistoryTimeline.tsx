@@ -5,8 +5,14 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import type { Dictionary } from "@/i18n/getDictionary";
-import type { SubmissionHistoryEvent } from "@/lib/api/types";
+import type { RejectionReason, SubmissionHistoryEvent } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
+import { formatRejectionReasons } from "@/lib/rejectionReasons";
+
+/** Realtime history entries also carry coded automatic rejection reasons. */
+export type HistoryTimelineEvent = SubmissionHistoryEvent & {
+  reasons?: RejectionReason[] | null;
+};
 
 export function HistoryTimeline({
   events,
@@ -15,11 +21,14 @@ export function HistoryTimeline({
   locale = "pl",
   dict,
 }: {
-  events: SubmissionHistoryEvent[];
+  events: HistoryTimelineEvent[];
   title: string;
   emptyLabel: string;
   locale?: string;
-  dict: Pick<Dictionary, "submissionHistoryEventLabels">;
+  dict: Pick<
+    Dictionary,
+    "submissionHistoryEventLabels" | "realtimeRejectionReasons" | "realtimeRejectionReasonUnknown"
+  >;
 }) {
   const eventLabels: Record<string, string> = dict.submissionHistoryEventLabels;
   if (!events.length) {
@@ -55,7 +64,16 @@ export function HistoryTimeline({
                 {ev.actor}
               </Typography>
             ) : null}
-            {ev.cause ? (
+            {/* Coded reasons replace the cause text (backend docs/api/feeds.md). */}
+            {ev.reasons?.length ? (
+              <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+                {formatRejectionReasons(ev.reasons, dict).map((reason, j) => (
+                  <Typography key={j} component="li" variant="body2" color="text.secondary">
+                    {reason}
+                  </Typography>
+                ))}
+              </Box>
+            ) : ev.cause ? (
               <Typography variant="body2" color="text.secondary">
                 {ev.cause}
               </Typography>
