@@ -4,12 +4,15 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+import type { Dictionary } from "@/i18n/getDictionary";
 import { blogReactionOrder, reactionMdIcons } from "@/lib/reactionIcons";
 
 export function BlogPostListReactionSummary({
   summary,
+  dict,
 }: {
   summary: Record<string, number> | null | undefined;
+  dict: Pick<Dictionary, "blogReactionLabels" | "blogReactionCountLabel">;
 }) {
   const counts = blogReactionOrder
     .map((key) => [key, Number(summary?.[key] ?? 0)] as const)
@@ -32,6 +35,10 @@ export function BlogPostListReactionSummary({
               direction="row"
               spacing={0.5}
               useFlexGap
+              role="img"
+              aria-label={dict.blogReactionCountLabel
+                .replace("{reaction}", dict.blogReactionLabels[key])
+                .replace("{count}", String(n))}
               sx={{
                 alignItems: "center",
                 color: "text.secondary",
