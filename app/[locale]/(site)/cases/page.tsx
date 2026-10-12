@@ -39,7 +39,12 @@ export default async function CasesPage({ params }: { params: Promise<{ locale: 
   const { data: organizations } = await loadOrError(fetchTransportOrganizations());
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesRoot(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={casesRoot(locale, dict)}
+    >
       <PageHeader
         title={dict.casesTitle}
         subtitle={dict.casesSubtitle}

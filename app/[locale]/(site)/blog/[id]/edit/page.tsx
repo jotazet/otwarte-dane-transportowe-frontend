@@ -31,6 +31,7 @@ export default async function BlogEditPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={blogEdit(locale, dict, postId, title)}
     >
       <PageHeader

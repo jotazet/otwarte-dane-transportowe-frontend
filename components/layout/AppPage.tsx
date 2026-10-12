@@ -13,12 +13,14 @@ export function AppPage({
   breadcrumbs,
   locale,
   backLabel,
+  breadcrumbsLabel,
   maxWidth = "lg",
 }: {
   children: ReactNode;
   breadcrumbs?: BreadcrumbItem[];
   locale: string;
   backLabel: string;
+  breadcrumbsLabel: string;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
 }) {
   const homeHref = paths(locale).home;
@@ -27,7 +29,12 @@ export function AppPage({
   return (
     <PageSection maxWidth={maxWidth}>
       {breadcrumbs?.length ? (
-        <AppBreadcrumbs items={breadcrumbs} backHref={backHref} backLabel={backLabel} />
+        <AppBreadcrumbs
+          items={breadcrumbs}
+          backHref={backHref}
+          backLabel={backLabel}
+          label={breadcrumbsLabel}
+        />
       ) : null}
       <Stack spacing={3}>{children}</Stack>
     </PageSection>

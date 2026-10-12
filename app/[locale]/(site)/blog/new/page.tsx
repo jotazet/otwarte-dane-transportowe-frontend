@@ -15,7 +15,12 @@ export default async function BlogNewPage({ params }: { params: Promise<{ locale
   const dict = await getDictionary(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogNew(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={blogNew(locale, dict)}
+    >
       <PageHeader
         title={dict.createPost}
         subtitle={dict.blogSubtitle}

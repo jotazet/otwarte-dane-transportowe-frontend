@@ -16,6 +16,7 @@ import { AccessGate } from "@/components/AccessGate";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { FormActions } from "@/components/layout/FormActions";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { usePermissions } from "@/lib/auth/usePermissions";
 
@@ -118,7 +119,7 @@ export function BlogPostForm({
       router.replace(`/${locale}/blog/${id}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

@@ -60,6 +60,7 @@ export default async function BlogPostPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={blogPost(locale, dict, postId, title)}
       maxWidth="md"
     >

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { MdEdit } from "react-icons/md";
 
 import { TableCard } from "@/components/TableCard";
+import { formatApiError } from "@/lib/formatApiError";
 import { getJson } from "@/lib/api/http";
 import type { DataProviderRecord } from "@/lib/api/cases";
 import { fetchAllPages } from "@/lib/api/types";
@@ -83,7 +84,7 @@ export function OrganizationProvidersPanel({
       });
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(formatApiError(e, dict));
     } finally {
       setSaving(false);
     }

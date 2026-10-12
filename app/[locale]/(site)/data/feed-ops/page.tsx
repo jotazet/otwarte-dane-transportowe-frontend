@@ -43,7 +43,12 @@ export default async function FeedOpsPage({
     : "overview";
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataFeedOps(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={dataFeedOps(locale, dict)}
+    >
       <PageHeader
         title={dict.feedOps}
         subtitle={dict.feedOpsSubtitle}

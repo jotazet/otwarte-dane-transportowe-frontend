@@ -16,7 +16,12 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const dict = await getDictionary(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={accountRoot(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={accountRoot(locale, dict)}
+    >
       <PageHeader
         title={dict.accountSettings}
         subtitle={dict.accountSettingsDesc}

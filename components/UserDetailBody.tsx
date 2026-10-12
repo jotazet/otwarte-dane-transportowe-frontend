@@ -70,7 +70,7 @@ export function UserDetailBody({
       const data = await auth.apiJson<UserDetail>("GET", userDetailPath(userId));
       setUser(data);
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setUser(null);
     } finally {
       setLoading(false);
@@ -101,7 +101,7 @@ export function UserDetailBody({
         setPasswordDialogOpen(true);
       }
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
     } finally {
       setPending(false);
     }
@@ -116,7 +116,7 @@ export function UserDetailBody({
       router.replace(p.users);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

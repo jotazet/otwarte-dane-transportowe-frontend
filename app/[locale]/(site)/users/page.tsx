@@ -12,7 +12,12 @@ export default async function UsersPage({ params }: { params: Promise<{ locale: 
   const { locale, dict } = await resolvePageLocale(params);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={usersRoot(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={usersRoot(locale, dict)}
+    >
       <PageHeader
         title={dict.users}
         subtitle={dict.usersDesc}

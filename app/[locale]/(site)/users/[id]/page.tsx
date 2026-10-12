@@ -22,6 +22,7 @@ export default async function UserDetailPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={userDetail(locale, dict, userId, `#${userId}`)}
     >
       <PageHeader

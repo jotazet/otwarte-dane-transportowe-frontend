@@ -64,6 +64,7 @@ export default async function FeedCatalogDetailPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={dataFeedDetail(locale, dict, orgId, orgLabel)}
     >
       <FeedCatalogDetailHeader organization={organization} dict={dict} locale={locale} />

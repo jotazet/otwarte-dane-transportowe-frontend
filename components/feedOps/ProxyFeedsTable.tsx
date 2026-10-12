@@ -84,7 +84,7 @@ export function ProxyFeedsTable({
       setRows(data.results ?? []);
       setCount(data.count ?? 0);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
       setRows([]);
       setCount(0);
     } finally {
@@ -151,7 +151,7 @@ export function ProxyFeedsTable({
       setPauseTarget(null);
       onReload();
     } catch (e) {
-      setActionError(formatApiError(e));
+      setActionError(formatApiError(e, dict));
     } finally {
       setBusyId(null);
     }

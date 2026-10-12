@@ -141,7 +141,7 @@ export function RealtimeSubmissionDetail({
       const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
       applyDetail(d);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }, [apiJson, authStatus, submissionId, applyDetail]);
 
@@ -156,7 +156,7 @@ export function RealtimeSubmissionDetail({
         const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
         if (!cancelled) applyDetail(d);
       } catch (e) {
-        if (!cancelled) setError(formatApiError(e));
+        if (!cancelled) setError(formatApiError(e, dict));
       }
     })();
     return () => {
@@ -218,7 +218,7 @@ export function RealtimeSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), body);
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -231,7 +231,7 @@ export function RealtimeSubmissionDetail({
       });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -244,7 +244,7 @@ export function RealtimeSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), { rejection_cause: rc });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -256,7 +256,7 @@ export function RealtimeSubmissionDetail({
       router.replace(listHref);
       router.refresh();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -271,7 +271,7 @@ export function RealtimeSubmissionDetail({
       );
       downloadBlob(blob, `submission-${row.id}-rt-${epPk}.zip`);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 

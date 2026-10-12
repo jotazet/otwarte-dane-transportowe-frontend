@@ -142,6 +142,9 @@ export const dictDe: Dictionary = {
   pageErrorTitle: "Etwas ist schiefgelaufen",
   pageErrorBody: "Diese Seite konnte nicht geladen werden. Bitte versuche es gleich noch einmal.",
   tryAgain: "Erneut versuchen",
+  apiErrorConnection:
+    "Die Verbindung zum ODT-Server ist fehlgeschlagen. Versuchen Sie es in Kürze erneut.",
+  apiErrorLoginRequired: "Die Sitzung ist abgelaufen. Melden Sie sich erneut an.",
   addFeed: "Feed hinzufügen",
   myFeeds: "Meine Feeds",
   myFeedsSectionList: "Deine Einreichungen",
@@ -285,6 +288,7 @@ export const dictDe: Dictionary = {
   homeMotivation5: "Viel Spaß beim Entdecken der Daten!",
   homeCreatePostHint: "Schreib einen interessanten Beitrag.",
   back: "Zurück",
+  breadcrumbsLabel: "Brotkrümelnavigation",
   homeRolePanel: "Dein Bereich",
   paginationPrev: "Vorherige Seite",
   paginationNext: "Nächste Seite",

@@ -19,7 +19,12 @@ export default async function VerificationQueuePage({
   const orgId = parseOrganizationQueryParam(sp.organization);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataQueue(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={dataQueue(locale, dict)}
+    >
       <PageHeader
         title={dict.submissions}
         subtitle={dict.submissionsQueueHint}

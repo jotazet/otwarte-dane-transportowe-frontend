@@ -18,6 +18,7 @@ const LOCALE_MAP: Record<string, string> = {
   pl: "pl-PL",
   en: "en-GB",
   de: "de-DE",
+  bg: "bg-BG",
 };
 
 export function formatDateTime(value?: string | null, locale = "pl") {
@@ -31,5 +32,7 @@ export function formatDateTime(value?: string | null, locale = "pl") {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    // Explicit zone: the server (UTC) and the browser must render the same time.
+    timeZone: "Europe/Warsaw",
   }).format(d);
 }

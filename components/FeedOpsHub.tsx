@@ -77,7 +77,7 @@ export function FeedOpsHub({
     try {
       setOverviewRows(await fetchAllProxyFeeds(apiJson));
     } catch (e) {
-      setOverviewError(formatApiError(e));
+      setOverviewError(formatApiError(e, dict));
       setOverviewRows([]);
     } finally {
       setOverviewLoading(false);

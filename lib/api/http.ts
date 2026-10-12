@@ -1,9 +1,13 @@
 import { apiBaseUrl } from "@/lib/config";
 
+/** Errors raised by the client itself; `formatApiError` translates them. */
+export type ClientErrorCode = "client.connection_failed" | "client.login_required";
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    public readonly code?: ClientErrorCode,
   ) {
     super(message);
   }
@@ -14,12 +18,9 @@ export const DEFAULT_TIMEOUT_MS = 20_000;
 /** Dłuższy limit dla przesyłania plików (multipart). */
 export const UPLOAD_TIMEOUT_MS = 60_000;
 
-/** Neutralny komunikat błędu połączenia/timeoutu (bez wycieku szczegółów backendu). */
-export const CONNECTION_ERROR_MESSAGE = "Błąd połączenia z serwerem. Spróbuj ponownie.";
-
 /**
- * `fetch` z limitem czasu. Zamienia błędy sieci/timeoutu na `ApiError(0, …)`
- * z neutralnym komunikatem zamiast surowego wyjątku przeglądarki.
+ * `fetch` with a timeout. Turns network errors and timeouts into an `ApiError` with
+ * status 0 and the `client.connection_failed` code instead of the raw browser exception.
  */
 export async function fetchWithTimeout(
   url: string,
@@ -30,7 +31,7 @@ export async function fetchWithTimeout(
     return await fetch(url, { ...init, signal: init.signal ?? AbortSignal.timeout(timeoutMs) });
   } catch (e) {
     if (e instanceof ApiError) throw e;
-    throw new ApiError(0, CONNECTION_ERROR_MESSAGE);
+    throw new ApiError(0, "Connection failed", "client.connection_failed");
   }
 }
 

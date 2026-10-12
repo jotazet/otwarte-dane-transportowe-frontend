@@ -20,6 +20,7 @@ import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import { TableCard } from "@/components/TableCard";
 import { TableFilterSelect } from "@/components/TableFilterSelect";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasAdminAccess } from "@/lib/auth/permissions";
 import { fetchAllPages } from "@/lib/api/types";
@@ -59,7 +60,7 @@ export function UsersHub({ locale, dict }: { locale: string; dict: Dictionary })
       const list = await fetchAllPages<UserRecord>((p) => auth.apiJson("GET", p), USERS_BASE);
       setUsers(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setUsers([]);
     } finally {
       setLoading(false);

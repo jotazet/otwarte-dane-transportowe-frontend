@@ -158,7 +158,7 @@ export function SubmissionsTableHub({
       setFeeds(parsed.static);
       setRts(parsed.realtime);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
       setFeeds([]);
       setRts([]);
     }

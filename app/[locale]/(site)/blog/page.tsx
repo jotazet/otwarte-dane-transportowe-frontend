@@ -54,7 +54,12 @@ export default async function BlogPage({
   }
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogRoot(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={blogRoot(locale, dict)}
+    >
       <PageHeader
         title={dict.blogTitle}
         subtitle={dict.blogSubtitle}

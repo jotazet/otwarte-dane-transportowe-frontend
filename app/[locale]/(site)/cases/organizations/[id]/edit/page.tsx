@@ -31,6 +31,7 @@ export default async function OrganizationEditPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={casesOrganizationEdit(locale, dict, orgId, orgLabel)}
     >
       <PageHeader

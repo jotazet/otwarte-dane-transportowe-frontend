@@ -229,7 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
+      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access));
       if (res.status === 401) {
@@ -262,7 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
+      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
@@ -291,7 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Wymagane logowanie.");
+      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {

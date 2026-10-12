@@ -37,7 +37,12 @@ export default async function DataPage({ params }: { params: Promise<{ locale: s
   const { data: organizations } = await loadOrError(fetchFeedCatalog());
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataCatalog(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={dataCatalog(locale, dict)}
+    >
       <PageHeader
         title={dict.dataTitle}
         subtitle={dict.dataSubtitle}

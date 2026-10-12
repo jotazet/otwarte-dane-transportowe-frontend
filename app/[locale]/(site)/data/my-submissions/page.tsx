@@ -25,6 +25,7 @@ export default async function MySubmissionsPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={dataMySubmissionsList(locale, dict)}
     >
       <PageHeader
