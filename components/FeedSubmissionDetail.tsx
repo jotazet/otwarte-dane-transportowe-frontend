@@ -586,13 +586,7 @@ export function FeedSubmissionDetail({
 
       {row.history?.length ? (
         <FormSection title={dict.historyTitle}>
-          <HistoryTimeline
-            events={row.history}
-            title=""
-            emptyLabel={dict.emptyListBody}
-            locale={locale}
-            dict={dict}
-          />
+          <HistoryTimeline events={row.history} locale={locale} dict={dict} />
         </FormSection>
       ) : null}
       {confirmDialog}
