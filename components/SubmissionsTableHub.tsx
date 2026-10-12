@@ -241,7 +241,7 @@ export function SubmissionsTableHub({
       <Stack spacing={2} sx={listContext === "my" ? { mb: 3 } : undefined}>
         {config.showOrgFilterBanner && filterOrgId != null ? (
           <Typography variant="body2" color="text.secondary">
-            {dict.filteredByOrganization} #{filterOrgId}
+            {dict.filteredByOrganization.replace("{id}", String(filterOrgId))}
           </Typography>
         ) : null}
         {error ? <Alert severity="error">{error}</Alert> : null}

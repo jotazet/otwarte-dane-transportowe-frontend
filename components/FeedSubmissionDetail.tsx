@@ -378,7 +378,7 @@ export function FeedSubmissionDetail({
       ) : null}
 
       {canEditMeta ? (
-        <FormSection title={`${dict.name} / ${dict.note}`}>
+        <FormSection title={dict.submissionNameAndNoteSection}>
           <Stack spacing={2}>
             <TextField
               label={dict.name}
@@ -495,7 +495,7 @@ export function FeedSubmissionDetail({
                   label={dict.authValue}
                   value={authValue}
                   onChange={(e) => setAuthValue(e.target.value)}
-                  helperText={`${dict.authValueNewOnly} - ${dict.authValueHint}`}
+                  helperText={dict.authValueEditHint}
                   autoComplete="new-password"
                   fullWidth
                   disabled={sourceFieldsDisabled || limitedOnly}

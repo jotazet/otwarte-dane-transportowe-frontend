@@ -504,7 +504,7 @@ export function RealtimeSubmissionDetail({
                         prev.map((x, i) => (i === idx ? { ...x, auth_value: v } : x)),
                       );
                     }}
-                    helperText={dict.authValueNewOnly + " - " + dict.authValueHint}
+                    helperText={dict.authValueEditHint}
                     autoComplete="new-password"
                     disabled={fieldsLocked}
                     showPasswordLabel={dict.showPassword}

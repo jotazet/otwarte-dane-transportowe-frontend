@@ -35,7 +35,7 @@ export default async function OrganizationEditPage({
       breadcrumbs={casesOrganizationEdit(locale, dict, orgId, orgLabel)}
     >
       <PageHeader
-        title={`${dict.edit}: ${orgLabel}`}
+        title={dict.organizationEditTitle.replace("{organization}", orgLabel)}
         subtitle={dict.casesSubtitle}
         icon={<MdApartment size={28} aria-hidden />}
       />
