@@ -6,6 +6,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -45,7 +47,7 @@ export function BlogPostForm({
   const [title, setTitle] = React.useState(initialTitle ?? "");
   const [content, setContent] = React.useState(initialContent ?? "");
   const [tagsStr, setTagsStr] = React.useState((initialTags ?? []).join(", "));
-  const [imageUrl, setImageUrl] = React.useState(initialImage ?? "");
+  const [removeImage, setRemoveImage] = React.useState(false);
   const [imageFile, setImageFile] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
@@ -102,11 +104,13 @@ export function BlogPostForm({
           id = postId;
         }
       } else {
+        // The API takes images only as uploads. Leaving `image` out keeps the
+        // current one; null removes it.
         const body = {
           title: trimmedTitle,
           content,
           tags,
-          image: imageUrl.trim() || null,
+          ...(removeImage ? { image: null } : {}),
         };
         if (postId == null) {
           const created = await apiJson<{ id: number }>("POST", "/api/blog/posts/", body);
@@ -167,13 +171,6 @@ export function BlogPostForm({
                   helperText={dict.blogTagsHint}
                   disabled={pending}
                 />
-                <TextField
-                  label={dict.blogImageUrl}
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  disabled={pending || !!imageFile}
-                  fullWidth
-                />
                 <Button
                   variant="outlined"
                   component="label"
@@ -192,6 +189,19 @@ export function BlogPostForm({
                   <Typography variant="caption" color="text.secondary">
                     {imageFile.name}
                   </Typography>
+                ) : null}
+                {postId != null && initialImage ? (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={removeImage}
+                        onChange={(e) => setRemoveImage(e.target.checked)}
+                      />
+                    }
+                    label={dict.blogRemoveImage}
+                    disabled={pending || !!imageFile}
+                    sx={{ alignSelf: "flex-start" }}
+                  />
                 ) : null}
                 <MarkdownEditor
                   id="blog-post-content"

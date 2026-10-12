@@ -278,7 +278,6 @@ export const dictBg: Dictionary = {
   blogPostFormHint:
     "Заглавие до 24 знака, максимум 5 тага по 16 знака. Съдържание във формат Markdown.",
   blogTagsHint: "Тагове, разделени със запетаи.",
-  blogImageUrl: "URL адрес на изображението (по избор)",
   postContent: "Съдържание на публикацията",
   blogMarkdownHint: "Поддържа се формат Markdown (заглавия, списъци, линкове, код и др.).",
   staticSubmissionId: "ID на статичната заявка",
@@ -305,6 +304,7 @@ export const dictBg: Dictionary = {
   loginInvalid: "Невалидно потребителско име или парола.",
   loginFailed: "Входът не беше успешен.",
   blogImageFile: "Качи изображение",
+  blogRemoveImage: "Премахни текущото изображение",
   viewFeedCatalog: "Каталог на фийдовете",
   viewCasesCatalog: "Каталог на казусите",
   homeWelcome: "Добре дошъл",
