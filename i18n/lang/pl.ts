@@ -224,8 +224,10 @@ export const dictPl = {
     "realtime.endpoint_content_empty": "Endpoint „{endpoint}” zwrócił pustą odpowiedź.",
     "realtime.endpoint_content_invalid":
       "Odpowiedź endpointu „{endpoint}” nie jest poprawnym feedem {protocol}.",
+    "realtime.endpoint_too_large":
+      "Odpowiedź endpointu „{endpoint}” przekracza dopuszczalny rozmiar feedu realtime.",
     "realtime.endpoint_url_blocked":
-      "Adres endpointu „{endpoint}” nie spełnia zasad bezpieczeństwa ODT: nazwa hosta nie istnieje, adres nie jest publiczny, przekierowanie jest niedozwolone albo odpowiedź jest zbyt duża.",
+      "Adres endpointu „{endpoint}” nie spełnia zasad bezpieczeństwa ODT: nazwa hosta nie istnieje, adres nie jest publiczny albo przekierowanie jest niedozwolone.",
     "realtime.endpoint_timeout": "Endpoint „{endpoint}” nie odpowiedział w wyznaczonym czasie.",
     "realtime.endpoint_unreachable":
       "Nie udało się połączyć z endpointem „{endpoint}”. Sprawdź, czy serwer jest dostępny z internetu.",

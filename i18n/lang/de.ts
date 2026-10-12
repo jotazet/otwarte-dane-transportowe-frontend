@@ -227,8 +227,10 @@ export const dictDe: Dictionary = {
       "Der Endpoint „{endpoint}“ hat eine leere Antwort zurückgegeben.",
     "realtime.endpoint_content_invalid":
       "Die Antwort des Endpoints „{endpoint}“ ist kein gültiger {protocol}-Feed.",
+    "realtime.endpoint_too_large":
+      "Die Antwort des Endpoints „{endpoint}“ überschreitet die zulässige Größe für Realtime-Feeds.",
     "realtime.endpoint_url_blocked":
-      "Die Adresse des Endpoints „{endpoint}“ erfüllt die Sicherheitsregeln von ODT nicht: Der Hostname existiert nicht, die Adresse ist nicht öffentlich, eine Weiterleitung ist nicht zulässig oder die Antwort ist zu groß.",
+      "Die Adresse des Endpoints „{endpoint}“ erfüllt die Sicherheitsregeln von ODT nicht: Der Hostname existiert nicht, die Adresse ist nicht öffentlich oder eine Weiterleitung ist nicht zulässig.",
     "realtime.endpoint_timeout": "Der Endpoint „{endpoint}“ hat nicht rechtzeitig geantwortet.",
     "realtime.endpoint_unreachable":
       "Keine Verbindung zum Endpoint „{endpoint}“ möglich. Prüfen Sie, ob der Server aus dem Internet erreichbar ist.",

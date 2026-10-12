@@ -222,8 +222,10 @@ export const dictEn: Dictionary = {
     "realtime.endpoint_content_empty": 'Endpoint "{endpoint}" returned an empty response.',
     "realtime.endpoint_content_invalid":
       'The response of endpoint "{endpoint}" is not a valid {protocol} feed.',
+    "realtime.endpoint_too_large":
+      'The response of endpoint "{endpoint}" exceeds the size limit for realtime feeds.',
     "realtime.endpoint_url_blocked":
-      'The URL of endpoint "{endpoint}" does not meet ODT security rules: the host name does not exist, the address is not public, a redirect is not allowed, or the response is too large.',
+      'The URL of endpoint "{endpoint}" does not meet ODT security rules: the host name does not exist, the address is not public, or a redirect is not allowed.',
     "realtime.endpoint_timeout": 'Endpoint "{endpoint}" did not respond in time.',
     "realtime.endpoint_unreachable":
       'Could not connect to endpoint "{endpoint}". Check that the server is reachable from the internet.',
