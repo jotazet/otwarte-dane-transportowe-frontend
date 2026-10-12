@@ -7,12 +7,16 @@ export function formatDate(value?: string | null) {
   if (!value) return "-";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return text(value);
-  // Data w strefie lokalnej (nie UTC) — `toISOString` przesuwałby dobę dla stref dodatnich.
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  // YYYY-MM-DD in Europe/Warsaw, like formatDateTime, so the server and the browser agree.
+  return DATE_FORMAT.format(d);
 }
+
+const DATE_FORMAT = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Warsaw",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 const LOCALE_MAP: Record<string, string> = {
   pl: "pl-PL",

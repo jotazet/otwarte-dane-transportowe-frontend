@@ -55,7 +55,7 @@ export function OrganizationProvidersPanel({
     void (async () => {
       setSelectedIds(linkedIds);
     })();
-  }, [linkedIds.join(","), dict]);
+  }, [linkedIds.join(",")]);
 
   React.useEffect(() => {
     let cancelled = false;
