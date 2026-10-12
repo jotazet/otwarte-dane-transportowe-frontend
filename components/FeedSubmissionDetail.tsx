@@ -591,6 +591,7 @@ export function FeedSubmissionDetail({
             title=""
             emptyLabel={dict.emptyListBody}
             locale={locale}
+            dict={dict}
           />
         </FormSection>
       ) : null}

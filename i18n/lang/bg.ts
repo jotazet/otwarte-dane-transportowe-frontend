@@ -311,6 +311,12 @@ export const dictBg: Dictionary = {
   adminSourceEditHint: "Можеш да промениш URL адреса, файла или данните за вход на етапи 2–4.",
   providerEditTab: "Редакция",
   historyTitle: "История на заявката",
+  submissionHistoryEventLabels: {
+    uploaded: "Заявката е изпратена",
+    stage_advanced: "Етапът е променен",
+    rejected: "Заявката е отхвърлена",
+    completed: "Фийдът е публикуван",
+  },
   roleAdmin: "Администратор",
   roleHelper: "Проверител",
   roleDataProvider: "Доставчик на данни",

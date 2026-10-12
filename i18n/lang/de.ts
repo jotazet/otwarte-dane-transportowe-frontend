@@ -316,6 +316,12 @@ export const dictDe: Dictionary = {
   adminSourceEditHint: "Du kannst URL, Datei oder Anmeldedaten in Stufen 2–4 ändern.",
   providerEditTab: "Bearbeiten",
   historyTitle: "Einreichungsverlauf",
+  submissionHistoryEventLabels: {
+    uploaded: "Einreichung übermittelt",
+    stage_advanced: "Stufe geändert",
+    rejected: "Einreichung abgelehnt",
+    completed: "Feed veröffentlicht",
+  },
   roleAdmin: "Administrator",
   roleHelper: "Prüfer",
   roleDataProvider: "Datenanbieter",

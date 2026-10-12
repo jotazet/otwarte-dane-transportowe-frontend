@@ -310,6 +310,12 @@ export const dictPl = {
   adminSourceEditHint: "Możesz zmienić adres URL, plik lub dane logowania na etapach 2–4.",
   providerEditTab: "Edycja",
   historyTitle: "Historia zgłoszenia",
+  submissionHistoryEventLabels: {
+    uploaded: "Przesłano zgłoszenie",
+    stage_advanced: "Zmieniono etap",
+    rejected: "Odrzucono zgłoszenie",
+    completed: "Opublikowano feed",
+  },
   roleAdmin: "Administrator",
   roleHelper: "Weryfikator",
   roleDataProvider: "Dostawca danych",

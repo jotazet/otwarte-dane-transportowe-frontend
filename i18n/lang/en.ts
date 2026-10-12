@@ -308,6 +308,12 @@ export const dictEn: Dictionary = {
   adminSourceEditHint: "You can change the URL, file or login credentials on stages 2–4.",
   providerEditTab: "Edit",
   historyTitle: "Submission history",
+  submissionHistoryEventLabels: {
+    uploaded: "Submission sent",
+    stage_advanced: "Stage changed",
+    rejected: "Submission rejected",
+    completed: "Feed published",
+  },
   roleAdmin: "Administrator",
   roleHelper: "Verifier",
   roleDataProvider: "Data provider",
