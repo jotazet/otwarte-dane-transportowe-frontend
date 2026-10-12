@@ -24,7 +24,7 @@ export default async function BlogNewPage({ params }: { params: Promise<{ locale
       <PageHeader
         title={dict.createPost}
         subtitle={dict.blogSubtitle}
-        icon={<MdArticle size={28} />}
+        icon={<MdArticle size={28} aria-hidden />}
       />
       <BlogPostForm locale={locale} dict={dict} />
     </AppPage>

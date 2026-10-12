@@ -90,14 +90,15 @@ export function AuthButton({
     .slice(0, 2)
     .map((s) => s[0]!.toUpperCase())
     .join("");
+  const accountLabel = `${labels.account}: ${displayName}`;
 
   return (
     <>
-      <Tooltip title={displayName}>
+      <Tooltip title={accountLabel}>
         <IconButton
           size="small"
           onClick={(e) => setAnchorEl(e.currentTarget)}
-          aria-label={labels.account}
+          aria-label={accountLabel}
           aria-haspopup="true"
           aria-expanded={open}
           sx={{ flexShrink: 0 }}

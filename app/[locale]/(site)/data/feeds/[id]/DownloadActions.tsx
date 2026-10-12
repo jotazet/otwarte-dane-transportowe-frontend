@@ -48,7 +48,7 @@ export function DownloadActions({
           size="small"
           aria-label={labels.downloadFile}
         >
-          <MdFileDownload size={22} />
+          <MdFileDownload size={22} aria-hidden />
         </IconButton>
       </Tooltip>
       <Tooltip title={labels.copyLink}>
@@ -59,7 +59,7 @@ export function DownloadActions({
           size="small"
           aria-label={labels.copyLink}
         >
-          {copied ? <MdCheck size={22} /> : <MdContentCopy size={20} />}
+          {copied ? <MdCheck size={22} aria-hidden /> : <MdContentCopy size={20} aria-hidden />}
         </IconButton>
       </Tooltip>
     </Stack>

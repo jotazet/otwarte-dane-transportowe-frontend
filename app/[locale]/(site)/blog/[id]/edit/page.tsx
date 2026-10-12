@@ -37,7 +37,7 @@ export default async function BlogEditPage({
       <PageHeader
         title={`${dict.edit}: ${title}`}
         subtitle={dict.blogSubtitle}
-        icon={<MdArticle size={28} />}
+        icon={<MdArticle size={28} aria-hidden />}
       />
       <BlogPostForm
         locale={locale}
