@@ -118,6 +118,7 @@ export const dictBg: Dictionary = {
   actions: "Действия",
   downloadFile: "Изтегли файла",
   copyLink: "Копирай линка",
+  linkCopied: "Линкът е копиран",
   openLinkError: "Линкът не можа да бъде отворен",
   phone: "Телефон",
   name: "Име",

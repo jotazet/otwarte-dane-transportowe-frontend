@@ -70,6 +70,7 @@ export function FeedCatalogDetailBody({
                             labels={{
                               downloadFile: dict.downloadFile,
                               copyLink: dict.copyLink,
+                              linkCopied: dict.linkCopied,
                               openLinkError: dict.openLinkError,
                             }}
                           />

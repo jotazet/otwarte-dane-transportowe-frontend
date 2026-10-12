@@ -117,6 +117,7 @@ export const dictDe: Dictionary = {
   actions: "Aktionen",
   downloadFile: "Datei herunterladen",
   copyLink: "Link kopieren",
+  linkCopied: "Link kopiert",
   openLinkError: "Link konnte nicht geöffnet werden",
   phone: "Telefon",
   name: "Name",

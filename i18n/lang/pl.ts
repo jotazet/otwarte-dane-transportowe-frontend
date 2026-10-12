@@ -116,6 +116,7 @@ export const dictPl = {
   actions: "Akcje",
   downloadFile: "Pobierz plik",
   copyLink: "Kopiuj link",
+  linkCopied: "Skopiowano link",
   openLinkError: "Nie udało się otworzyć linku",
   phone: "Telefon",
   name: "Nazwa",

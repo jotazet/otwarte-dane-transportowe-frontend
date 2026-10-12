@@ -117,6 +117,7 @@ export const dictEn: Dictionary = {
   actions: "Actions",
   downloadFile: "Download file",
   copyLink: "Copy link",
+  linkCopied: "Link copied",
   openLinkError: "Could not open the link",
   phone: "Phone",
   name: "Name",
