@@ -64,7 +64,7 @@ export function buildPageMetadata(
   };
 }
 
-export function buildSiteFallbackMetadata(dict: Dictionary): Metadata {
+export function buildSiteFallbackMetadata(dict: Dictionary, locale: Locale): Metadata {
   const title = dict.metaSiteTitle ?? dict.appName;
   const description = dict.metaSiteDescription ?? "";
   const keywords = dict.metaKeywords;
@@ -81,7 +81,7 @@ export function buildSiteFallbackMetadata(dict: Dictionary): Metadata {
     openGraph: {
       type: "website",
       siteName: dict.appName,
-      locale: "pl_PL",
+      locale: OG_LOCALES[locale],
       title,
       description,
     },
