@@ -138,6 +138,7 @@ export const dictPl = {
   login: "Zaloguj",
   logout: "Wyloguj",
   account: "Konto",
+  accountMenuLabel: "Konto: {name}",
   myAccount: "Moje konto",
   loginTitle: "Zaloguj się",
   loginSubtitle: "Zaloguj się kontem ODT, aby dodawać feedy i zarządzać treścią.",

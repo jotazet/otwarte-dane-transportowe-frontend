@@ -36,7 +36,7 @@ export function AuthButton({
   roleLabels,
 }: {
   locale: string;
-  labels: { login: string; account: string; logout: string };
+  labels: { login: string; account: string; accountMenuLabel: string; logout: string };
   roleLabels?: Partial<DictionaryShape>;
 }) {
   const pathname = usePathname();
@@ -83,7 +83,7 @@ export function AuthButton({
     .slice(0, 2)
     .map((s) => s[0]!.toUpperCase())
     .join("");
-  const accountLabel = `${labels.account}: ${displayName}`;
+  const accountLabel = labels.accountMenuLabel.replace("{name}", displayName);
 
   return (
     <>

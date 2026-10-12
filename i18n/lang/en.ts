@@ -139,6 +139,7 @@ export const dictEn: Dictionary = {
   login: "Sign in",
   logout: "Sign out",
   account: "Account",
+  accountMenuLabel: "Account: {name}",
   myAccount: "My account",
   loginTitle: "Sign in",
   loginSubtitle: "Sign in with your ODT account to add feeds and manage content.",

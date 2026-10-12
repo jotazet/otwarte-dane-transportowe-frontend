@@ -494,7 +494,12 @@ function MuiAppShellInner({
                     ) : (
                       <AuthButton
                         locale={locale}
-                        labels={{ login: dict.login, account: dict.account, logout: dict.logout }}
+                        labels={{
+                          login: dict.login,
+                          account: dict.account,
+                          accountMenuLabel: dict.accountMenuLabel,
+                          logout: dict.logout,
+                        }}
                         roleLabels={dict}
                       />
                     )}

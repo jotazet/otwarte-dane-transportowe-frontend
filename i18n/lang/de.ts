@@ -139,6 +139,7 @@ export const dictDe: Dictionary = {
   login: "Anmelden",
   logout: "Abmelden",
   account: "Konto",
+  accountMenuLabel: "Konto: {name}",
   myAccount: "Mein Konto",
   loginTitle: "Anmelden",
   loginSubtitle:

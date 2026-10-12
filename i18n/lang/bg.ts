@@ -140,6 +140,7 @@ export const dictBg: Dictionary = {
   login: "Вход",
   logout: "Изход",
   account: "Акаунт",
+  accountMenuLabel: "Акаунт: {name}",
   myAccount: "Моят акаунт",
   loginTitle: "Вход",
   loginSubtitle: "Влез с акаунта си в ODT, за да добавяш фийдове и да управляваш съдържанието.",
