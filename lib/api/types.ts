@@ -64,15 +64,15 @@ export type SubmissionHistoryEvent = {
   stage_before?: number | null;
   stage_after?: number | null;
   actor?: string | null;
-  cause?: string | null;
+  cause?: string;
   created_at?: string;
 };
 
 export type SubmissionStageFields = {
   id: number;
   transport_organization: number | string;
-  name?: string | null;
-  note?: string | null;
+  name?: string;
+  note?: string;
   current_stage: number;
   current_stage_label: string;
   is_rejected: boolean;

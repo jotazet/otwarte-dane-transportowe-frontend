@@ -18,7 +18,7 @@ export type FeedEndpoint = {
 };
 
 export type FeedDetail = {
-  license?: string | null;
+  license?: string;
   is_original?: boolean | null;
   download_url?: string | null;
   download_time_1?: string | null;
@@ -27,16 +27,16 @@ export type FeedDetail = {
 };
 
 export type FeedCatalogFeed = {
-  name?: string | null;
+  name?: string;
   data_type?: string | null;
   static_feed?: FeedDetail | null;
   realtime_feed?: FeedDetail | null;
 };
 
 export type FeedCatalogOrganizationDetail = FeedCatalogOrganizationListItem & {
-  website?: string | null;
-  contact_email?: string | null;
-  phone_number?: string | null;
+  website?: string;
+  contact_email?: string;
+  phone_number?: string;
   feeds?: FeedCatalogFeed[];
 };
 

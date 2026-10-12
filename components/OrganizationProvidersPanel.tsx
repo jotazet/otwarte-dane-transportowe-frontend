@@ -35,12 +35,7 @@ export function OrganizationProvidersPanel({
   locale: string;
   dict: Dictionary;
   organizationId: number;
-  linked: {
-    id?: number;
-    name?: string | null;
-    website?: string | null;
-    contact_email?: string | null;
-  }[];
+  linked: { id?: number; name?: string | null; website?: string; contact_email?: string }[];
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();

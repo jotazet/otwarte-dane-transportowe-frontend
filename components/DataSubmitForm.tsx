@@ -47,7 +47,7 @@ type EligibleStaticRow = {
   id: number;
   transport_organization: number;
   data_type: string;
-  name?: string | null;
+  name?: string;
   allowed_realtime_protocols?: string[];
 };
 
@@ -282,7 +282,7 @@ export function DataSubmitForm({
   }
 
   function staticAuthPayload(): Record<string, unknown> {
-    if (!staticAuthType) return { auth_type: null };
+    if (!staticAuthType) return { auth_type: "" };
     const o: Record<string, unknown> = { auth_type: staticAuthType };
     if (staticAuthValue.trim()) o.auth_value = staticAuthValue.trim();
     return o;
@@ -300,7 +300,7 @@ export function DataSubmitForm({
       o.auth_type = ep.auth_type;
       if (ep.auth_value.trim()) o.auth_value = ep.auth_value.trim();
     } else {
-      o.auth_type = null;
+      o.auth_type = "";
     }
     return o;
   }
@@ -339,7 +339,7 @@ export function DataSubmitForm({
           url: staticUrl.trim(),
           is_original: staticOriginal,
           hide_original: resolveHideOriginal(staticAuthType, staticHide),
-          license: staticLicense.trim() || null,
+          license: staticLicense.trim() || "",
           download_time_1: dt1,
           ...(dt2 ? { download_time_2: dt2 } : {}),
           ...staticAuthPayload(),
@@ -347,8 +347,8 @@ export function DataSubmitForm({
         const body: Record<string, unknown> = {
           transport_organization: staticOrgId,
           data_type: dataType,
-          name: staticName.trim() || null,
-          note: staticNote.trim() || null,
+          name: staticName.trim() || "",
+          note: staticNote.trim() || "",
           static_entry,
         };
         created = await apiJson<{ id: number }>(
@@ -403,9 +403,9 @@ export function DataSubmitForm({
       const body: Record<string, unknown> = {
         transport_organization: rtOrgId,
         protocol,
-        name: rtName.trim() || null,
-        note: rtNote.trim() || null,
-        license: rtLicense.trim() || null,
+        name: rtName.trim() || "",
+        note: rtNote.trim() || "",
+        license: rtLicense.trim() || "",
         endpoints: rtEndpoints.map((ep) => endpointPayload(ep)),
       };
       if (protocol !== "gbfs" && staticId !== null && Number.isFinite(staticId)) {

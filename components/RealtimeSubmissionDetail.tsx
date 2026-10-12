@@ -52,7 +52,7 @@ type RtEndpoint = FetchHealthFields & {
   interval?: number | null;
   is_original?: boolean | null;
   hide_original?: boolean | null;
-  auth_type?: string | null;
+  auth_type?: string;
 };
 
 type RtDetail = {
@@ -60,9 +60,9 @@ type RtDetail = {
   transport_organization: number;
   static_submission?: number | null;
   protocol: string;
-  name?: string | null;
-  note?: string | null;
-  license?: string | null;
+  name?: string;
+  note?: string;
+  license?: string;
   current_stage: number;
   current_stage_label: string;
   is_rejected: boolean;
@@ -187,11 +187,11 @@ export function RealtimeSubmissionDetail({
     }
     try {
       const body: Record<string, unknown> = {
-        note: note.trim() || null,
-        license: license.trim() || null,
+        note: note.trim() || "",
+        license: license.trim() || "",
       };
       if (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
-        body.name = name.trim() || null;
+        body.name = name.trim() || "";
         body.endpoints = endpointsDraft.map((e) => {
           const o: Record<string, unknown> = {
             endpoint_type: e.endpoint_type,
@@ -204,7 +204,7 @@ export function RealtimeSubmissionDetail({
           if (e.auth_type) {
             o.auth_type = e.auth_type;
             if (e.auth_value.trim()) o.auth_value = e.auth_value.trim();
-          } else o.auth_type = null;
+          } else o.auth_type = "";
           return o;
         });
       } else if (sourcePerms.canEditLimitedMeta) {
@@ -343,7 +343,7 @@ export function RealtimeSubmissionDetail({
           </Typography>
           {row.is_rejected ? (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {dict.rejected}: {row.rejection_cause ?? "-"}
+              {dict.rejected}: {row.rejection_cause || "-"}
             </Typography>
           ) : null}
           <Divider sx={{ my: 2 }} />

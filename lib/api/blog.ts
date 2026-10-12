@@ -77,7 +77,8 @@ export async function fetchBlogPost(id: number): Promise<BlogPost> {
 }
 
 export async function reactToPost(postId: number, reaction: string | null) {
-  await postJson<void>(`/api/blog/reactions/${postId}/`, { reaction });
+  // The API removes a reaction on "", the only empty value it accepts.
+  await postJson<void>(`/api/blog/reactions/${postId}/`, { reaction: reaction ?? "" });
 }
 
 /**
