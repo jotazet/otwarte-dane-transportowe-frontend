@@ -19,7 +19,12 @@ export default async function OrganizationNewPage({
   const dict = await getDictionary(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesAddOrganization(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={casesAddOrganization(locale, dict)}
+    >
       <PageHeader
         title={dict.addOrganization}
         subtitle={dict.casesSubtitle}

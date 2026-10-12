@@ -70,7 +70,7 @@ export function FeedFetchHealthPanel({
       setPauseOpen(false);
       onChanged();
     } catch (e) {
-      setActionError(formatApiError(e));
+      setActionError(formatApiError(e, dict));
     } finally {
       setBusy(false);
     }

@@ -24,7 +24,12 @@ export default async function MySubmissionsNewPage({
   const initialOrganizationId = parseNumericId(sp.organization) ?? undefined;
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataMySubmissionsNew(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={dataMySubmissionsNew(locale, dict)}
+    >
       <PageHeader
         title={dict.addNewFeed}
         subtitle={dict.staticSubmissionHint}

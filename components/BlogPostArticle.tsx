@@ -64,7 +64,7 @@ export function BlogPostArticle({
       router.replace(`/${locale}/blog`);
       router.refresh();
     } catch (err) {
-      setDelError(formatApiError(err));
+      setDelError(formatApiError(err, dict));
     } finally {
       setDelPending(false);
     }

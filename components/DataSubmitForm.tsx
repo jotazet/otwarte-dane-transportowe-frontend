@@ -22,6 +22,7 @@ import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
 import { SourceModeToggle } from "@/components/layout/SourceModeToggle";
 import { PasswordTextField } from "@/components/PasswordTextField";
+import { formatApiError } from "@/lib/formatApiError";
 import { getJson } from "@/lib/api/http";
 import type { TransportOrganizationListItem } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
@@ -244,7 +245,7 @@ export function DataSubmitForm({
       } catch (e) {
         if (!cancelled) {
           setEligibleStatics([]);
-          setEligibleError(e instanceof Error ? e.message : String(e));
+          setEligibleError(formatApiError(e, dict));
         }
       } finally {
         if (!cancelled) setEligibleLoading(false);
@@ -254,7 +255,7 @@ export function DataSubmitForm({
     return () => {
       cancelled = true;
     };
-  }, [apiJson, auth.status, auth.user?.roles, protocol, rtOrgId]);
+  }, [apiJson, auth.status, auth.user?.roles, protocol, rtOrgId, dict]);
 
   const orgNameById = React.useMemo(() => {
     const m = new Map<number, string>();
@@ -376,7 +377,7 @@ export function DataSubmitForm({
       router.push(submissionDetailPath(locale, redirectContext, "feed", created.id));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }
@@ -419,7 +420,7 @@ export function DataSubmitForm({
       router.push(submissionDetailPath(locale, redirectContext, "realtime", created.id));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

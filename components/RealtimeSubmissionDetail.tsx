@@ -143,9 +143,9 @@ export function RealtimeSubmissionDetail({
       const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
       applyDetail(d);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`
   // chroniącą przed setState po unmount i nadpisaniem nowszej odpowiedzi starszą.
@@ -158,13 +158,13 @@ export function RealtimeSubmissionDetail({
         const d = await apiJson<RtDetail>("GET", submissionsPaths.realtimeDetail(submissionId));
         if (!cancelled) applyDetail(d);
       } catch (e) {
-        if (!cancelled) setError(formatApiError(e));
+        if (!cancelled) setError(formatApiError(e, dict));
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   const listHref = submissionListPath(locale, listContext);
 
@@ -220,7 +220,7 @@ export function RealtimeSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), body);
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -233,7 +233,7 @@ export function RealtimeSubmissionDetail({
       });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -246,7 +246,7 @@ export function RealtimeSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), { rejection_cause: rc });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -258,7 +258,7 @@ export function RealtimeSubmissionDetail({
       router.replace(listHref);
       router.refresh();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -273,7 +273,7 @@ export function RealtimeSubmissionDetail({
       );
       downloadBlob(blob, `submission-${row.id}-rt-${epPk}.zip`);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 

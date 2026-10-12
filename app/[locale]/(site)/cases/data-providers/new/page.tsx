@@ -19,7 +19,12 @@ export default async function DataProviderNewPage({
   const dict = await getDictionary(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesProviderNew(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={casesProviderNew(locale, dict)}
+    >
       <PageHeader
         title={dict.createProvider}
         subtitle={dict.providersDesc}

@@ -135,9 +135,9 @@ export function FeedSubmissionDetail({
       const d = await apiJson<FeedDetail>("GET", submissionsPaths.feedDetail(submissionId));
       applyDetail(d);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`.
   React.useEffect(() => {
@@ -149,13 +149,13 @@ export function FeedSubmissionDetail({
         const d = await apiJson<FeedDetail>("GET", submissionsPaths.feedDetail(submissionId));
         if (!cancelled) applyDetail(d);
       } catch (e) {
-        if (!cancelled) setError(formatApiError(e));
+        if (!cancelled) setError(formatApiError(e, dict));
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   if (auth.status !== "authenticated" || !row) {
     return (
@@ -217,7 +217,7 @@ export function FeedSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), body);
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -253,7 +253,7 @@ export function FeedSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), { static_entry });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -264,7 +264,7 @@ export function FeedSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), { stage: Number(stage) });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -277,7 +277,7 @@ export function FeedSubmissionDetail({
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), { rejection_cause: rc });
       await load();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -289,7 +289,7 @@ export function FeedSubmissionDetail({
       router.replace(listHref);
       router.refresh();
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 
@@ -301,7 +301,7 @@ export function FeedSubmissionDetail({
       );
       downloadBlob(blob, `submission-${row.id}-static.zip`);
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
     }
   }
 

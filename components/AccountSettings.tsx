@@ -15,6 +15,7 @@ import { DetailField } from "@/components/layout/DetailField";
 import { FormSection } from "@/components/layout/FormSection";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   USER_ME,
@@ -53,12 +54,12 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       setProfile(data);
       setNewEmail(data.email ?? "");
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setProfile(null);
     } finally {
       setLoading(false);
     }
-  }, [apiJson]);
+  }, [apiJson, dict]);
 
   React.useEffect(() => {
     void (async () => {
@@ -81,7 +82,7 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       setEmailSuccess(dict.emailChanged);
       await loadProfile();
     } catch (err) {
-      setEmailError(err instanceof Error ? err.message : String(err));
+      setEmailError(formatApiError(err, dict));
     } finally {
       setEmailPending(false);
     }
@@ -107,7 +108,7 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       setConfirmPassword("");
       setPasswordSuccess(dict.passwordChanged);
     } catch (err) {
-      setPasswordError(err instanceof Error ? err.message : String(err));
+      setPasswordError(formatApiError(err, dict));
     } finally {
       setPasswordPending(false);
     }

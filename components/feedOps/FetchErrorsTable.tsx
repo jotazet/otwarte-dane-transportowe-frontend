@@ -71,13 +71,13 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
         setCount(data.count ?? 0);
       }
     } catch (e) {
-      setError(formatApiError(e));
+      setError(formatApiError(e, dict));
       setRows([]);
       setCount(0);
     } finally {
       setLoading(false);
     }
-  }, [apiJson, days, page, errorType, source]);
+  }, [apiJson, days, page, errorType, source, dict]);
 
   React.useEffect(() => {
     void (async () => {

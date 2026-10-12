@@ -233,8 +233,8 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
 
   const firstName = isAuthenticated ? auth.user.firstName?.trim() || null : null;
   const greeting = firstName
-    ? (dict.homeGreeting ?? "Cześć, {name}!").replace("{name}", firstName)
-    : (dict.homeGreetingNoName ?? dict.homeGreeting?.replace(", {name}", "") ?? "Cześć!");
+    ? dict.homeGreeting.replace("{name}", firstName)
+    : dict.homeGreetingNoName;
 
   return (
     <Box>

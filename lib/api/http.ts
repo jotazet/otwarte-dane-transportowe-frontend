@@ -1,5 +1,6 @@
 import { apiBaseUrl } from "@/lib/config";
 
+/** A failed request. `status` is 0 when the server could not be reached. */
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -14,12 +15,9 @@ export const DEFAULT_TIMEOUT_MS = 20_000;
 /** Dłuższy limit dla przesyłania plików (multipart). */
 export const UPLOAD_TIMEOUT_MS = 60_000;
 
-/** Neutralny komunikat błędu połączenia/timeoutu (bez wycieku szczegółów backendu). */
-export const CONNECTION_ERROR_MESSAGE = "Błąd połączenia z serwerem. Spróbuj ponownie.";
-
 /**
- * `fetch` z limitem czasu. Zamienia błędy sieci/timeoutu na `ApiError(0, …)`
- * z neutralnym komunikatem zamiast surowego wyjątku przeglądarki.
+ * `fetch` with a timeout. Turns network errors and timeouts into an `ApiError` with
+ * status 0 instead of the raw browser exception.
  */
 export async function fetchWithTimeout(
   url: string,
@@ -30,56 +28,8 @@ export async function fetchWithTimeout(
     return await fetch(url, { ...init, signal: init.signal ?? AbortSignal.timeout(timeoutMs) });
   } catch (e) {
     if (e instanceof ApiError) throw e;
-    throw new ApiError(0, CONNECTION_ERROR_MESSAGE);
+    throw new ApiError(0, "Connection failed");
   }
-}
-
-/**
- * Spłaszcza wartość błędu DRF do listy linii. Zagnieżdżone błędy pól dostają
- * kropkowaną ścieżkę (np. `static_entry.file: Uploaded GTFS file is not a ZIP archive.`).
- */
-function flattenErrorValue(prefix: string, value: unknown, out: string[]): void {
-  if (value == null) return;
-  if (Array.isArray(value)) {
-    const strings = value.filter((x): x is string => typeof x === "string");
-    if (strings.length) out.push(prefix ? `${prefix}: ${strings.join(", ")}` : strings.join(", "));
-    for (const x of value) {
-      if (x != null && typeof x === "object") flattenErrorValue(prefix, x, out);
-    }
-    return;
-  }
-  if (typeof value === "object") {
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      flattenErrorValue(prefix ? `${prefix}.${k}` : k, v, out);
-    }
-    return;
-  }
-  out.push(prefix ? `${prefix}: ${String(value)}` : String(value));
-}
-
-/** Czytelny komunikat z treści odpowiedzi JSON (DRF: `detail`, błędy pól, tablice top-level). */
-export async function formatApiErrorResponse(res: Response): Promise<string> {
-  const raw = await res.text().catch(() => "");
-  const generic = `HTTP ${res.status}`;
-  if (!raw) return generic;
-  let j: unknown;
-  try {
-    j = JSON.parse(raw);
-  } catch {
-    // Body nie jest JSON-em (np. strona błędu HTML / stack trace) — nie ujawniamy go użytkownikowi.
-    return generic;
-  }
-  if (typeof j === "string") return j;
-  if (j != null && !Array.isArray(j) && typeof j === "object") {
-    const detail = (j as Record<string, unknown>).detail;
-    if (typeof detail === "string") return detail;
-    if (Array.isArray(detail)) {
-      return detail.map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join("; ");
-    }
-  }
-  const lines: string[] = [];
-  flattenErrorValue("", j, lines);
-  return lines.length ? lines.join("\n") : generic;
 }
 
 /** Bezpieczne parsowanie JSON dla odpowiedzi sukcesu (spójny błąd zamiast surowego SyntaxError). */
@@ -113,8 +63,7 @@ export async function postJson<TResponse>(path: string, body: unknown): Promise<
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    const msg = await formatApiErrorResponse(res);
-    throw new ApiError(res.status, msg);
+    throw new ApiError(res.status, `HTTP ${res.status}`);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -130,8 +79,7 @@ export async function putJson<TResponse>(path: string, body: unknown): Promise<T
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    const msg = await formatApiErrorResponse(res);
-    throw new ApiError(res.status, msg);
+    throw new ApiError(res.status, `HTTP ${res.status}`);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -147,8 +95,7 @@ export async function patchJson<TResponse>(path: string, body: unknown): Promise
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    const msg = await formatApiErrorResponse(res);
-    throw new ApiError(res.status, msg);
+    throw new ApiError(res.status, `HTTP ${res.status}`);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -160,7 +107,6 @@ export async function deleteVoid(path: string): Promise<void> {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) {
-    const msg = await formatApiErrorResponse(res);
-    throw new ApiError(res.status, msg);
+    throw new ApiError(res.status, `HTTP ${res.status}`);
   }
 }

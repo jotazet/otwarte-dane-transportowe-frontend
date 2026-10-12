@@ -31,6 +31,7 @@ export default async function StatusNewPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={casesStatusNew(locale, dict, orgId, orgLabel)}
     >
       <PageHeader

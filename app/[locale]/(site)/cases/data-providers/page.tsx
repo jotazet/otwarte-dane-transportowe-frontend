@@ -19,7 +19,12 @@ export default async function DataProvidersListPage({
   const { locale, dict } = await resolvePageLocale(params);
   const { data: providers } = await loadOrError(fetchDataProviders());
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesProvidersList(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={casesProvidersList(locale, dict)}
+    >
       <PageHeader
         title={dict.providers}
         subtitle={dict.providersDesc}

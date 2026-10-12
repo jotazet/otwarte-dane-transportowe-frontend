@@ -30,6 +30,7 @@ export default async function DataProviderEditPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={casesProviderDetail(locale, dict, providerId, label)}
     >
       <PageHeader

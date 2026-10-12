@@ -37,6 +37,7 @@ export default async function InfoPage({ params }: { params: Promise<{ locale: s
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={infoRoot(locale, dict)}
       maxWidth="lg"
     >

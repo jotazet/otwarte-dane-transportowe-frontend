@@ -67,7 +67,7 @@ export function DataProviderForm({
       router.replace(listHref);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }
@@ -81,7 +81,7 @@ export function DataProviderForm({
       router.replace(listHref);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

@@ -142,6 +142,16 @@ export const dictDe: Dictionary = {
   pageErrorTitle: "Etwas ist schiefgelaufen",
   pageErrorBody: "Diese Seite konnte nicht geladen werden. Bitte versuche es gleich noch einmal.",
   tryAgain: "Erneut versuchen",
+  apiErrorConnection:
+    "Die Verbindung zum ODT-Server ist fehlgeschlagen. Versuchen Sie es in Kürze erneut.",
+  apiErrorLoginRequired: "Die Sitzung ist abgelaufen. Melden Sie sich erneut an.",
+  apiErrorInvalidData:
+    "Die übermittelten Daten sind ungültig. Prüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+  apiErrorForbidden: "Sie haben keine Berechtigung für diese Aktion.",
+  apiErrorNotFound:
+    "Die Daten wurden nicht gefunden und wurden möglicherweise gelöscht. Laden Sie die Seite neu.",
+  apiErrorRateLimited: "Zu viele Anfragen an den Server. Versuchen Sie es in Kürze erneut.",
+  apiErrorGeneric: "Der Vorgang konnte nicht ausgeführt werden. Versuchen Sie es in Kürze erneut.",
   addFeed: "Feed hinzufügen",
   myFeeds: "Meine Feeds",
   myFeedsSectionList: "Deine Einreichungen",
@@ -311,6 +321,7 @@ export const dictDe: Dictionary = {
   homeMotivation5: "Viel Spaß beim Entdecken der Daten!",
   homeCreatePostHint: "Schreib einen interessanten Beitrag.",
   back: "Zurück",
+  breadcrumbsLabel: "Brotkrümelnavigation",
   homeRolePanel: "Dein Bereich",
   paginationPrev: "Vorherige Seite",
   paginationNext: "Nächste Seite",

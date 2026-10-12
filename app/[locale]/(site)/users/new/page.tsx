@@ -15,7 +15,12 @@ export default async function UserNewPage({ params }: { params: Promise<{ locale
   const dict = await getDictionary(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={userNew(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
+      breadcrumbs={userNew(locale, dict)}
+    >
       <PageHeader
         title={dict.addUser}
         subtitle={dict.usersDesc}

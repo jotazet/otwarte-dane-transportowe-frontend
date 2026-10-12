@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { StatusScreen } from "@/components/layout/StatusScreen";
+import { dictBg } from "@/i18n/lang/bg";
 import { dictDe } from "@/i18n/lang/de";
 import { dictEn } from "@/i18n/lang/en";
 import { dictPl } from "@/i18n/lang/pl";
@@ -11,6 +12,7 @@ import { locales, type Locale } from "@/i18n/locales";
 function dictFor(locale: Locale) {
   if (locale === "en") return dictEn;
   if (locale === "de") return dictDe;
+  if (locale === "bg") return dictBg;
   return dictPl;
 }
 

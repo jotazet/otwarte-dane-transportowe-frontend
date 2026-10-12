@@ -62,7 +62,7 @@ export function CaseStatusForm({
       router.replace(cancelHref);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }
@@ -76,7 +76,7 @@ export function CaseStatusForm({
       router.replace(cancelHref);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

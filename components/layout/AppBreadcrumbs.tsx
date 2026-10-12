@@ -17,10 +17,12 @@ export function AppBreadcrumbs({
   items,
   backHref,
   backLabel,
+  label,
 }: {
   items: BreadcrumbItem[];
   backHref: string;
   backLabel: string;
+  label: string;
 }) {
   const router = useRouter();
   const handleBack = React.useCallback(() => {
@@ -34,7 +36,7 @@ export function AppBreadcrumbs({
           <MdArrowBack size={22} aria-hidden />
         </IconButton>
       </Tooltip>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ fontSize: 14, flex: 1, minWidth: 0 }}>
+      <Breadcrumbs aria-label={label} sx={{ fontSize: 14, flex: 1, minWidth: 0 }}>
         {items.map((item, i) => {
           const last = i === items.length - 1;
           if (last || !item.href) {

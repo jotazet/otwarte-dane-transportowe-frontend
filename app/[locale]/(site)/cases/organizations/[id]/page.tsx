@@ -30,6 +30,7 @@ export default async function OrganizationDetailPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={casesOrganization(locale, dict, orgId, orgLabel, { linkOrg: false })}
     >
       <OrganizationDetailHeader organization={organization} dict={dict} locale={locale} />

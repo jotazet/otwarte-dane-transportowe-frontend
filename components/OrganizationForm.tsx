@@ -82,7 +82,7 @@ export function OrganizationForm({
       router.replace(p.casesOrg(id));
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }
@@ -96,7 +96,7 @@ export function OrganizationForm({
       router.replace(p.cases);
       router.refresh();
     } catch (err) {
-      setError(formatApiError(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

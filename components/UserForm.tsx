@@ -16,6 +16,7 @@ import { AccessGate } from "@/components/AccessGate";
 import { GeneratedPasswordDialog } from "@/components/GeneratedPasswordDialog";
 import { FormActions } from "@/components/layout/FormActions";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   ALL_ASSIGNABLE_ROLES,
@@ -150,7 +151,7 @@ export function UserForm({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(formatApiError(err, dict));
       setPending(false);
     }
   }

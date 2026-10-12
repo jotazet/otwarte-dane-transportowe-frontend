@@ -35,6 +35,7 @@ export default async function StatusEditPage({
     <AppPage
       locale={locale}
       backLabel={dict.back}
+      breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={casesStatusEdit(locale, dict, orgId, orgLabel)}
     >
       <PageHeader
