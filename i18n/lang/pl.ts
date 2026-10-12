@@ -440,12 +440,18 @@ export const dictPl = {
   metaDataTitle: "Katalog GTFS Polska – feedy statyczne i realtime",
   metaDataDescription:
     "Katalog feedów GTFS, NeTEx, GTFS-RT i GBFS od polskich operatorów transportu. Skopiuj linki do feedów lub korzystaj z API otwartych danych transportowych.",
+  metaFeedDetailTitle: "{organization} – feedy statyczne i realtime",
+  metaFeedDetailDescription:
+    "Feedy statyczne i realtime organizacji {organization}: typy danych, licencje i linki do feedów.",
   metaInfoTitle: "Otwarte dane transportowe – GTFS, NeTEx, podstawa prawna",
   metaInfoDescription:
     "Standardy GTFS, NeTEx, GTFS-RT i SIRI w Polsce. Podstawa prawna otwartych danych transportowych, współpraca i kontakt z projektem ODT.",
   metaCasesTitle: "Statusy pozyskiwania danych transportowych w Polsce",
   metaCasesDescription:
     "Sprawdzaj statusy pozyskiwania otwartych danych GTFS i NeTEx dla organizacji transportowych w Polsce - publicznych i prywatnych.",
+  metaCaseOrganizationTitle: "{organization} – status pozyskiwania danych",
+  metaCaseOrganizationDescription:
+    "Status pozyskiwania danych transportowych od organizacji {organization}: historia sprawy i dostawcy danych.",
   metaBlogTitle: "Blog o transporcie publicznym i otwartych danych",
   metaBlogDescription:
     "Aktualności, przemyślenia i komunikaty o transporcie publicznym, GTFS, NeTEx i otwartych danych transportowych w Polsce.",

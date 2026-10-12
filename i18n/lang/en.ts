@@ -438,12 +438,18 @@ export const dictEn: Dictionary = {
   metaDataTitle: "GTFS Poland catalog – static and realtime feeds",
   metaDataDescription:
     "Catalog of GTFS, NeTEx, GTFS-RT and GBFS feeds from Polish transport operators. Copy feed links or use the open transport data API.",
+  metaFeedDetailTitle: "{organization} – static and realtime feeds",
+  metaFeedDetailDescription:
+    "Static and realtime feeds of {organization}: data types, licenses and feed links.",
   metaInfoTitle: "Open transport data – GTFS, NeTEx, legal basis",
   metaInfoDescription:
     "GTFS, NeTEx, GTFS-RT and SIRI standards in Poland. Legal basis for open transport data, collaboration and contact with the ODT project.",
   metaCasesTitle: "Transport data acquisition statuses in Poland",
   metaCasesDescription:
     "Check open GTFS and NeTEx data acquisition statuses for transport organizations in Poland - public and private.",
+  metaCaseOrganizationTitle: "{organization} – data acquisition status",
+  metaCaseOrganizationDescription:
+    "Transport data acquisition status for {organization}: case history and data providers.",
   metaBlogTitle: "Blog on public transport and open data",
   metaBlogDescription:
     "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",

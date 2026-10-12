@@ -441,12 +441,18 @@ export const dictBg: Dictionary = {
   metaDataTitle: "Каталог GTFS Полша – статични фийдове и фийдове в реално време",
   metaDataDescription:
     "Каталог на GTFS, NeTEx, GTFS-RT и GBFS фийдове от полски транспортни оператори. Копирай линкове към фийдовете или използвай API на отворените транспортни данни.",
+  metaFeedDetailTitle: "{organization} – статични фийдове и фийдове в реално време",
+  metaFeedDetailDescription:
+    "Статични фийдове и фийдове в реално време на {organization}: типове данни, лицензи и линкове към фийдовете.",
   metaInfoTitle: "Отворени транспортни данни – GTFS, NeTEx, правно основание",
   metaInfoDescription:
     "Стандартите GTFS, NeTEx, GTFS-RT и SIRI в Полша. Правно основание за отворените транспортни данни, сътрудничество и контакт с проекта ODT.",
   metaCasesTitle: "Статуси на набавянето на транспортни данни в Полша",
   metaCasesDescription:
     "Проверявай статусите на набавянето на отворени GTFS и NeTEx данни за транспортните организации в Полша - публични и частни.",
+  metaCaseOrganizationTitle: "{organization} – статус на набавянето на данни",
+  metaCaseOrganizationDescription:
+    "Статус на набавянето на транспортни данни от {organization}: история на казуса и доставчици на данни.",
   metaBlogTitle: "Блог за обществения транспорт и отворените данни",
   metaBlogDescription:
     "Новини, размисли и съобщения за обществения транспорт, GTFS, NeTEx и отворените транспортни данни в Полша.",
