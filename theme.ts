@@ -2,11 +2,33 @@ import { createTheme } from "@mui/material/styles";
 
 import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
 
+// Every `main` reaches 4.5:1 as text on both backgrounds of its scheme, and `contrastText`
+// reaches 4.5:1 on `main` and `dark` (filled chips, contained buttons and their hover).
 function paletteScheme(isLight: boolean) {
+  const contrastText = isLight ? "#FFFFFF" : "#202124";
   return {
     palette: {
+      // Dark text sits on dark-scheme fills, so their hover shade (`dark`) must stay light.
+      ...(isLight ? {} : { tonalOffset: { light: 0.2, dark: 0.1 } }),
       primary: {
-        main: "#1A73E8",
+        main: isLight ? "#1967D2" : "#8AB4F8",
+        contrastText,
+      },
+      success: {
+        main: isLight ? "#2E7D32" : "#66BB6A",
+        contrastText,
+      },
+      warning: {
+        main: isLight ? "#B35000" : "#FFA726",
+        contrastText,
+      },
+      error: {
+        main: isLight ? "#D32F2F" : "#F28B82",
+        contrastText,
+      },
+      info: {
+        main: isLight ? "#0071B2" : "#29B6F6",
+        contrastText,
       },
       secondary: {
         main: isLight ? "#174EA6" : "#8AB4F8",
@@ -174,7 +196,7 @@ const sharedComponents = {
   MuiCollapse: { defaultProps: { timeout: 0 } },
 } as const;
 
-/** Google-style blue aligned with Flutter `AppTheme` (`#1A73E8`). */
+/** Google-style blues: Flutter `AppTheme`'s `#1A73E8` adjusted per scheme to meet WCAG AA. */
 export const appTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: '[data-color-mode="%s"]',
