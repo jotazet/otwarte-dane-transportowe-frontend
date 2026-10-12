@@ -45,9 +45,12 @@ function secureCookieSuffix() {
   return typeof location !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
 }
 
-function setAuthCookieFlag() {
+/** The flag lives as long as the refresh token, so proxy.ts stops trusting a dead session. */
+function setAuthCookieFlag(refresh: string) {
   if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${secureCookieSuffix()}`;
+  const exp = decodeJwt(refresh)?.exp;
+  const maxAge = typeof exp === "number" ? Math.max(0, exp - Math.floor(Date.now() / 1000)) : 0;
+  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax${secureCookieSuffix()}`;
 }
 
 function clearAuthCookieFlag() {
@@ -121,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const applyTokens = React.useCallback((tokens: Tokens, loginUsername?: string | null) => {
     writeStoredTokens(tokens);
-    setAuthCookieFlag();
+    setAuthCookieFlag(tokens.refresh);
     const user = userFromAccess(tokens.access, loginUsername);
     setState({
       status: "authenticated",
