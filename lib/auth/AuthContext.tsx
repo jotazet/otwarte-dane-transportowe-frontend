@@ -137,22 +137,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState({ status: "anonymous", user: null, tokens: null });
   }, []);
 
-  const refreshAccess = React.useCallback(async (): Promise<Tokens | null> => {
-    const stored = readStoredTokens();
-    if (!stored?.refresh) return null;
-    try {
-      // The backend rotates refresh tokens and blacklists the old one, so the
-      // new one must replace it or the next refresh fails.
-      const res = await postJson<{ access: string; refresh?: string }>("/api/auth/token/refresh/", {
-        refresh: stored.refresh,
+  const refreshInFlight = React.useRef<Promise<Tokens | null> | null>(null);
+
+  const refreshAccess = React.useCallback((): Promise<Tokens | null> => {
+    // Requests that find the access token expired at the same time share one
+    // refresh: a second refresh with the same, by then blacklisted, token
+    // would fail and log the user out.
+    if (!refreshInFlight.current) {
+      refreshInFlight.current = (async () => {
+        const stored = readStoredTokens();
+        if (!stored?.refresh) return null;
+        try {
+          // The backend rotates refresh tokens and blacklists the old one, so
+          // the new one must replace it or the next refresh fails.
+          const res = await postJson<{ access: string; refresh?: string }>(
+            "/api/auth/token/refresh/",
+            { refresh: stored.refresh },
+          );
+          const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
+          applyTokens(next);
+          return next;
+        } catch {
+          clearAuth();
+          return null;
+        }
+      })().finally(() => {
+        refreshInFlight.current = null;
       });
-      const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
-      applyTokens(next);
-      return next;
-    } catch {
-      clearAuth();
-      return null;
     }
+    return refreshInFlight.current;
   }, [applyTokens, clearAuth]);
 
   React.useLayoutEffect(() => {
@@ -168,24 +181,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled) applyTokens(t);
         return;
       }
-      try {
-        const res = await postJson<{ access: string; refresh?: string }>(
-          "/api/auth/token/refresh/",
-          { refresh: t.refresh },
-        );
-        const next = { access: res.access, refresh: res.refresh ?? t.refresh };
-        writeStoredTokens(next);
-        if (!cancelled) applyTokens(next);
-      } catch {
-        writeStoredTokens(null);
-        if (!cancelled) clearAuth();
-      }
+      // Through the shared refresh: Strict Mode runs this effect twice in
+      // development, and components may already be calling the API.
+      await refreshAccess();
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [applyTokens, clearAuth]);
+  }, [applyTokens, refreshAccess]);
 
   const login = React.useCallback(
     async (creds: { username: string; password: string }) => {
