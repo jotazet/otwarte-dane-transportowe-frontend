@@ -38,7 +38,9 @@ export default async function FeedOpsPage({
 }) {
   const { locale, dict } = await resolvePageLocale(params);
   const sp = await searchParams;
-  const initialTab = VALID_TABS.includes(sp.tab as FeedOpsTab) ? (sp.tab as FeedOpsTab) : "overview";
+  const initialTab = VALID_TABS.includes(sp.tab as FeedOpsTab)
+    ? (sp.tab as FeedOpsTab)
+    : "overview";
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataFeedOps(locale, dict)}>

@@ -173,19 +173,14 @@ export function FeedSubmissionDetail({
 
   if (forbidden) {
     return (
-      <SubmissionDetailAuthGate
-        locale={locale}
-        dict={dict}
-        error={error}
-        hasData
-        forbidden
-      >
+      <SubmissionDetailAuthGate locale={locale} dict={dict} error={error} hasData forbidden>
         <></>
       </SubmissionDetailAuthGate>
     );
   }
 
-  const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
+  const isOwner =
+    user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const isHelper = hasHelperAccess(user);
   const isDjangoAdmin = user.isDjangoAdmin;
   const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
@@ -200,7 +195,10 @@ export function FeedSubmissionDetail({
 
   const canEditMeta =
     (isOwner && (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta)) ||
-    (isDjangoAdmin && (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus || sourcePerms.canEditLimitedMeta));
+    (isDjangoAdmin &&
+      (sourcePerms.canEditFullSource ||
+        sourcePerms.canAdminSourceOnStage2Plus ||
+        sourcePerms.canEditLimitedMeta));
 
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =
@@ -228,7 +226,11 @@ export function FeedSubmissionDetail({
     setError(null);
     try {
       const static_entry: Record<string, unknown> = {};
-      if (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
+      if (
+        sourcePerms.canEditLimitedMeta ||
+        sourcePerms.canEditFullSource ||
+        sourcePerms.canAdminSourceOnStage2Plus
+      ) {
         static_entry.license = license.trim() || null;
         // Godziny pobierania dotyczą tylko feedów z URL — backend odrzuca je dla wpisów plikowych.
         if (!isFileEntry && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
@@ -303,8 +305,12 @@ export function FeedSubmissionDetail({
     }
   }
 
-  const sourceFieldsDisabled = !sourcePerms.canEditSource && !sourcePerms.canAdminSourceOnStage2Plus;
-  const limitedOnly = sourcePerms.canEditLimitedMeta && !sourcePerms.canEditFullSource && !sourcePerms.canAdminSourceOnStage2Plus;
+  const sourceFieldsDisabled =
+    !sourcePerms.canEditSource && !sourcePerms.canAdminSourceOnStage2Plus;
+  const limitedOnly =
+    sourcePerms.canEditLimitedMeta &&
+    !sourcePerms.canEditFullSource &&
+    !sourcePerms.canAdminSourceOnStage2Plus;
 
   return (
     <Stack spacing={2}>
@@ -325,7 +331,8 @@ export function FeedSubmissionDetail({
             #{row.id} - {row.data_type}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {dict.organizations}: {row.transport_organization} • {dict.author}: {row.submitted_by_username ?? "-"}
+            {dict.organizations}: {row.transport_organization} • {dict.author}:{" "}
+            {row.submitted_by_username ?? "-"}
           </Typography>
           <Divider sx={{ my: 2 }} />
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
@@ -422,7 +429,10 @@ export function FeedSubmissionDetail({
                     label={dict.downloadTime1Utc}
                     value={dt1}
                     onChange={(e) => setDt1(e.target.value)}
-                    disabled={sourceFieldsDisabled || !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)}
+                    disabled={
+                      sourceFieldsDisabled ||
+                      !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)
+                    }
                   />
                   {dt2Enabled ? (
                     <>
@@ -430,7 +440,10 @@ export function FeedSubmissionDetail({
                         label={dict.downloadTime2UtcOptional}
                         value={dt2}
                         onChange={(e) => setDt2(e.target.value)}
-                        disabled={sourceFieldsDisabled || !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)}
+                        disabled={
+                          sourceFieldsDisabled ||
+                          !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)
+                        }
                       />
                       <Button
                         type="button"
@@ -513,7 +526,9 @@ export function FeedSubmissionDetail({
                   label={dict.hideOriginal}
                 />
               </Stack>
-              {(sourcePerms.canEditSource || sourcePerms.canEditLimitedMeta || sourcePerms.canAdminSourceOnStage2Plus) && (
+              {(sourcePerms.canEditSource ||
+                sourcePerms.canEditLimitedMeta ||
+                sourcePerms.canAdminSourceOnStage2Plus) && (
                 <FormActions>
                   <Button variant="contained" onClick={() => void saveStatic()}>
                     {dict.save}
@@ -531,7 +546,12 @@ export function FeedSubmissionDetail({
           {showAdminSourceTab && tab === 1 && (
             <Stack spacing={2}>
               <Alert severity="info">{dict.adminSourceEditHint ?? dict.reviewSubmission}</Alert>
-              <TextField label={dict.feedUrl} fullWidth value={url} onChange={(e) => setUrl(e.target.value)} />
+              <TextField
+                label={dict.feedUrl}
+                fullWidth
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
               <InlineSelect
                 fullWidth
                 label={dict.authType}
@@ -565,7 +585,12 @@ export function FeedSubmissionDetail({
 
       {row.history?.length ? (
         <FormSection title={dict.historyTitle ?? "Historia"}>
-          <HistoryTimeline events={row.history} title="" emptyLabel={dict.emptyListBody} locale={locale} />
+          <HistoryTimeline
+            events={row.history}
+            title=""
+            emptyLabel={dict.emptyListBody}
+            locale={locale}
+          />
         </FormSection>
       ) : null}
       {confirmDialog}

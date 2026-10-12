@@ -8,11 +8,7 @@ import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { blogNew } from "@/lib/nav/breadcrumbTrails";
 
-export default async function BlogNewPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function BlogNewPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params;
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
@@ -20,7 +16,11 @@ export default async function BlogNewPage({
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogNew(locale, dict)}>
-      <PageHeader title={dict.createPost} subtitle={dict.blogSubtitle} icon={<MdArticle size={28} />} />
+      <PageHeader
+        title={dict.createPost}
+        subtitle={dict.blogSubtitle}
+        icon={<MdArticle size={28} />}
+      />
       <BlogPostForm locale={locale} dict={dict} />
     </AppPage>
   );

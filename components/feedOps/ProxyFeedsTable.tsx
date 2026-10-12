@@ -99,7 +99,8 @@ export function ProxyFeedsTable({
   }, [load, reloadKey]);
 
   const sourceLabel = React.useCallback(
-    (source: ProxyFeedListItem["source"]) => (source === "static" ? dict.sourceStatic : dict.sourceRealtime),
+    (source: ProxyFeedListItem["source"]) =>
+      source === "static" ? dict.sourceStatic : dict.sourceRealtime,
     [dict.sourceStatic, dict.sourceRealtime],
   );
 
@@ -247,7 +248,9 @@ export function ProxyFeedsTable({
                   <TableCell>
                     <FetchStatusChip status={status} dict={dict} />
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>{row.fetch_error_count_7d ?? 0}</TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {row.fetch_error_count_7d ?? 0}
+                  </TableCell>
                   <TableCell>{formatDateTime(row.next_fetch_after, locale)}</TableCell>
                   <TableCell sx={{ maxWidth: 240 }}>
                     {row.last_fetch_error_message ? (

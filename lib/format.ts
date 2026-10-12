@@ -33,4 +33,3 @@ export function formatDateTime(value?: string | null, locale = "pl") {
     minute: "2-digit",
   }).format(d);
 }
-

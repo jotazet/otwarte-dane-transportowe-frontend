@@ -70,7 +70,9 @@ export function AuthButton({
           aria-label={labels.login}
           sx={{ flexShrink: 0 }}
         >
-          <Avatar sx={{ width: 32, height: 32, bgcolor: "action.selected", color: "text.secondary" }}>
+          <Avatar
+            sx={{ width: 32, height: 32, bgcolor: "action.selected", color: "text.secondary" }}
+          >
             <MdPerson size={18} aria-hidden />
           </Avatar>
         </IconButton>

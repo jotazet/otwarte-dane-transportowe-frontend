@@ -107,8 +107,14 @@ export function FeedFetchHealthPanel({
         </Stack>
 
         <MetricRow label={dict.fetchErrors7d} value={health.fetch_error_count_7d ?? 0} />
-        <MetricRow label={dict.fetchNextAttempt} value={formatDateTime(health.next_fetch_after, locale)} />
-        <MetricRow label={dict.fetchLastSuccess} value={formatDateTime(health.last_fetch_success_at, locale)} />
+        <MetricRow
+          label={dict.fetchNextAttempt}
+          value={formatDateTime(health.next_fetch_after, locale)}
+        />
+        <MetricRow
+          label={dict.fetchLastSuccess}
+          value={formatDateTime(health.last_fetch_success_at, locale)}
+        />
         <MetricRow label={dict.fetchLastError} value={text(health.last_fetch_error_message)} />
         {health.fetch_pause_reason ? (
           <MetricRow label={dict.fetchPauseReason} value={text(health.fetch_pause_reason)} />

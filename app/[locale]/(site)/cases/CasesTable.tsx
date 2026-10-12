@@ -36,7 +36,14 @@ export function CasesTable({
   organizations: TransportOrganizationListItem[];
   dict: Pick<
     Dictionary,
-    "organizations" | "region" | "latestStatus" | "providers" | "all" | "actions" | "edit" | "caseStatusLabels"
+    | "organizations"
+    | "region"
+    | "latestStatus"
+    | "providers"
+    | "all"
+    | "actions"
+    | "edit"
+    | "caseStatusLabels"
   >;
 }) {
   const auth = useAuth();
@@ -67,20 +74,13 @@ export function CasesTable({
   const rows = useMemo(() => {
     const filtered = organizations.filter((org) => {
       const matchesStatus = !status || latestStatus(org, dict) === status;
-      const matchesProvider =
-        !provider || providerNames(org).some((p) => p === provider);
+      const matchesProvider = !provider || providerNames(org).some((p) => p === provider);
       return matchesStatus && matchesProvider;
     });
 
     const sorted = [...filtered].sort((a, b) => {
-      const av =
-        sortColumn === "organization"
-          ? text(a.transport_organization)
-          : text(a.region);
-      const bv =
-        sortColumn === "organization"
-          ? text(b.transport_organization)
-          : text(b.region);
+      const av = sortColumn === "organization" ? text(a.transport_organization) : text(a.region);
+      const bv = sortColumn === "organization" ? text(b.transport_organization) : text(b.region);
       const cmp = av.toLowerCase().localeCompare(bv.toLowerCase());
       return sortAscending ? cmp : -cmp;
     });
@@ -96,13 +96,7 @@ export function CasesTable({
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "organization"}
-                direction={
-                  sortColumn === "organization"
-                    ? sortAscending
-                      ? "asc"
-                      : "desc"
-                    : "asc"
-                }
+                direction={sortColumn === "organization" ? (sortAscending ? "asc" : "desc") : "asc"}
                 onClick={() => toggleSort("organization")}
               >
                 {dict.organizations}
@@ -111,13 +105,7 @@ export function CasesTable({
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "region"}
-                direction={
-                  sortColumn === "region"
-                    ? sortAscending
-                      ? "asc"
-                      : "desc"
-                    : "asc"
-                }
+                direction={sortColumn === "region" ? (sortAscending ? "asc" : "desc") : "asc"}
                 onClick={() => toggleSort("region")}
               >
                 {dict.region}
@@ -229,7 +217,10 @@ function providerNames(org: TransportOrganizationListItem) {
   return names.length ? names : ["-"];
 }
 
-function latestStatus(org: TransportOrganizationListItem, dict: Pick<Dictionary, "caseStatusLabels">) {
+function latestStatus(
+  org: TransportOrganizationListItem,
+  dict: Pick<Dictionary, "caseStatusLabels">,
+) {
   const s = org.latest_status ?? null;
   if (!s) return "-";
   if (s.status) return caseStatusLabel(s.status, dict.caseStatusLabels);

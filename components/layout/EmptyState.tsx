@@ -29,7 +29,13 @@ export function EmptyState({
           </Typography>
         ) : null}
         {actionLabel && actionHref ? (
-          <Button component={NextLink} href={actionHref} variant="outlined" size="small" prefetch={false}>
+          <Button
+            component={NextLink}
+            href={actionHref}
+            variant="outlined"
+            size="small"
+            prefetch={false}
+          >
             {actionLabel}
           </Button>
         ) : null}

@@ -91,7 +91,11 @@ export function UserDetailBody({
     setPending(true);
     setError(null);
     try {
-      const res = await auth.apiJson<UserWithGeneratedPassword>("POST", userResetPasswordPath(userId), {});
+      const res = await auth.apiJson<UserWithGeneratedPassword>(
+        "POST",
+        userResetPasswordPath(userId),
+        {},
+      );
       if (res.generated_password) {
         setGeneratedPassword(res.generated_password);
         setPasswordDialogOpen(true);
@@ -166,84 +170,89 @@ export function UserDetailBody({
         home: dict.home,
       }}
     >
-    <Stack spacing={3}>
-      {error ? <Alert severity="error">{error}</Alert> : null}
+      <Stack spacing={3}>
+        {error ? <Alert severity="error">{error}</Alert> : null}
 
-      <Card>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailField label={dict.username} value={text(user.username)} />
+        <Card>
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailField label={dict.username} value={text(user.username)} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailField label={dict.email} value={text(user.email)} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailField label={dict.firstName} value={text(user.first_name)} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailField label={dict.lastName} value={text(user.last_name)} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailChips label={dict.accountStatus}>
+                  <Chip
+                    size="small"
+                    color={user.is_active ? "success" : "error"}
+                    label={user.is_active ? dict.userActive : dict.userInactive}
+                  />
+                </DetailChips>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <DetailChips label={dict.userRoles}>
+                  {user.roles.length ? (
+                    user.roles.map((r) => <Chip key={r} size="small" label={formatRole(r, dict)} />)
+                  ) : (
+                    <Chip size="small" label="-" />
+                  )}
+                </DetailChips>
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailField label={dict.email} value={text(user.email)} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailField label={dict.firstName} value={text(user.first_name)} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailField label={dict.lastName} value={text(user.last_name)} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailChips label={dict.accountStatus}>
-                <Chip
-                  size="small"
-                  color={user.is_active ? "success" : "error"}
-                  label={user.is_active ? dict.userActive : dict.userInactive}
-                />
-              </DetailChips>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <DetailChips label={dict.userRoles}>
-                {user.roles.length ? (
-                  user.roles.map((r) => <Chip key={r} size="small" label={formatRole(r, dict)} />)
-                ) : (
-                  <Chip size="small" label="-" />
-                )}
-              </DetailChips>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
-        <Button variant="outlined" onClick={() => void resetPassword()} disabled={pending}>
-          {dict.resetPassword}
-        </Button>
-        {!isSelf ? (
-          <Button color="error" variant="outlined" onClick={() => void remove()} disabled={pending}>
-            {dict.delete}
+        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
+          <Button variant="outlined" onClick={() => void resetPassword()} disabled={pending}>
+            {dict.resetPassword}
           </Button>
-        ) : null}
+          {!isSelf ? (
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={() => void remove()}
+              disabled={pending}
+            >
+              {dict.delete}
+            </Button>
+          ) : null}
+        </Stack>
+
+        <Card>
+          <CardContent>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+              {dict.edit}
+            </Typography>
+            <UserForm
+              locale={locale}
+              dict={dict}
+              userId={userId}
+              initial={user}
+              cancelHref={p.users}
+              onSaved={() => void load()}
+            />
+          </CardContent>
+        </Card>
+
+        <GeneratedPasswordDialog
+          open={passwordDialogOpen}
+          password={generatedPassword}
+          onClose={() => {
+            setPasswordDialogOpen(false);
+            setGeneratedPassword(null);
+          }}
+          dict={dict}
+        />
+        {confirmDialog}
       </Stack>
-
-      <Card>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-            {dict.edit}
-          </Typography>
-          <UserForm
-            locale={locale}
-            dict={dict}
-            userId={userId}
-            initial={user}
-            cancelHref={p.users}
-            onSaved={() => void load()}
-          />
-        </CardContent>
-      </Card>
-
-      <GeneratedPasswordDialog
-        open={passwordDialogOpen}
-        password={generatedPassword}
-        onClose={() => {
-          setPasswordDialogOpen(false);
-          setGeneratedPassword(null);
-        }}
-        dict={dict}
-      />
-      {confirmDialog}
-    </Stack>
     </AccessGate>
   );
 }

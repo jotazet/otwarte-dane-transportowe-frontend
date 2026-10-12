@@ -57,7 +57,12 @@ export default async function BlogPostPage({
   const title = text(post.title) || `#${postId}`;
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogPost(locale, dict, postId, title)} maxWidth="md">
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={blogPost(locale, dict, postId, title)}
+      maxWidth="md"
+    >
       <BlogPostArticle post={post} postId={postId} dict={dict} locale={locale} />
     </AppPage>
   );

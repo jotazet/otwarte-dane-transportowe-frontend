@@ -22,11 +22,7 @@ export function SourceModeToggle({
 }) {
   return (
     <FormControl>
-      <RadioGroup
-        row
-        value={value}
-        onChange={(e) => onChange(e.target.value as SourceMode)}
-      >
+      <RadioGroup row value={value} onChange={(e) => onChange(e.target.value as SourceMode)}>
         <FormControlLabel value="url" control={<Radio disabled={disabled} />} label={urlLabel} />
         <FormControlLabel value="file" control={<Radio disabled={disabled} />} label={fileLabel} />
       </RadioGroup>

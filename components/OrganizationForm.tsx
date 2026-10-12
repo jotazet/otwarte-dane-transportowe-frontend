@@ -113,64 +113,64 @@ export function OrganizationForm({
         home: dict.home,
       }}
     >
-    <CrudFormCard error={error} onSubmit={save}>
-      <Stack spacing={2}>
-        <TextField
-          label={dict.organizationName}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          disabled={pending}
-        />
-        <TextField
-          label={dict.region}
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          required
-          disabled={pending}
-        />
-        <TextField
-          label={dict.website}
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          disabled={pending}
-        />
-        <TextField
-          label={dict.contact}
-          type="email"
-          value={contactEmail}
-          onChange={(e) => setContactEmail(e.target.value)}
-          disabled={pending}
-        />
-        <TextField
-          label={dict.phone}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          disabled={pending}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              disabled={pending}
-            />
-          }
-          label={dict.publicOrganization}
-        />
-        <CrudFormActions
-          saveLabel={dict.save}
-          cancelHref={cancelHref}
-          cancelLabel={dict.cancel}
-          pending={pending}
-          saveDisabled={!name.trim() || !region.trim()}
-          deleteLabel={orgId != null ? dict.delete : undefined}
-          onDelete={orgId != null ? () => void remove() : undefined}
-          hint={orgId != null ? dict.caseHint : undefined}
-        />
-      </Stack>
-    </CrudFormCard>
-    {confirmDialog}
+      <CrudFormCard error={error} onSubmit={save}>
+        <Stack spacing={2}>
+          <TextField
+            label={dict.organizationName}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            disabled={pending}
+          />
+          <TextField
+            label={dict.region}
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            required
+            disabled={pending}
+          />
+          <TextField
+            label={dict.website}
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            disabled={pending}
+          />
+          <TextField
+            label={dict.contact}
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            disabled={pending}
+          />
+          <TextField
+            label={dict.phone}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            disabled={pending}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                disabled={pending}
+              />
+            }
+            label={dict.publicOrganization}
+          />
+          <CrudFormActions
+            saveLabel={dict.save}
+            cancelHref={cancelHref}
+            cancelLabel={dict.cancel}
+            pending={pending}
+            saveDisabled={!name.trim() || !region.trim()}
+            deleteLabel={orgId != null ? dict.delete : undefined}
+            onDelete={orgId != null ? () => void remove() : undefined}
+            hint={orgId != null ? dict.caseHint : undefined}
+          />
+        </Stack>
+      </CrudFormCard>
+      {confirmDialog}
     </AccessGate>
   );
 }

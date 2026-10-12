@@ -28,8 +28,16 @@ export default async function BlogEditPage({
   const title = text(post.title) || `#${postId}`;
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={blogEdit(locale, dict, postId, title)}>
-      <PageHeader title={`${dict.edit}: ${title}`} subtitle={dict.blogSubtitle} icon={<MdArticle size={28} />} />
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={blogEdit(locale, dict, postId, title)}
+    >
+      <PageHeader
+        title={`${dict.edit}: ${title}`}
+        subtitle={dict.blogSubtitle}
+        icon={<MdArticle size={28} />}
+      />
       <BlogPostForm
         locale={locale}
         dict={dict}

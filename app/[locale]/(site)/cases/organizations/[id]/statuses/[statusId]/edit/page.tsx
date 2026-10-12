@@ -32,7 +32,11 @@ export default async function StatusEditPage({
   const orgLabel = text(org.transport_organization);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesStatusEdit(locale, dict, orgId, orgLabel)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={casesStatusEdit(locale, dict, orgId, orgLabel)}
+    >
       <PageHeader
         title={`${dict.edit} ${dict.caseStatuses}: #${sid}`}
         subtitle={dict.caseStatusesDesc}

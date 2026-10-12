@@ -43,8 +43,7 @@ export const dictEn: Dictionary = {
   organizations: "Organizations",
   providers: "Data providers",
   caseStatuses: "Case statuses",
-  footer:
-    "Otwarte Dane Transportowe (ODT), Jakub Zydroń, MIT Licence",
+  footer: "Otwarte Dane Transportowe (ODT), Jakub Zydroń, MIT Licence",
   postList: "Post list",
   postDetails: "Post details",
   reactions: "Reactions",
@@ -103,7 +102,8 @@ export const dictEn: Dictionary = {
   original: "Original",
   interval: "Interval",
   sourceUpdateInterval: "Source update interval",
-  sourceUpdateIntervalRange: "Source update interval: enter a whole number from 5 to 120 in seconds.",
+  sourceUpdateIntervalRange:
+    "Source update interval: enter a whole number from 5 to 120 in seconds.",
   actions: "Actions",
   downloadFile: "Download file",
   copyLink: "Copy link",
@@ -179,8 +179,7 @@ export const dictEn: Dictionary = {
   feedSubmissions: "Static feed submissions",
   realtimeSubmissions: "Realtime submissions",
   feedUrl: "Feed URL",
-  feedUrlHint:
-    "If you provide a static file URL, a download time is required in the field below.",
+  feedUrlHint: "If you provide a static file URL, a download time is required in the field below.",
   downloadTime1Utc: "Download time 1 (UTC, HH:MM:SS)",
   downloadTime2UtcOptional: "Download time 2 (optional, UTC, HH:MM:SS)",
   addSecondDownloadTime: "Add second time",
@@ -228,8 +227,7 @@ export const dictEn: Dictionary = {
   confirmDeletePost: "Delete this post?",
   confirmDeleteSubmission: "Delete this submission?",
   organizationName: "Organization name",
-  caseHint:
-    "Add statuses separately - each new step is another entry in the case history.",
+  caseHint: "Add statuses separately - each new step is another entry in the case history.",
   createProvider: "New provider",
   linkProviders: "Link providers",
   saveLinks: "Save links",
@@ -243,13 +241,15 @@ export const dictEn: Dictionary = {
   fileTooLarge: "The file is too large.",
   providerName: "Provider name",
   postTitle: "Title",
-  blogPostFormHint: "Title up to 24 characters, up to 5 tags of 16 characters each. Body in Markdown.",
+  blogPostFormHint:
+    "Title up to 24 characters, up to 5 tags of 16 characters each. Body in Markdown.",
   blogTagsHint: "Comma-separated tags.",
   blogImageUrl: "Cover image URL (optional)",
   postContent: "Post body",
   blogMarkdownHint: "Markdown supported (headings, lists, links, code, etc.).",
   staticSubmissionId: "Static submission ID",
-  staticSubmissionIdHint: "Optional - if the realtime concerns the same package as an existing static submission.",
+  staticSubmissionIdHint:
+    "Optional - if the realtime concerns the same package as an existing static submission.",
   yes: "Yes",
   no: "No",
   hideOriginal: "Hide original URL",

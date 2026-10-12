@@ -91,27 +91,19 @@ async function parseJsonOk<T>(res: Response): Promise<T> {
   }
 }
 
-export async function getJson<T>(
-  path: string,
-  opts?: { revalidate?: number },
-): Promise<T> {
+export async function getJson<T>(path: string, opts?: { revalidate?: number }): Promise<T> {
   const useIsr =
     typeof opts?.revalidate === "number" && Number.isFinite(opts.revalidate) && opts.revalidate > 0;
 
   const res = await fetchWithTimeout(`${apiBaseUrl()}${path}`, {
     headers: { Accept: "application/json" },
-    ...(useIsr
-      ? { next: { revalidate: opts!.revalidate } }
-      : { cache: "no-store" as const }),
+    ...(useIsr ? { next: { revalidate: opts!.revalidate } } : { cache: "no-store" as const }),
   });
   if (!res.ok) throw new ApiError(res.status, `GET ${path} failed: ${res.status}`);
   return parseJsonOk<T>(res);
 }
 
-export async function postJson<TResponse>(
-  path: string,
-  body: unknown,
-): Promise<TResponse> {
+export async function postJson<TResponse>(path: string, body: unknown): Promise<TResponse> {
   const res = await fetchWithTimeout(`${apiBaseUrl()}${path}`, {
     method: "POST",
     headers: {

@@ -37,4 +37,3 @@ export function isJwtExpired(token: string, skewSeconds = 30) {
   const now = Math.floor(Date.now() / 1000);
   return exp <= now + skewSeconds;
 }
-

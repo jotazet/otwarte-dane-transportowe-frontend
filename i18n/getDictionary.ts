@@ -13,4 +13,3 @@ export async function getDictionary(locale: Locale): Promise<Dictionary> {
   if (locale === "bg") return dictBg;
   return dictPl;
 }
-

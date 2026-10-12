@@ -28,8 +28,16 @@ export default async function OrganizationEditPage({
   const orgLabel = text(org.transport_organization);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesOrganizationEdit(locale, dict, orgId, orgLabel)}>
-      <PageHeader title={`${dict.edit}: ${orgLabel}`} subtitle={dict.casesSubtitle} icon={<MdApartment size={28} aria-hidden />} />
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={casesOrganizationEdit(locale, dict, orgId, orgLabel)}
+    >
+      <PageHeader
+        title={`${dict.edit}: ${orgLabel}`}
+        subtitle={dict.casesSubtitle}
+        icon={<MdApartment size={28} aria-hidden />}
+      />
       <OrganizationForm locale={locale} dict={dict} orgId={orgId} initial={org} />
     </AppPage>
   );

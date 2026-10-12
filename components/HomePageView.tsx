@@ -131,7 +131,13 @@ function OverviewCards({
   dict,
   outlined,
 }: {
-  cards: readonly { title: string; body: string; href: string; icon: React.ReactNode; key?: string }[];
+  cards: readonly {
+    title: string;
+    body: string;
+    href: string;
+    icon: React.ReactNode;
+    key?: string;
+  }[];
   dict: Dictionary;
   outlined?: boolean;
 }) {
@@ -140,7 +146,11 @@ function OverviewCards({
       {cards.map((c) => (
         <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={c.key ?? c.href}>
           <Card sx={{ height: "100%", ...(outlined ? { borderColor: "primary.light" } : {}) }}>
-            <CardActionArea component={Link} href={c.href} sx={{ height: "100%", alignItems: "stretch" }}>
+            <CardActionArea
+              component={Link}
+              href={c.href}
+              sx={{ height: "100%", alignItems: "stretch" }}
+            >
               <CardContent>
                 <Box sx={{ color: "primary.main" }}>{c.icon}</Box>
                 <Typography variant="h6" sx={{ mt: 2 }}>
@@ -150,7 +160,11 @@ function OverviewCards({
                   {c.body}
                 </Typography>
                 {!outlined ? (
-                  <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mt: 2, color: "primary.main" }}>
+                  <Stack
+                    direction="row"
+                    spacing={0.5}
+                    sx={{ alignItems: "center", mt: 2, color: "primary.main" }}
+                  >
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                       {dict.open}
                     </Typography>
@@ -166,19 +180,25 @@ function OverviewCards({
   );
 }
 
-export function HomePageView({
-  locale,
-  dict,
-}: {
-  locale: Locale;
-  dict: Dictionary;
-}) {
+export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const auth = useAuth();
   const p = paths(locale);
 
   const publicCards = [
-    { key: "blog", title: dict.blog, body: dict.blogIntro, href: p.blog, icon: <MdArticle size={28} aria-hidden /> },
-    { key: "data", title: dict.data, body: dict.dataIntro, href: p.data, icon: <MdDataset size={28} aria-hidden /> },
+    {
+      key: "blog",
+      title: dict.blog,
+      body: dict.blogIntro,
+      href: p.blog,
+      icon: <MdArticle size={28} aria-hidden />,
+    },
+    {
+      key: "data",
+      title: dict.data,
+      body: dict.dataIntro,
+      href: p.data,
+      icon: <MdDataset size={28} aria-hidden />,
+    },
     {
       key: "cases",
       title: dict.cases,
@@ -195,13 +215,16 @@ export function HomePageView({
     : [];
 
   // Losowa wiadomość motywacyjna wybierana raz po zamontowaniu (Math.random poza renderem).
-  const [motivationKey, setMotivationKey] =
-    React.useState<(typeof HOME_MOTIVATION_KEYS)[number]>(HOME_MOTIVATION_KEYS[0]);
+  const [motivationKey, setMotivationKey] = React.useState<(typeof HOME_MOTIVATION_KEYS)[number]>(
+    HOME_MOTIVATION_KEYS[0],
+  );
   React.useEffect(() => {
     let cancelled = false;
     void (async () => {
       if (cancelled) return;
-      setMotivationKey(HOME_MOTIVATION_KEYS[Math.floor(Math.random() * HOME_MOTIVATION_KEYS.length)]);
+      setMotivationKey(
+        HOME_MOTIVATION_KEYS[Math.floor(Math.random() * HOME_MOTIVATION_KEYS.length)],
+      );
     })();
     return () => {
       cancelled = true;
@@ -231,10 +254,18 @@ export function HomePageView({
               </>
             ) : isAuthenticated ? (
               <>
-                <Typography variant="h3" component="h1" sx={{ fontWeight: 500, letterSpacing: "-0.02em" }}>
+                <Typography
+                  variant="h3"
+                  component="h1"
+                  sx={{ fontWeight: 500, letterSpacing: "-0.02em" }}
+                >
                   {greeting}
                 </Typography>
-                <Typography variant="h6" color="text.secondary" sx={{ mt: 2, fontWeight: 500, lineHeight: 1.5 }}>
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ mt: 2, fontWeight: 500, lineHeight: 1.5 }}
+                >
                   {dict[motivationKey]}
                 </Typography>
               </>
@@ -254,10 +285,22 @@ export function HomePageView({
                   {dict.heroBody}
                 </Typography>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                  <Button component={Link} href={p.data} variant="contained" size="large" color="primary">
+                  <Button
+                    component={Link}
+                    href={p.data}
+                    variant="contained"
+                    size="large"
+                    color="primary"
+                  >
                     {dict.browseData}
                   </Button>
-                  <Button component={Link} href={p.info} variant="outlined" size="large" color="primary">
+                  <Button
+                    component={Link}
+                    href={p.info}
+                    variant="outlined"
+                    size="large"
+                    color="primary"
+                  >
                     {dict.learnMore}
                   </Button>
                 </Stack>

@@ -60,7 +60,11 @@ export default async function BlogPage({
         subtitle={dict.blogSubtitle}
         icon={<MdArticle size={28} aria-hidden />}
         actions={
-          <CreateActionButton roles={["Blogger", "Editor"]} href={paths(locale).blogNew} label={dict.createPost} />
+          <CreateActionButton
+            roles={["Blogger", "Editor"]}
+            href={paths(locale).blogNew}
+            label={dict.createPost}
+          />
         }
       />
       {list === null ? (

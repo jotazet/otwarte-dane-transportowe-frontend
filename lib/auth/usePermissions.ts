@@ -44,7 +44,11 @@ export function usePermissions() {
     hasBlogManageAccess: () => (user ? hasBlogManageAccess(user) : false),
     canBlogEditPost: (authorId: number | null | undefined) =>
       user ? canBlogEditPost(user, authorId) : false,
-    feedSource: (ctx: Omit<FeedSourceEditContext, "isDjangoAdmin" | "isStaff" | "isHelper"> & { isHelper?: boolean }) => {
+    feedSource: (
+      ctx: Omit<FeedSourceEditContext, "isDjangoAdmin" | "isStaff" | "isHelper"> & {
+        isHelper?: boolean;
+      },
+    ) => {
       const full: FeedSourceEditContext = {
         ...ctx,
         isDjangoAdmin: user?.isDjangoAdmin ?? false,

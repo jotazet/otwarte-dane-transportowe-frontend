@@ -22,7 +22,11 @@ export default async function MySubmissionsPage({
   const p = paths(locale);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataMySubmissionsList(locale, dict)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={dataMySubmissionsList(locale, dict)}
+    >
       <PageHeader
         title={dict.myFeeds}
         subtitle={dict.myFeedsSubtitle ?? dict.dataSubtitle}
@@ -35,7 +39,12 @@ export default async function MySubmissionsPage({
           />
         }
       />
-      <SubmissionsTableHub locale={locale} dict={dict} filterOrgId={filterOrganizationId} listContext="my" />
+      <SubmissionsTableHub
+        locale={locale}
+        dict={dict}
+        filterOrgId={filterOrganizationId}
+        listContext="my"
+      />
     </AppPage>
   );
 }

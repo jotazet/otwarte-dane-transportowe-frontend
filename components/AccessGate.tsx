@@ -57,11 +57,7 @@ export function AccessGate({
     if (mode === "hide") return null;
     if (dict && locale) {
       return (
-        <EmptyState
-          title={dict.requiresLogin}
-          actionLabel={dict.login}
-          actionHref={loginHref}
-        />
+        <EmptyState title={dict.requiresLogin} actionLabel={dict.login} actionHref={loginHref} />
       );
     }
     return null;

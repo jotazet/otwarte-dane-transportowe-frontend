@@ -28,8 +28,16 @@ export default async function StatusNewPage({
   const orgLabel = text(org.transport_organization);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesStatusNew(locale, dict, orgId, orgLabel)}>
-      <PageHeader title={`${dict.addStatus}: ${orgLabel}`} subtitle={dict.caseStatusesDesc} icon={<MdRuleFolder size={28} aria-hidden />} />
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={casesStatusNew(locale, dict, orgId, orgLabel)}
+    >
+      <PageHeader
+        title={`${dict.addStatus}: ${orgLabel}`}
+        subtitle={dict.caseStatusesDesc}
+        icon={<MdRuleFolder size={28} aria-hidden />}
+      />
       <CaseStatusForm locale={locale} dict={dict} organizationId={orgId} />
     </AppPage>
   );

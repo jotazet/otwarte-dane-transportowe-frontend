@@ -19,12 +19,13 @@ import { TableFilterHeaderCell } from "@/components/layout/TableFilterHeaderCell
 import { TableCard } from "@/components/TableCard";
 import { getJson } from "@/lib/api/http";
 import type { TransportOrganizationListItem } from "@/lib/api/cases";
+import { submissionsPaths, buildListQuery, parseCombinedSubmissions } from "@/lib/api/submissions";
 import {
-  submissionsPaths,
-  buildListQuery,
-  parseCombinedSubmissions,
-} from "@/lib/api/submissions";
-import { fetchAllPages, type CombinedSubmissionsBundle, type FeedSubmissionListItem, type RealtimeSubmissionListItem } from "@/lib/api/types";
+  fetchAllPages,
+  type CombinedSubmissionsBundle,
+  type FeedSubmissionListItem,
+  type RealtimeSubmissionListItem,
+} from "@/lib/api/types";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
@@ -149,7 +150,10 @@ export function SubmissionsTableHub({
     setError(null);
     try {
       const q = buildListQuery({ transport_organization: filterOrgId });
-      const data = await apiJson<CombinedSubmissionsBundle>("GET", `${submissionsPaths.combined}${q}`);
+      const data = await apiJson<CombinedSubmissionsBundle>(
+        "GET",
+        `${submissionsPaths.combined}${q}`,
+      );
       const parsed = parseCombinedSubmissions(data);
       setFeeds(parsed.static);
       setRts(parsed.realtime);
@@ -229,7 +233,9 @@ export function SubmissionsTableHub({
         home: dict.home,
       }}
       forbiddenAlternateHref={config.forbiddenAlternate ? p.mySubmissions : undefined}
-      forbiddenAlternateLabel={config.forbiddenAlternate ? dict[config.forbiddenAlternate] : undefined}
+      forbiddenAlternateLabel={
+        config.forbiddenAlternate ? dict[config.forbiddenAlternate] : undefined
+      }
     >
       <Stack spacing={2} sx={listContext === "my" ? { mb: 3 } : undefined}>
         {config.showOrgFilterBanner && filterOrgId != null ? (

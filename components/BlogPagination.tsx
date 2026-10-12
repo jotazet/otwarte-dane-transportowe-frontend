@@ -44,7 +44,12 @@ export function BlogPagination({
 
       {items.map((item, index) =>
         item === "ellipsis" ? (
-          <Typography key={`ellipsis-${index}`} variant="body2" color="text.secondary" sx={{ px: 0.5 }}>
+          <Typography
+            key={`ellipsis-${index}`}
+            variant="body2"
+            color="text.secondary"
+            sx={{ px: 0.5 }}
+          >
             …
           </Typography>
         ) : (

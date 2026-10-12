@@ -63,8 +63,7 @@ export function DataCatalogTable({
       ? { roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin }
       : null;
   const canManage =
-    userClaims &&
-    (hasDataProviderAccess(userClaims) || hasHelperAccess(userClaims));
+    userClaims && (hasDataProviderAccess(userClaims) || hasHelperAccess(userClaims));
   const [staticType, setStaticType] = useState<string | "">("");
   const [realtimeType, setRealtimeType] = useState<string | "">("");
   const { sortColumn, sortAscending, toggleSort } = useTableSort<SortColumn>("organization");
@@ -95,14 +94,8 @@ export function DataCatalogTable({
     });
 
     return [...filtered].sort((a, b) => {
-      const av =
-        sortColumn === "organization"
-          ? text(a.transport_organization)
-          : text(a.region);
-      const bv =
-        sortColumn === "organization"
-          ? text(b.transport_organization)
-          : text(b.region);
+      const av = sortColumn === "organization" ? text(a.transport_organization) : text(a.region);
+      const bv = sortColumn === "organization" ? text(b.transport_organization) : text(b.region);
       const cmp = av.toLowerCase().localeCompare(bv.toLowerCase());
       return sortAscending ? cmp : -cmp;
     });
@@ -116,13 +109,7 @@ export function DataCatalogTable({
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "organization"}
-                direction={
-                  sortColumn === "organization"
-                    ? sortAscending
-                      ? "asc"
-                      : "desc"
-                    : "asc"
-                }
+                direction={sortColumn === "organization" ? (sortAscending ? "asc" : "desc") : "asc"}
                 onClick={() => toggleSort("organization")}
               >
                 {dict.organizations}
@@ -131,13 +118,7 @@ export function DataCatalogTable({
             <TableCell>
               <TableSortLabel
                 active={sortColumn === "region"}
-                direction={
-                  sortColumn === "region"
-                    ? sortAscending
-                      ? "asc"
-                      : "desc"
-                    : "asc"
-                }
+                direction={sortColumn === "region" ? (sortAscending ? "asc" : "desc") : "asc"}
                 onClick={() => toggleSort("region")}
               >
                 {dict.region}

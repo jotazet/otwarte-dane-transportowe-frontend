@@ -13,13 +13,19 @@ export type AuthUserClaims = {
 };
 
 function groupNames(payload: JwtPayload | null): string[] {
-  const raw = (payload as Record<string, unknown> | null)?.roles ??
+  const raw =
+    (payload as Record<string, unknown> | null)?.roles ??
     (payload as Record<string, unknown> | null)?.groups ??
     (payload as Record<string, unknown> | null)?.role;
   const names: string[] = [];
   const push = (v: unknown) => {
     if (typeof v === "string") names.push(v);
-    else if (v && typeof v === "object" && "name" in v && typeof (v as { name: string }).name === "string") {
+    else if (
+      v &&
+      typeof v === "object" &&
+      "name" in v &&
+      typeof (v as { name: string }).name === "string"
+    ) {
       names.push((v as { name: string }).name);
     }
   };
@@ -28,7 +34,10 @@ function groupNames(payload: JwtPayload | null): string[] {
   return names;
 }
 
-export function claimsFromAccessToken(access: string, loginUsername?: string | null): AuthUserClaims {
+export function claimsFromAccessToken(
+  access: string,
+  loginUsername?: string | null,
+): AuthUserClaims {
   const payload = decodeJwt(access);
 
   const username =
@@ -66,7 +75,11 @@ export function claimsFromAccessToken(access: string, loginUsername?: string | n
       : null;
 
   const userId =
-    typeof uid === "number" ? uid : typeof uid === "string" && /^\d+$/.test(uid) ? Number(uid) : null;
+    typeof uid === "number"
+      ? uid
+      : typeof uid === "string" && /^\d+$/.test(uid)
+        ? Number(uid)
+        : null;
 
   return {
     username,
@@ -80,7 +93,10 @@ export function claimsFromAccessToken(access: string, loginUsername?: string | n
   };
 }
 
-export function hasRoleAccess(user: Pick<AuthUserClaims, "roles" | "isDjangoAdmin">, wanted: AppRole[]) {
+export function hasRoleAccess(
+  user: Pick<AuthUserClaims, "roles" | "isDjangoAdmin">,
+  wanted: AppRole[],
+) {
   if (!wanted.length) return false;
   if (user.isDjangoAdmin) return true;
   return wanted.some((r) => user.roles.has(r));
@@ -133,7 +149,9 @@ export function canEditFeedSourceFields(ctx: FeedSourceEditContext) {
   return false;
 }
 
-export function canHelperReviewOnly(ctx: Pick<FeedSourceEditContext, "isHelper" | "isDjangoAdmin">) {
+export function canHelperReviewOnly(
+  ctx: Pick<FeedSourceEditContext, "isHelper" | "isDjangoAdmin">,
+) {
   return ctx.isHelper && !ctx.isDjangoAdmin;
 }
 
@@ -142,7 +160,12 @@ export function canBlogEditPost(
   authorId: number | null | undefined,
 ) {
   if (hasRoleAccess(user, ["Editor"])) return true;
-  if (hasRoleAccess(user, ["Blogger"]) && user.userId != null && authorId != null && user.userId === authorId) {
+  if (
+    hasRoleAccess(user, ["Blogger"]) &&
+    user.userId != null &&
+    authorId != null &&
+    user.userId === authorId
+  ) {
     return true;
   }
   return false;

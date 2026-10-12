@@ -1,8 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-).replace(/\/+$/, "");
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
 
 /**
  * Ścieżki podawane bez prefiksu języka — wiodące `/*` pokrywa `/pl`, `/en`, `/de`, `/bg`.

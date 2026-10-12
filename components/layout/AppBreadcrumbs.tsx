@@ -30,12 +30,7 @@ export function AppBreadcrumbs({
   return (
     <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", minHeight: 40 }}>
       <Tooltip title={backLabel}>
-        <IconButton
-          onClick={handleBack}
-          size="small"
-          aria-label={backLabel}
-          sx={{ flexShrink: 0 }}
-        >
+        <IconButton onClick={handleBack} size="small" aria-label={backLabel} sx={{ flexShrink: 0 }}>
           <MdArrowBack size={22} aria-hidden />
         </IconButton>
       </Tooltip>
@@ -44,7 +39,11 @@ export function AppBreadcrumbs({
           const last = i === items.length - 1;
           if (last || !item.href) {
             return (
-              <Typography key={`${item.label}-${i}`} color="text.primary" sx={{ fontWeight: last ? 600 : 400 }}>
+              <Typography
+                key={`${item.label}-${i}`}
+                color="text.primary"
+                sx={{ fontWeight: last ? 600 : 400 }}
+              >
                 {item.label}
               </Typography>
             );

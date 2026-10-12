@@ -1,0 +1,9 @@
+.next
+node_modules
+package-lock.json
+next-env.d.ts
+# Generated; see the header of the file.
+lib/icons/react-icons-md.js
+# Copied verbatim from mui/material-ui; keep them identical to upstream.
+.claude/skills/material-ui-*
+*.md

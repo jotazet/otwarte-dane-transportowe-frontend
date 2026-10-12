@@ -31,11 +31,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function CasesPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function CasesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params;
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
@@ -48,25 +44,31 @@ export default async function CasesPage({
         title={dict.casesTitle}
         subtitle={dict.casesSubtitle}
         icon={<MdRuleFolder size={28} aria-hidden />}
-        actions={<CreateActionButton roles={["Helper"]} href={paths(locale).casesOrgNew} label={dict.addOrganization} />}
+        actions={
+          <CreateActionButton
+            roles={["Helper"]}
+            href={paths(locale).casesOrgNew}
+            label={dict.addOrganization}
+          />
+        }
       />
       {organizations === null ? (
         <PageLoadErrorAlert body={dict.pageErrorBody} retryLabel={dict.tryAgain} />
       ) : (
-      <CasesTable
-        locale={locale}
-        organizations={organizations}
-        dict={{
-          organizations: dict.organizations,
-          region: dict.region,
-          latestStatus: dict.latestStatus,
-          providers: dict.providers,
-          all: dict.all,
-          actions: dict.actions,
-          edit: dict.edit,
-          caseStatusLabels: dict.caseStatusLabels,
-        }}
-      />
+        <CasesTable
+          locale={locale}
+          organizations={organizations}
+          dict={{
+            organizations: dict.organizations,
+            region: dict.region,
+            latestStatus: dict.latestStatus,
+            providers: dict.providers,
+            all: dict.all,
+            actions: dict.actions,
+            edit: dict.edit,
+            caseStatusLabels: dict.caseStatusLabels,
+          }}
+        />
       )}
     </AppPage>
   );

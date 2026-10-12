@@ -17,7 +17,13 @@ export default async function UsersPage({ params }: { params: Promise<{ locale: 
         title={dict.users}
         subtitle={dict.usersDesc}
         icon={<MdManageAccounts size={28} aria-hidden />}
-        actions={<CreateActionButton roles={["Admin"]} href={paths(locale).usersNew} label={dict.addUser} />}
+        actions={
+          <CreateActionButton
+            roles={["Admin"]}
+            href={paths(locale).usersNew}
+            label={dict.addUser}
+          />
+        }
       />
       <UsersHub locale={locale} dict={dict} />
     </AppPage>

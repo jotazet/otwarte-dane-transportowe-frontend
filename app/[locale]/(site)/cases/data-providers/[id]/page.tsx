@@ -27,7 +27,11 @@ export default async function DataProviderEditPage({
   const label = prov.name?.trim() || `#${providerId}`;
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesProviderDetail(locale, dict, providerId, label)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={casesProviderDetail(locale, dict, providerId, label)}
+    >
       <PageHeader
         title={`${dict.edit}: ${label}`}
         subtitle={dict.providersDesc}
