@@ -68,6 +68,12 @@ export type SubmissionHistoryEvent = {
   created_at?: string;
 };
 
+/** An automatic rejection reason; see the backend's docs/api/feeds.md. */
+export type RejectionReason = {
+  code: string;
+  details?: { endpoint_type?: string; status?: number; protocol?: string };
+};
+
 export type SubmissionStageFields = {
   id: number;
   transport_organization: number | string;

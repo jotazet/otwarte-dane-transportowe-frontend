@@ -214,6 +214,30 @@ export const dictDe: Dictionary = {
   published: "Veröffentlicht",
   rejectionCause: "Ablehnungsgrund",
   rejectionCauseHint: "Optional - bei Ablehnung der Einreichung angeben.",
+  realtimeRejectionReasons: {
+    "realtime.static_submission_missing":
+      "Der Realtime-Feed ist mit keiner statischen Einreichung verknüpft. Wählen Sie für GTFS-RT und SIRI eine veröffentlichte statische Einreichung aus.",
+    "realtime.static_submission_not_published":
+      "Die verknüpfte statische Einreichung ist noch nicht veröffentlicht. Der Realtime-Feed kann erst nach Veröffentlichung des statischen Feeds geprüft werden.",
+    "realtime.no_endpoints":
+      "Die Einreichung hat keine Endpoints. Fügen Sie mindestens einen Endpoint hinzu.",
+    "realtime.endpoint_http_error":
+      "Der Endpoint „{endpoint}“ hat den HTTP-Fehler {status} zurückgegeben. Prüfen Sie die URL und die Zugangsdaten.",
+    "realtime.endpoint_content_empty":
+      "Der Endpoint „{endpoint}“ hat eine leere Antwort zurückgegeben.",
+    "realtime.endpoint_content_invalid":
+      "Die Antwort des Endpoints „{endpoint}“ ist kein gültiger {protocol}-Feed.",
+    "realtime.endpoint_url_blocked":
+      "Die Adresse des Endpoints „{endpoint}“ erfüllt die Sicherheitsregeln von ODT nicht: Der Hostname existiert nicht, die Adresse ist nicht öffentlich, eine Weiterleitung ist nicht zulässig oder die Antwort ist zu groß.",
+    "realtime.endpoint_timeout": "Der Endpoint „{endpoint}“ hat nicht rechtzeitig geantwortet.",
+    "realtime.endpoint_unreachable":
+      "Keine Verbindung zum Endpoint „{endpoint}“ möglich. Prüfen Sie, ob der Server aus dem Internet erreichbar ist.",
+    "realtime.endpoint_fetch_failed":
+      "Die Daten des Endpoints „{endpoint}“ konnten nicht abgerufen werden.",
+    "realtime.endpoint_cache_failed":
+      "Die erste Kopie der Daten des Endpoints „{endpoint}“ konnte nicht auf dem ODT-Server gespeichert werden. Versuchen Sie es später erneut.",
+  },
+  realtimeRejectionReasonUnknown: "Die Einreichung wurde bei der automatischen Prüfung abgelehnt.",
   applyStage: "Stufe anwenden",
   rejectSubmission: "Ablehnen",
   reviewSubmission: "Einreichung prüfen",

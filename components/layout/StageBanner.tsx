@@ -1,6 +1,7 @@
 "use client";
 
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 
 const STAGE_SEVERITY: Record<number, "info" | "warning" | "success"> = {
   1: "info",
@@ -14,6 +15,7 @@ export function StageBanner({
   stageLabel,
   isRejected,
   rejectionCause,
+  rejectionReasons,
   rejectedLabel,
   fixHint,
 }: {
@@ -21,6 +23,8 @@ export function StageBanner({
   stageLabel: string;
   isRejected: boolean;
   rejectionCause?: string | null;
+  /** Translated automatic reasons; shown as a list instead of rejectionCause. */
+  rejectionReasons?: string[];
   rejectedLabel: string;
   fixHint?: string;
 }) {
@@ -28,8 +32,15 @@ export function StageBanner({
     return (
       <Alert severity="error">
         <strong>{rejectedLabel}</strong>
-        {rejectionCause ? `: ${rejectionCause}` : null}
+        {!rejectionReasons?.length && rejectionCause ? `: ${rejectionCause}` : null}
         {fixHint ? ` - ${fixHint}` : null}
+        {rejectionReasons?.length ? (
+          <Box component="ul" sx={{ m: 0, mt: 0.5, pl: 2.5 }}>
+            {rejectionReasons.map((reason, i) => (
+              <li key={i}>{reason}</li>
+            ))}
+          </Box>
+        ) : null}
       </Alert>
     );
   }
