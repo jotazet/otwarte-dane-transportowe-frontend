@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { FeedCatalogDetailBody, type FeedDetailGroup } from "@/components/FeedCatalogDetailBody";
 import { FeedCatalogDetailHeader } from "@/components/FeedCatalogDetailHeader";
 import { AppPage } from "@/components/layout/AppPage";
-import { getDictionary, type Dictionary } from "@/i18n/getDictionary";
+import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalogOrganization, type FeedDetail } from "@/lib/api/dataCatalog";
 import { loadOr404 } from "@/lib/api/loadOr404";
@@ -40,7 +40,7 @@ export default async function FeedCatalogDetailPage({
           type: text(feed.data_type).toUpperCase(),
           original: staticFeed.is_original ?? null,
           interval: "-",
-          downloadTimes: downloadTimesText(staticFeed, dict),
+          downloadTimes: downloadTimesText(staticFeed),
           license: text(staticFeed.license),
           url: text(staticFeed.download_url),
         });
@@ -81,10 +81,9 @@ function intervalText(value: unknown) {
   return s ? `${s} s` : "-";
 }
 
-function downloadTimesText(feed: FeedDetail, dict: Dictionary): string | null {
+function downloadTimesText(feed: FeedDetail): string | null {
   const times = [feed.download_time_1, feed.download_time_2]
     .map(formatTimeOfDay)
-    .filter((t): t is string => t != null)
-    .map((t) => dict.feedDownloadTimeUtc.replace("{time}", t));
+    .filter((t): t is string => t != null);
   return times.length ? times.join(", ") : null;
 }

@@ -28,8 +28,6 @@ export type ProxyFeedListItem = FetchHealthFields & {
 export type FeedFetchError = {
   id: number;
   source?: FetchErrorSource | string | null;
-  static_entry?: number | null;
-  endpoint_rt?: number | null;
   /** FeedSubmission (static) or RealtimeSubmission (realtime) id; older backends omit it. */
   submission_id?: number | null;
   error_type?: string | null;

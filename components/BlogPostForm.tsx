@@ -190,7 +190,7 @@ export function BlogPostForm({
                     {imageFile.name}
                   </Typography>
                 ) : null}
-                {postId != null && initialImage ? (
+                {initialImage ? (
                   <FormControlLabel
                     control={
                       <Checkbox

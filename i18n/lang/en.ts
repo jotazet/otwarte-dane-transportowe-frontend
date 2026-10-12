@@ -101,8 +101,7 @@ export const dictEn: Dictionary = {
   publicOrganization: "Public",
   original: "Original",
   interval: "Interval",
-  feedDownloadTimes: "Download times",
-  feedDownloadTimeUtc: "{time} UTC",
+  feedDownloadTimes: "Download times (UTC)",
   sourceUpdateInterval: "Source update interval",
   sourceUpdateIntervalRange:
     "Source update interval: enter a whole number from 5 to 120 in seconds.",
