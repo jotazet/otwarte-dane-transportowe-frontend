@@ -194,6 +194,7 @@ export const dictBg: Dictionary = {
   submissions: "Заявки за фийдове",
   staticSubmissionTitle: "Заявка за статичен фийд #{id}",
   realtimeSubmissionTitle: "Заявка за фийд в реално време #{id}",
+  realtimeSubmissionCardTitle: "Реално време #{id} – {protocol}",
   feedUrl: "URL на фийда",
   feedUrlHint:
     "Ако подаваш URL адрес на статичен файл, е необходим час на изтегляне в полето по-долу.",

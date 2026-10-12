@@ -192,6 +192,7 @@ export const dictPl = {
   submissions: "Zgłoszenia feedów",
   staticSubmissionTitle: "Zgłoszenie feedu statycznego #{id}",
   realtimeSubmissionTitle: "Zgłoszenie feedu realtime #{id}",
+  realtimeSubmissionCardTitle: "Realtime #{id} – {protocol}",
   feedUrl: "URL feedu",
   feedUrlHint:
     "Jeśli podajesz adres URL pliku statycznego, wymagana jest godzina pobierania w polu poniżej.",

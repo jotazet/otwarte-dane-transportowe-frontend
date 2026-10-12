@@ -192,6 +192,7 @@ export const dictEn: Dictionary = {
   submissions: "Feed submissions",
   staticSubmissionTitle: "Static feed submission #{id}",
   realtimeSubmissionTitle: "Realtime feed submission #{id}",
+  realtimeSubmissionCardTitle: "Realtime #{id} – {protocol}",
   feedUrl: "Feed URL",
   feedUrlHint: "If you provide a static file URL, a download time is required in the field below.",
   downloadTime1Utc: "Download time 1 (UTC, HH:MM:SS)",

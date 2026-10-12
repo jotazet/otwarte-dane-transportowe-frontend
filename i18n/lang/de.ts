@@ -196,6 +196,7 @@ export const dictDe: Dictionary = {
   submissions: "Feed-Einreichungen",
   staticSubmissionTitle: "Statische Feed-Einreichung #{id}",
   realtimeSubmissionTitle: "Realtime-Feed-Einreichung #{id}",
+  realtimeSubmissionCardTitle: "Realtime #{id} – {protocol}",
   feedUrl: "Feed-URL",
   feedUrlHint:
     "Wenn du eine statische Datei-URL angibst, ist eine Download-Zeit im Feld unten erforderlich.",

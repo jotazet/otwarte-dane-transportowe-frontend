@@ -339,7 +339,9 @@ export function RealtimeSubmissionDetail({
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            RT #{row.id} - {row.protocol}
+            {dict.realtimeSubmissionCardTitle
+              .replace("{id}", String(row.id))
+              .replace("{protocol}", row.protocol)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {dict.organizations}: {row.transport_organization} • {dict.staticSubmissionId}:{" "}
