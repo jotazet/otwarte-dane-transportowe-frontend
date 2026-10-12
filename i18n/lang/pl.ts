@@ -215,6 +215,18 @@ export const dictPl = {
   addEndpoint: "Dodaj endpoint",
   stage: "Etap",
   stageNumber: "Numer etapu",
+  staticSubmissionStageLabels: {
+    1: "Etap 1: przesłanie danych",
+    2: "Etap 2: weryfikacja danych",
+    3: "Etap 3: zatwierdzenie",
+    4: "Etap 4: opublikowano",
+  },
+  realtimeSubmissionStageLabels: {
+    1: "Etap 1: dodanie endpointów",
+    2: "Etap 2: weryfikacja danych",
+    3: "Etap 3: zatwierdzenie",
+    4: "Etap 4: opublikowano",
+  },
   status: "Status",
   rejected: "Odrzucone",
   published: "Opublikowane",

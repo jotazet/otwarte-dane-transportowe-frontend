@@ -31,6 +31,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
 import { formatApiError } from "@/lib/formatApiError";
 import { paths, submissionDetailPath, type SubmissionListContext } from "@/lib/nav/routes";
+import { submissionStageLabel } from "@/lib/submissionStage";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 
 type UnifiedRow =
@@ -296,7 +297,9 @@ export function SubmissionsTableHub({
                   </TableCell>
                   <TableCell>{orgLabel(row)}</TableCell>
                   <TableCell>{row.typeLabel}</TableCell>
-                  <TableCell>{row.current_stage_label}</TableCell>
+                  <TableCell>
+                    {submissionStageLabel(row.kind, row.current_stage, row.is_rejected, dict)}
+                  </TableCell>
                   <TableCell>
                     <StatusChip row={row} dict={dict} listContext={listContext} />
                   </TableCell>

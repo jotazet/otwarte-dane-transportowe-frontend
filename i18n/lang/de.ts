@@ -219,6 +219,18 @@ export const dictDe: Dictionary = {
   addEndpoint: "Endpoint hinzufügen",
   stage: "Stufe",
   stageNumber: "Stufen-Nummer",
+  staticSubmissionStageLabels: {
+    1: "Stufe 1: Hochladen der Daten",
+    2: "Stufe 2: Datenprüfung",
+    3: "Stufe 3: Freigabe",
+    4: "Stufe 4: Veröffentlicht",
+  },
+  realtimeSubmissionStageLabels: {
+    1: "Stufe 1: Hinzufügen der Endpoints",
+    2: "Stufe 2: Datenprüfung",
+    3: "Stufe 3: Freigabe",
+    4: "Stufe 4: Veröffentlicht",
+  },
   status: "Status",
   rejected: "Abgelehnt",
   published: "Veröffentlicht",

@@ -213,6 +213,18 @@ export const dictEn: Dictionary = {
   addEndpoint: "Add endpoint",
   stage: "Stage",
   stageNumber: "Stage number",
+  staticSubmissionStageLabels: {
+    1: "Stage 1: Data upload",
+    2: "Stage 2: Data verification",
+    3: "Stage 3: Approval",
+    4: "Stage 4: Published",
+  },
+  realtimeSubmissionStageLabels: {
+    1: "Stage 1: Adding endpoints",
+    2: "Stage 2: Data verification",
+    3: "Stage 3: Approval",
+    4: "Stage 4: Published",
+  },
   status: "Status",
   rejected: "Rejected",
   published: "Published",

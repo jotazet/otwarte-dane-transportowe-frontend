@@ -41,6 +41,7 @@ import {
 import { downloadBlob } from "@/lib/download";
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
+import { submissionStageLabel } from "@/lib/submissionStage";
 
 type StaticEntry = FetchHealthFields & {
   id: number;
@@ -61,7 +62,6 @@ type FeedDetail = {
   name?: string;
   note?: string;
   current_stage: number;
-  current_stage_label: string;
   is_rejected: boolean;
   rejection_cause?: string | null;
   static_entry?: StaticEntry | null;
@@ -318,7 +318,7 @@ export function FeedSubmissionDetail({
 
       <StageBanner
         stage={row.current_stage}
-        stageLabel={row.current_stage_label}
+        stageLabel={submissionStageLabel("static", row.current_stage, row.is_rejected, dict)}
         isRejected={row.is_rejected}
         rejectionCause={row.rejection_cause}
         rejectedLabel={dict.rejected}
