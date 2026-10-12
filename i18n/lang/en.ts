@@ -211,6 +211,29 @@ export const dictEn: Dictionary = {
   published: "Published",
   rejectionCause: "Rejection cause",
   rejectionCauseHint: "Optional - provide when rejecting a submission.",
+  realtimeRejectionReasons: {
+    "realtime.static_submission_missing":
+      "The realtime feed is not linked to a static submission. For GTFS-RT and SIRI, select a published static submission.",
+    "realtime.static_submission_not_published":
+      "The linked static submission has not been published yet. The realtime feed can be verified only after the static feed is published.",
+    "realtime.no_endpoints": "The submission has no endpoints. Add at least one endpoint.",
+    "realtime.endpoint_http_error":
+      'Endpoint "{endpoint}" returned HTTP error {status}. Check the URL and the authorization details.',
+    "realtime.endpoint_content_empty": 'Endpoint "{endpoint}" returned an empty response.',
+    "realtime.endpoint_content_invalid":
+      'The response of endpoint "{endpoint}" is not a valid {protocol} feed.',
+    "realtime.endpoint_too_large":
+      'The response of endpoint "{endpoint}" exceeds the size limit for realtime feeds.',
+    "realtime.endpoint_url_blocked":
+      'The URL of endpoint "{endpoint}" does not meet ODT security rules: the host name does not exist, the address is not public, or a redirect is not allowed.',
+    "realtime.endpoint_timeout": 'Endpoint "{endpoint}" did not respond in time.',
+    "realtime.endpoint_unreachable":
+      'Could not connect to endpoint "{endpoint}". Check that the server is reachable from the internet.',
+    "realtime.endpoint_fetch_failed": 'Could not fetch data from endpoint "{endpoint}".',
+    "realtime.endpoint_cache_failed":
+      'Could not store the first copy of data from endpoint "{endpoint}" on the ODT server. Try again later.',
+  },
+  realtimeRejectionReasonUnknown: "The submission was rejected during automatic verification.",
   applyStage: "Apply stage",
   rejectSubmission: "Reject",
   reviewSubmission: "Submission review",

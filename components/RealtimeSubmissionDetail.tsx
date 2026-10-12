@@ -23,7 +23,7 @@ import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
-import type { FetchHealthFields } from "@/lib/api/types";
+import type { FetchHealthFields, RejectionReason } from "@/lib/api/types";
 import { downloadBlob } from "@/lib/download";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -44,6 +44,7 @@ import {
 } from "@/lib/data/intervalChoices";
 import { formatApiError } from "@/lib/formatApiError";
 import { text } from "@/lib/format";
+import { formatRejectionReasons } from "@/lib/rejectionReasons";
 
 type RtEndpoint = FetchHealthFields & {
   id?: number;
@@ -67,6 +68,7 @@ type RtDetail = {
   current_stage_label: string;
   is_rejected: boolean;
   rejection_cause?: string | null;
+  rejection_reasons?: RejectionReason[] | null;
   endpoints?: RtEndpoint[];
   submitted_by?: number;
   submitted_by_username?: string | null;
@@ -315,6 +317,7 @@ export function RealtimeSubmissionDetail({
     sourcePerms.canEditLimitedMeta &&
     !sourcePerms.canEditFullSource &&
     !sourcePerms.canAdminSourceOnStage2Plus;
+  const rejectionReasons = formatRejectionReasons(row.rejection_reasons ?? [], dict);
 
   return (
     <Stack spacing={2}>
@@ -325,6 +328,7 @@ export function RealtimeSubmissionDetail({
         stageLabel={row.current_stage_label}
         isRejected={row.is_rejected}
         rejectionCause={row.rejection_cause}
+        rejectionReasons={rejectionReasons}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
       />
@@ -343,7 +347,8 @@ export function RealtimeSubmissionDetail({
           </Typography>
           {row.is_rejected ? (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {dict.rejected}: {row.rejection_cause ?? "-"}
+              {dict.rejected}:{" "}
+              {rejectionReasons.length ? rejectionReasons.join(" ") : text(row.rejection_cause)}
             </Typography>
           ) : null}
           <Divider sx={{ my: 2 }} />
