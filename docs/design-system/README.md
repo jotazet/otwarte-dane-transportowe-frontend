@@ -11,7 +11,7 @@
 | Status | success, warning, error, info per scheme, see [ADR 0003](../architecture/decisions/0003-scheme-specific-palette-colors-for-wcag-aa.md) |
 | Secondary | `#174EA6` (light), `#8AB4F8` (dark) |
 | Text | `#202124` / `#5F6368` (light), `#E8EAED` / `#9AA0A6` (dark) |
-| Font | Roboto via `next/font` (`--font-roboto`), weights 300, 400, 500, 600 and 700 loaded (use no others); headings weight 500 |
+| Font | Roboto via `next/font` (`--font-roboto`) as a variable font, so every weight from 100 to 900 is available; headings weight 500 |
 | Radius | 12 by default; cards 16; buttons 24 |
 | Motion | none: `transitions` in the theme sets every duration to 0 and every CSS transition MUI generates to `none`, and the Skeleton animation is off; don't set timeouts per component |
 

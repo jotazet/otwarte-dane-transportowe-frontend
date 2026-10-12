@@ -13,7 +13,6 @@ import { COLOR_MODE_STORAGE_KEY } from "@/lib/theme/colorMode";
 import "./globals.css";
 
 const roboto = Roboto({
-  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin", "latin-ext"],
   display: "swap",
   variable: "--font-roboto",
