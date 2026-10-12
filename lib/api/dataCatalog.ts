@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getJson } from "@/lib/api/http";
 import { fetchAllPages } from "@/lib/api/types";
 
@@ -49,8 +51,8 @@ export async function fetchFeedCatalog(opts?: {
   );
 }
 
-export async function fetchFeedCatalogOrganization(
-  id: number,
-): Promise<FeedCatalogOrganizationDetail> {
-  return await getJson<FeedCatalogOrganizationDetail>(`/api/data_manager/feeds/${id}/`);
-}
+/** Cached per render for the same reason as `fetchTransportOrganization` (lib/api/cases.ts). */
+export const fetchFeedCatalogOrganization = cache(
+  (id: number): Promise<FeedCatalogOrganizationDetail> =>
+    getJson<FeedCatalogOrganizationDetail>(`/api/data_manager/feeds/${id}/`),
+);
