@@ -56,8 +56,8 @@ export function DataProviderForm({
     try {
       const body = {
         name: name.trim(),
-        website: website.trim() || "",
-        contact_email: email.trim() || "",
+        website: website.trim(),
+        contact_email: email.trim(),
       };
       if (providerId == null) {
         await apiJson("POST", casesPaths.dataProviders, body);

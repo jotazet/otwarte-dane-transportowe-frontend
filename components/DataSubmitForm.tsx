@@ -339,7 +339,7 @@ export function DataSubmitForm({
           url: staticUrl.trim(),
           is_original: staticOriginal,
           hide_original: resolveHideOriginal(staticAuthType, staticHide),
-          license: staticLicense.trim() || "",
+          license: staticLicense.trim(),
           download_time_1: dt1,
           ...(dt2 ? { download_time_2: dt2 } : {}),
           ...staticAuthPayload(),
@@ -347,8 +347,8 @@ export function DataSubmitForm({
         const body: Record<string, unknown> = {
           transport_organization: staticOrgId,
           data_type: dataType,
-          name: staticName.trim() || "",
-          note: staticNote.trim() || "",
+          name: staticName.trim(),
+          note: staticNote.trim(),
           static_entry,
         };
         created = await apiJson<{ id: number }>(
@@ -403,9 +403,9 @@ export function DataSubmitForm({
       const body: Record<string, unknown> = {
         transport_organization: rtOrgId,
         protocol,
-        name: rtName.trim() || "",
-        note: rtNote.trim() || "",
-        license: rtLicense.trim() || "",
+        name: rtName.trim(),
+        note: rtNote.trim(),
+        license: rtLicense.trim(),
         endpoints: rtEndpoints.map((ep) => endpointPayload(ep)),
       };
       if (protocol !== "gbfs" && staticId !== null && Number.isFinite(staticId)) {

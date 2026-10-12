@@ -210,9 +210,9 @@ export function FeedSubmissionDetail({
     if (!row || !canEditMeta) return;
     setError(null);
     try {
-      const body: Record<string, unknown> = { note: subNote.trim() || "" };
+      const body: Record<string, unknown> = { note: subNote.trim() };
       if (sourcePerms.canEditFullSource || (isDjangoAdmin && tab === 1)) {
-        body.name = subName.trim() || "";
+        body.name = subName.trim();
       }
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), body);
       await load();
@@ -231,7 +231,7 @@ export function FeedSubmissionDetail({
         sourcePerms.canEditFullSource ||
         sourcePerms.canAdminSourceOnStage2Plus
       ) {
-        static_entry.license = license.trim() || "";
+        static_entry.license = license.trim();
         // Godziny pobierania dotyczą tylko feedów z URL — backend odrzuca je dla wpisów plikowych.
         if (!isFileEntry && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
           static_entry.download_time_1 = dt1.trim() || "02:00:00";

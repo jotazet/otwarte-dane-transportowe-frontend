@@ -49,14 +49,14 @@ export function CaseStatusForm({
       const body = {
         case: organizationId,
         status,
-        description: description.trim() || "",
+        description: description.trim(),
       };
       if (statusId == null) {
         await apiJson("POST", casesPaths.caseStatuses, body);
       } else {
         await apiJson("PATCH", casesPaths.caseStatus(statusId), {
           status,
-          description: description.trim() || "",
+          description: description.trim(),
         });
       }
       router.replace(cancelHref);

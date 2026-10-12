@@ -187,11 +187,11 @@ export function RealtimeSubmissionDetail({
     }
     try {
       const body: Record<string, unknown> = {
-        note: note.trim() || "",
-        license: license.trim() || "",
+        note: note.trim(),
+        license: license.trim(),
       };
       if (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
-        body.name = name.trim() || "";
+        body.name = name.trim();
         body.endpoints = endpointsDraft.map((e) => {
           const o: Record<string, unknown> = {
             endpoint_type: e.endpoint_type,

@@ -66,9 +66,9 @@ export function OrganizationForm({
       const body = {
         region: region.trim(),
         transport_organization: name.trim(),
-        website: website.trim() || "",
-        contact_email: contactEmail.trim() || "",
-        phone_number: phone.trim() || "",
+        website: website.trim(),
+        contact_email: contactEmail.trim(),
+        phone_number: phone.trim(),
         is_public: isPublic,
       };
       let id: number;
