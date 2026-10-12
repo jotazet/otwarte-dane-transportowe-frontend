@@ -172,26 +172,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [applyTokens, clearAuth]);
 
   React.useLayoutEffect(() => {
-    let cancelled = false;
-
-    (async () => {
+    void (async () => {
       const t = readStoredTokens();
       if (!t?.refresh) {
-        if (!cancelled) setState({ status: "anonymous", user: null, tokens: null });
+        setState({ status: "anonymous", user: null, tokens: null });
         return;
       }
       if (t.access && !isJwtExpired(t.access)) {
-        if (!cancelled) applyTokens(t);
+        applyTokens(t);
         return;
       }
       // Through the shared refresh: Strict Mode runs this effect twice in
       // development, and components may already be calling the API.
       await refreshAccess();
     })();
-
-    return () => {
-      cancelled = true;
-    };
   }, [applyTokens, refreshAccess]);
 
   const login = React.useCallback(
