@@ -141,10 +141,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const stored = readStoredTokens();
     if (!stored?.refresh) return null;
     try {
-      const { access } = await postJson<{ access: string }>("/api/auth/token/refresh/", {
+      // The backend rotates refresh tokens and blacklists the old one, so the
+      // new one must replace it or the next refresh fails.
+      const res = await postJson<{ access: string; refresh?: string }>("/api/auth/token/refresh/", {
         refresh: stored.refresh,
       });
-      const next = { access, refresh: stored.refresh };
+      const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
       applyTokens(next);
       return next;
     } catch {
@@ -167,10 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       try {
-        const { access } = await postJson<{ access: string }>("/api/auth/token/refresh/", {
-          refresh: t.refresh,
-        });
-        const next = { access, refresh: t.refresh };
+        const res = await postJson<{ access: string; refresh?: string }>(
+          "/api/auth/token/refresh/",
+          { refresh: t.refresh },
+        );
+        const next = { access: res.access, refresh: res.refresh ?? t.refresh };
         writeStoredTokens(next);
         if (!cancelled) applyTokens(next);
       } catch {
