@@ -101,6 +101,8 @@ export const dictPl = {
   publicOrganization: "Publiczna",
   original: "Oryginalny",
   interval: "Interwał",
+  feedDownloadTimes: "Godziny pobierania",
+  feedDownloadTimeUtc: "{time} UTC",
   sourceUpdateInterval: "Aktualizacja źródeł",
   sourceUpdateIntervalRange: "Aktualizacja źródeł: podaj liczbę całkowitą od 5 do 120 w sekundach.",
   actions: "Akcje",

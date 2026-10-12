@@ -102,6 +102,8 @@ export const dictBg: Dictionary = {
   publicOrganization: "Публична",
   original: "Оригинален",
   interval: "Интервал",
+  feedDownloadTimes: "Часове на изтегляне",
+  feedDownloadTimeUtc: "{time} UTC",
   sourceUpdateInterval: "Актуализация на източниците",
   sourceUpdateIntervalRange:
     "Актуализация на източниците: въведи цяло число от 5 до 120 в секунди.",

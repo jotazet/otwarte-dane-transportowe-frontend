@@ -18,6 +18,8 @@ export type FeedDetailRow = {
   type: string;
   original: boolean | null;
   interval: string;
+  /** Download times of a proxied static feed, shown in their own column. */
+  downloadTimes: string | null;
   license: string;
   url: string;
 };
@@ -26,6 +28,10 @@ export type FeedDetailGroup = {
   name: string;
   rows: FeedDetailRow[];
 };
+
+function hasDownloadTimes(group: FeedDetailGroup) {
+  return group.rows.some((row) => row.downloadTimes);
+}
 
 export function FeedCatalogDetailBody({
   dict,
@@ -51,6 +57,9 @@ export function FeedCatalogDetailBody({
                       <TableCell>{dict.feedTypes}</TableCell>
                       <TableCell sx={{ width: 120 }}>{dict.original}</TableCell>
                       <TableCell sx={{ width: 160 }}>{dict.interval}</TableCell>
+                      {hasDownloadTimes(group) ? (
+                        <TableCell sx={{ width: 180 }}>{dict.feedDownloadTimes}</TableCell>
+                      ) : null}
                       <TableCell sx={{ width: 200 }}>{dict.license}</TableCell>
                       <TableCell sx={{ width: 120 }}>{dict.actions}</TableCell>
                     </TableRow>
@@ -63,6 +72,9 @@ export function FeedCatalogDetailBody({
                           <OriginalCell value={row.original} />
                         </TableCell>
                         <TableCell>{row.interval}</TableCell>
+                        {hasDownloadTimes(group) ? (
+                          <TableCell>{row.downloadTimes ?? "-"}</TableCell>
+                        ) : null}
                         <TableCell>{row.license}</TableCell>
                         <TableCell>
                           <DownloadActions

@@ -40,3 +40,9 @@ export function formatDateTime(value?: string | null, locale = "pl") {
     timeZone: "Europe/Warsaw",
   }).format(d);
 }
+
+/** A time of day from the API ("03:00:00") as "03:00"; null when absent or malformed. */
+export function formatTimeOfDay(value?: string | null): string | null {
+  const m = /^(\d{2}):(\d{2})/.exec(value ?? "");
+  return m ? `${m[1]}:${m[2]}` : null;
+}
