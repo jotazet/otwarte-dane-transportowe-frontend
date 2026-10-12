@@ -23,12 +23,13 @@ export function formatRejectionReasons(
   dict: RejectionReasonDict,
 ): string[] {
   const messages = dict.realtimeRejectionReasons as Record<string, string>;
-  return reasons.map(({ code, details }) => {
+  return reasons.map(({ code, details = {} }) => {
     const template = messages[code] ?? dict.realtimeRejectionReasonUnknown;
-    const protocol = details?.protocol ?? "";
-    return template
-      .replace("{endpoint}", details?.endpoint_type ?? "")
-      .replace("{status}", String(details?.status ?? ""))
-      .replace("{protocol}", PROTOCOL_NAMES[protocol] ?? protocol);
+    const values: Record<string, string> = {
+      endpoint: details.endpoint_type ?? "",
+      status: String(details.status ?? ""),
+      protocol: PROTOCOL_NAMES[details.protocol ?? ""] ?? details.protocol ?? "",
+    };
+    return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
   });
 }

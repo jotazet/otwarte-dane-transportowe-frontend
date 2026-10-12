@@ -348,7 +348,7 @@ export function RealtimeSubmissionDetail({
           {row.is_rejected ? (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
               {dict.rejected}:{" "}
-              {rejectionReasons.length ? rejectionReasons.join(" ") : (row.rejection_cause ?? "-")}
+              {rejectionReasons.length ? rejectionReasons.join(" ") : text(row.rejection_cause)}
             </Typography>
           ) : null}
           <Divider sx={{ my: 2 }} />

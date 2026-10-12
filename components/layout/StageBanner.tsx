@@ -29,12 +29,13 @@ export function StageBanner({
   fixHint?: string;
 }) {
   if (isRejected) {
+    const hasReasons = rejectionReasons !== undefined && rejectionReasons.length > 0;
     return (
       <Alert severity="error">
         <strong>{rejectedLabel}</strong>
-        {!rejectionReasons?.length && rejectionCause ? `: ${rejectionCause}` : null}
+        {hasReasons ? null : rejectionCause ? `: ${rejectionCause}` : null}
         {fixHint ? ` - ${fixHint}` : null}
-        {rejectionReasons?.length ? (
+        {hasReasons ? (
           <Box component="ul" sx={{ m: 0, mt: 0.5, pl: 2.5 }}>
             {rejectionReasons.map((reason, i) => (
               <li key={i}>{reason}</li>
