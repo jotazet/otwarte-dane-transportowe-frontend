@@ -169,6 +169,7 @@ export function BlogPostArticle({
           postId={postId}
           initialSummary={post.reactions_summary}
           label={dict.reactions}
+          dict={dict}
         />
 
         <Dialog open={delOpen} onClose={() => !delPending && setDelOpen(false)}>
