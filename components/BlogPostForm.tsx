@@ -138,80 +138,89 @@ export function BlogPostForm({
       {postId != null && authorId != null && !perms.canBlogEditPost(authorId) ? (
         <Alert severity="warning">{dict.forbidden}</Alert>
       ) : (
-    <Card>
-      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-          {dict.blogPostFormHint}
-        </Typography>
-        {error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : null}
-        <Box component="form" onSubmit={submit} noValidate>
-          <Stack spacing={2}>
-            <TextField
-              label={dict.postTitle}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              slotProps={{ htmlInput: { maxLength: 24 } }}
-              helperText={`${title.length}/24`}
-              disabled={pending}
-            />
-            <TextField
-              label={dict.tags}
-              value={tagsStr}
-              onChange={(e) => setTagsStr(e.target.value)}
-              helperText={dict.blogTagsHint}
-              disabled={pending}
-            />
-            <TextField
-              label={dict.blogImageUrl}
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              disabled={pending || !!imageFile}
-              fullWidth
-            />
-            <Button variant="outlined" component="label" disabled={pending} sx={{ alignSelf: "flex-start" }}>
-              {dict.blogImageFile ?? dict.chooseFile}
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) => onImageFileChange(e.target.files?.[0] ?? null)}
-              />
-            </Button>
-            {imageFile ? (
-              <Typography variant="caption" color="text.secondary">
-                {imageFile.name}
-              </Typography>
+        <Card>
+          <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+              {dict.blogPostFormHint}
+            </Typography>
+            {error ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
             ) : null}
-            <MarkdownEditor
-              id="blog-post-content"
-              label={dict.postContent}
-              value={content}
-              onChange={setContent}
-              disabled={pending}
-              helperText={dict.blogMarkdownHint}
-            />
-            <FormActions>
-              <Button type="submit" variant="contained" disabled={pending || !title.trim() || !content}>
-                {dict.save}
-              </Button>
-              <Button
-                component={NextLink}
-                href={postId != null ? `/${locale}/blog/${postId}` : `/${locale}/blog`}
-                prefetch={false}
-                disabled={pending}
-              >
-                {dict.cancel}
-              </Button>
-            </FormActions>
-          </Stack>
-        </Box>
-      </CardContent>
-    </Card>
+            <Box component="form" onSubmit={submit} noValidate>
+              <Stack spacing={2}>
+                <TextField
+                  label={dict.postTitle}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  slotProps={{ htmlInput: { maxLength: 24 } }}
+                  helperText={`${title.length}/24`}
+                  disabled={pending}
+                />
+                <TextField
+                  label={dict.tags}
+                  value={tagsStr}
+                  onChange={(e) => setTagsStr(e.target.value)}
+                  helperText={dict.blogTagsHint}
+                  disabled={pending}
+                />
+                <TextField
+                  label={dict.blogImageUrl}
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  disabled={pending || !!imageFile}
+                  fullWidth
+                />
+                <Button
+                  variant="outlined"
+                  component="label"
+                  disabled={pending}
+                  sx={{ alignSelf: "flex-start" }}
+                >
+                  {dict.blogImageFile ?? dict.chooseFile}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => onImageFileChange(e.target.files?.[0] ?? null)}
+                  />
+                </Button>
+                {imageFile ? (
+                  <Typography variant="caption" color="text.secondary">
+                    {imageFile.name}
+                  </Typography>
+                ) : null}
+                <MarkdownEditor
+                  id="blog-post-content"
+                  label={dict.postContent}
+                  value={content}
+                  onChange={setContent}
+                  disabled={pending}
+                  helperText={dict.blogMarkdownHint}
+                />
+                <FormActions>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={pending || !title.trim() || !content}
+                  >
+                    {dict.save}
+                  </Button>
+                  <Button
+                    component={NextLink}
+                    href={postId != null ? `/${locale}/blog/${postId}` : `/${locale}/blog`}
+                    prefetch={false}
+                    disabled={pending}
+                  >
+                    {dict.cancel}
+                  </Button>
+                </FormActions>
+              </Stack>
+            </Box>
+          </CardContent>
+        </Card>
       )}
     </AccessGate>
   );

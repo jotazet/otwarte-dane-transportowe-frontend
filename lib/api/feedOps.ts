@@ -85,11 +85,19 @@ export function proxyFeedTypeLabel(
   return [item.protocol, item.endpoint_type].filter(Boolean).join(" · ");
 }
 
-export function pauseFetchPath(source: FetchErrorSource, id: number, action: "pause" | "resume"): string {
+export function pauseFetchPath(
+  source: FetchErrorSource,
+  id: number,
+  action: "pause" | "resume",
+): string {
   if (source === "static") {
-    return action === "pause" ? feedOpsPaths.staticPauseFetch(id) : feedOpsPaths.staticResumeFetch(id);
+    return action === "pause"
+      ? feedOpsPaths.staticPauseFetch(id)
+      : feedOpsPaths.staticResumeFetch(id);
   }
-  return action === "pause" ? feedOpsPaths.realtimePauseFetch(id) : feedOpsPaths.realtimeResumeFetch(id);
+  return action === "pause"
+    ? feedOpsPaths.realtimePauseFetch(id)
+    : feedOpsPaths.realtimeResumeFetch(id);
 }
 
 type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;

@@ -27,10 +27,9 @@ export function SubmissionDetailAuthGate({
 }) {
   const auth = useAuth();
   const pathname = usePathname() || "";
-  const loginHref =
-    pathname.startsWith(`/${locale}`)
-      ? paths(locale).login(pathname)
-      : paths(locale).login();
+  const loginHref = pathname.startsWith(`/${locale}`)
+    ? paths(locale).login(pathname)
+    : paths(locale).login();
 
   if (auth.status === "loading") {
     return <LoadingBlock label={dict.loading} />;
@@ -38,11 +37,7 @@ export function SubmissionDetailAuthGate({
 
   if (auth.status !== "authenticated") {
     return (
-      <EmptyState
-        title={dict.requiresLogin}
-        actionLabel={dict.login}
-        actionHref={loginHref}
-      />
+      <EmptyState title={dict.requiresLogin} actionLabel={dict.login} actionHref={loginHref} />
     );
   }
 

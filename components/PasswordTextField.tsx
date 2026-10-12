@@ -20,8 +20,7 @@ export function PasswordTextField({
   const [show, setShow] = React.useState(false);
   const inputSlot = slotProps?.input;
   const inputProps = typeof inputSlot === "object" && inputSlot != null ? inputSlot : {};
-  const existingEndAdornment =
-    "endAdornment" in inputProps ? inputProps.endAdornment : undefined;
+  const existingEndAdornment = "endAdornment" in inputProps ? inputProps.endAdornment : undefined;
 
   return (
     <TextField
@@ -43,7 +42,11 @@ export function PasswordTextField({
                   tabIndex={-1}
                   size="small"
                 >
-                  {show ? <MdVisibilityOff size={22} aria-hidden /> : <MdVisibility size={22} aria-hidden />}
+                  {show ? (
+                    <MdVisibilityOff size={22} aria-hidden />
+                  ) : (
+                    <MdVisibility size={22} aria-hidden />
+                  )}
                 </IconButton>
               </InputAdornment>
             </>

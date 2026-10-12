@@ -98,23 +98,40 @@ export function DataProviderForm({
         home: dict.home,
       }}
     >
-    <CrudFormCard error={error} onSubmit={save}>
-      <Stack spacing={2}>
-        <TextField label={dict.providerName} value={name} onChange={(e) => setName(e.target.value)} required disabled={pending} />
-        <TextField label={dict.website} value={website} onChange={(e) => setWebsite(e.target.value)} disabled={pending} />
-        <TextField label={dict.contact} type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={pending} />
-        <CrudFormActions
-          saveLabel={dict.save}
-          cancelHref={listHref}
-          cancelLabel={dict.cancel}
-          pending={pending}
-          saveDisabled={!name.trim()}
-          deleteLabel={providerId != null ? dict.delete : undefined}
-          onDelete={providerId != null ? () => void remove() : undefined}
-        />
-      </Stack>
-    </CrudFormCard>
-    {confirmDialog}
+      <CrudFormCard error={error} onSubmit={save}>
+        <Stack spacing={2}>
+          <TextField
+            label={dict.providerName}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            disabled={pending}
+          />
+          <TextField
+            label={dict.website}
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            disabled={pending}
+          />
+          <TextField
+            label={dict.contact}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={pending}
+          />
+          <CrudFormActions
+            saveLabel={dict.save}
+            cancelHref={listHref}
+            cancelLabel={dict.cancel}
+            pending={pending}
+            saveDisabled={!name.trim()}
+            deleteLabel={providerId != null ? dict.delete : undefined}
+            onDelete={providerId != null ? () => void remove() : undefined}
+          />
+        </Stack>
+      </CrudFormCard>
+      {confirmDialog}
     </AccessGate>
   );
 }

@@ -23,10 +23,7 @@ export type TransportOrganizationListItem = {
   data_providers?: { id?: number; name?: string | null }[];
 };
 
-export type TransportOrganizationDetail = Omit<
-  TransportOrganizationListItem,
-  "data_providers"
-> & {
+export type TransportOrganizationDetail = Omit<TransportOrganizationListItem, "data_providers"> & {
   website?: string | null;
   contact_email?: string | null;
   phone_number?: string | null;
@@ -61,9 +58,7 @@ export async function fetchTransportOrganizations(opts?: {
   );
 }
 
-export async function fetchTransportOrganization(
-  id: number,
-): Promise<TransportOrganizationDetail> {
+export async function fetchTransportOrganization(id: number): Promise<TransportOrganizationDetail> {
   return await getJson<TransportOrganizationDetail>(casesPaths.organization(id));
 }
 

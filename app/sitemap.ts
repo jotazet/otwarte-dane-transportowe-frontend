@@ -5,9 +5,7 @@ import { fetchAllBlogPosts } from "@/lib/api/blog";
 import { fetchTransportOrganizations } from "@/lib/api/cases";
 import { fetchFeedCatalog } from "@/lib/api/dataCatalog";
 
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-).replace(/\/+$/, "");
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
 
 /** Język bez prefiksu w nawigacji — trafia do `x-default` w hreflangach. */
 const DEFAULT_LOCALE: Locale = "pl";

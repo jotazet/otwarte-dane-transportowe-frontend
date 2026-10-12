@@ -20,7 +20,11 @@ export default async function DataProviderNewPage({
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesProviderNew(locale, dict)}>
-      <PageHeader title={dict.createProvider} subtitle={dict.providersDesc} icon={<MdBusiness size={28} aria-hidden />} />
+      <PageHeader
+        title={dict.createProvider}
+        subtitle={dict.providersDesc}
+        icon={<MdBusiness size={28} aria-hidden />}
+      />
       <DataProviderForm locale={locale} dict={dict} />
     </AppPage>
   );

@@ -7,7 +7,12 @@ export function normalizeRoles(input: unknown): AppRole[] {
 
   const push = (v: unknown) => {
     if (typeof v === "string") list.push(v);
-    else if (v && typeof v === "object" && "name" in v && typeof (v as Record<string, unknown>).name === "string") {
+    else if (
+      v &&
+      typeof v === "object" &&
+      "name" in v &&
+      typeof (v as Record<string, unknown>).name === "string"
+    ) {
       list.push((v as Record<string, string>).name);
     }
   };
@@ -22,7 +27,8 @@ export function normalizeRoles(input: unknown): AppRole[] {
 
     if (k === "admin") normalized.add("Admin");
     if (k === "helper") normalized.add("Helper");
-    if (k === "dataprovider" || k === "data_provider" || k === "data-provider") normalized.add("DataProvider");
+    if (k === "dataprovider" || k === "data_provider" || k === "data-provider")
+      normalized.add("DataProvider");
     if (k === "blogger") normalized.add("Blogger");
     if (k === "editor" || k === "redaktor") normalized.add("Editor");
   }
@@ -40,4 +46,3 @@ export function hasAnyRole(
   if (roles.has("Admin")) return true;
   return wanted.some((r) => roles.has(r));
 }
-

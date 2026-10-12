@@ -52,8 +52,5 @@ export async function fetchFeedCatalog(opts?: {
 export async function fetchFeedCatalogOrganization(
   id: number,
 ): Promise<FeedCatalogOrganizationDetail> {
-  return await getJson<FeedCatalogOrganizationDetail>(
-    `/api/data_manager/feeds/${id}/`,
-  );
+  return await getJson<FeedCatalogOrganizationDetail>(`/api/data_manager/feeds/${id}/`);
 }
-

@@ -11,7 +11,11 @@ import { PageLoadErrorAlert } from "@/components/PageLoadErrorAlert";
 import { casesProvidersList } from "@/lib/nav/breadcrumbTrails";
 import { paths } from "@/lib/nav/routes";
 
-export default async function DataProvidersListPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function DataProvidersListPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale, dict } = await resolvePageLocale(params);
   const { data: providers } = await loadOrError(fetchDataProviders());
   return (
@@ -21,7 +25,11 @@ export default async function DataProvidersListPage({ params }: { params: Promis
         subtitle={dict.providersDesc}
         icon={<MdGroups size={28} aria-hidden />}
         actions={
-          <CreateActionButton roles={["Helper"]} href={paths(locale).casesProviderNew} label={dict.createProvider} />
+          <CreateActionButton
+            roles={["Helper"]}
+            href={paths(locale).casesProviderNew}
+            label={dict.createProvider}
+          />
         }
       />
       {providers === null ? (

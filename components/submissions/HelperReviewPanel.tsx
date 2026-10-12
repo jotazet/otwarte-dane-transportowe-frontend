@@ -57,7 +57,12 @@ export function HelperReviewPanel({
             helperText={dict.rejectionCauseHint}
           />
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
-            <Button variant="contained" color="error" onClick={onReject} disabled={!rejectCause.trim()}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={onReject}
+              disabled={!rejectCause.trim()}
+            >
               {dict.rejectSubmission}
             </Button>
             <Button variant="outlined" onClick={cancelReject}>
@@ -66,7 +71,11 @@ export function HelperReviewPanel({
           </Stack>
         </Stack>
       ) : (
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { sm: "center" } }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ alignItems: { sm: "center" } }}
+        >
           <InlineSelect
             label={dict.stageNumber}
             value={stage}

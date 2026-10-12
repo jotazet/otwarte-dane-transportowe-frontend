@@ -43,8 +43,7 @@ export const dictBg: Dictionary = {
   organizations: "Организации",
   providers: "Доставчици на данни",
   caseStatuses: "Статуси на казусите",
-  footer:
-    "Otwarte Dane Transportowe (ODT), Jakub Zydroń, Лиценз MIT",
+  footer: "Otwarte Dane Transportowe (ODT), Jakub Zydroń, Лиценз MIT",
   postList: "Списък с публикации",
   postDetails: "Детайли на публикацията",
   reactions: "Реакции",
@@ -67,8 +66,7 @@ export const dictBg: Dictionary = {
   },
   staticFeedsDesc:
     "GTFS, NeTEx и други статични фийдове с информация за лиценза и датата на актуализация.",
-  realtimeFeedsDesc:
-    "GTFS-RT, SIRI и GBFS ендпойнти, групирани по транспортни организации.",
+  realtimeFeedsDesc: "GTFS-RT, SIRI и GBFS ендпойнти, групирани по транспортни организации.",
   openDataTitle: "Отворени данни",
   openDataDesc:
     "Отвореността на данните е важна за пътниците, градовете и разработчиците, защото позволява развитието на пътнически информационни системи и повишава осведомеността за наличните видове транспорт в даден регион.",
@@ -105,7 +103,8 @@ export const dictBg: Dictionary = {
   original: "Оригинален",
   interval: "Интервал",
   sourceUpdateInterval: "Актуализация на източниците",
-  sourceUpdateIntervalRange: "Актуализация на източниците: въведи цяло число от 5 до 120 в секунди.",
+  sourceUpdateIntervalRange:
+    "Актуализация на източниците: въведи цяло число от 5 до 120 в секунди.",
   actions: "Действия",
   downloadFile: "Изтегли файла",
   copyLink: "Копирай линка",
@@ -230,8 +229,7 @@ export const dictBg: Dictionary = {
   confirmDeletePost: "Да се изтрие ли тази публикация?",
   confirmDeleteSubmission: "Да се изтрие ли тази заявка?",
   organizationName: "Име на организацията",
-  caseHint:
-    "Статусите се добавят поотделно - всеки нов етап е нов запис в историята на казуса.",
+  caseHint: "Статусите се добавят поотделно - всеки нов етап е нов запис в историята на казуса.",
   createProvider: "Нов доставчик",
   linkProviders: "Свържи доставчици",
   saveLinks: "Запази връзките",
@@ -245,13 +243,15 @@ export const dictBg: Dictionary = {
   fileTooLarge: "Файлът е твърде голям.",
   providerName: "Име на доставчика",
   postTitle: "Заглавие",
-  blogPostFormHint: "Заглавие до 24 знака, максимум 5 тага по 16 знака. Съдържание във формат Markdown.",
+  blogPostFormHint:
+    "Заглавие до 24 знака, максимум 5 тага по 16 знака. Съдържание във формат Markdown.",
   blogTagsHint: "Тагове, разделени със запетаи.",
   blogImageUrl: "URL адрес на изображението (по избор)",
   postContent: "Съдържание на публикацията",
   blogMarkdownHint: "Поддържа се формат Markdown (заглавия, списъци, линкове, код и др.).",
   staticSubmissionId: "ID на статичната заявка",
-  staticSubmissionIdHint: "По избор - ако реалното време се отнася до същия пакет като съществуваща статична заявка.",
+  staticSubmissionIdHint:
+    "По избор - ако реалното време се отнася до същия пакет като съществуваща статична заявка.",
   yes: "Да",
   no: "Не",
   hideOriginal: "Скрий оригиналния URL адрес",

@@ -25,7 +25,13 @@ export function ForbiddenState({
         {message}
         <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
           {loginHref && loginLabel ? (
-            <Button component={NextLink} href={loginHref} variant="contained" size="small" prefetch={false}>
+            <Button
+              component={NextLink}
+              href={loginHref}
+              variant="contained"
+              size="small"
+              prefetch={false}
+            >
               {loginLabel}
             </Button>
           ) : null}

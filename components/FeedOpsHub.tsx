@@ -148,7 +148,9 @@ export function FeedOpsHub({
 
         {tab === "errors" ? <FetchErrorsTable locale={locale} dict={dict} /> : null}
 
-        {tab === "overview" && overviewError ? <Alert severity="error">{overviewError}</Alert> : null}
+        {tab === "overview" && overviewError ? (
+          <Alert severity="error">{overviewError}</Alert>
+        ) : null}
       </Stack>
     </AccessGate>
   );

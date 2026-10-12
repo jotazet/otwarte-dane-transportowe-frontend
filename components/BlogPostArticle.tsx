@@ -187,7 +187,12 @@ export function BlogPostArticle({
             <Button onClick={() => setDelOpen(false)} disabled={delPending}>
               {dict.cancel}
             </Button>
-            <Button color="error" variant="contained" onClick={() => void confirmDelete()} disabled={delPending}>
+            <Button
+              color="error"
+              variant="contained"
+              onClick={() => void confirmDelete()}
+              disabled={delPending}
+            >
               {dict.delete}
             </Button>
           </DialogActions>

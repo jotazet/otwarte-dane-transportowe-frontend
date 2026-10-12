@@ -29,11 +29,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function DataPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function DataPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params;
   if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
@@ -50,20 +46,20 @@ export default async function DataPage({
       {organizations === null ? (
         <PageLoadErrorAlert body={dict.pageErrorBody} retryLabel={dict.tryAgain} />
       ) : (
-      <DataCatalogTable
-        locale={locale}
-        organizations={organizations}
-        dict={{
-          organizations: dict.organizations,
-          region: dict.region,
-          staticFeeds: dict.staticFeeds,
-          realtimeFeeds: dict.realtimeFeeds,
-          publicOrganization: dict.publicOrganization,
-          all: dict.all,
-          actions: dict.actions,
-          edit: dict.edit,
-        }}
-      />
+        <DataCatalogTable
+          locale={locale}
+          organizations={organizations}
+          dict={{
+            organizations: dict.organizations,
+            region: dict.region,
+            staticFeeds: dict.staticFeeds,
+            realtimeFeeds: dict.realtimeFeeds,
+            publicOrganization: dict.publicOrganization,
+            all: dict.all,
+            actions: dict.actions,
+            edit: dict.edit,
+          }}
+        />
       )}
     </AppPage>
   );

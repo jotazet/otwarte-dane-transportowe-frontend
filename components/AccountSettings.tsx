@@ -147,8 +147,16 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       </FormSection>
 
       <FormSection title={dict.changeEmail}>
-        {emailSuccess ? <Alert severity="success" sx={{ mb: 2 }}>{emailSuccess}</Alert> : null}
-        {emailError ? <Alert severity="error" sx={{ mb: 2 }}>{emailError}</Alert> : null}
+        {emailSuccess ? (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {emailSuccess}
+          </Alert>
+        ) : null}
+        {emailError ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {emailError}
+          </Alert>
+        ) : null}
         <Box component="form" onSubmit={submitEmail} noValidate>
           <Stack spacing={2}>
             <PasswordTextField
@@ -178,8 +186,16 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       </FormSection>
 
       <FormSection title={dict.changePassword}>
-        {passwordSuccess ? <Alert severity="success" sx={{ mb: 2 }}>{passwordSuccess}</Alert> : null}
-        {passwordError ? <Alert severity="error" sx={{ mb: 2 }}>{passwordError}</Alert> : null}
+        {passwordSuccess ? (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {passwordSuccess}
+          </Alert>
+        ) : null}
+        {passwordError ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {passwordError}
+          </Alert>
+        ) : null}
         <Box component="form" onSubmit={submitPassword} noValidate>
           <Stack spacing={2}>
             <PasswordTextField

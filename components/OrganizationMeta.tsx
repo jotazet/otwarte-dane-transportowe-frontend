@@ -8,7 +8,11 @@ import { text } from "@/lib/format";
 function MetaItem({ label, children }: { label: string; children: ReactNode }) {
   return (
     <Typography variant="body2" color="text.secondary" component="span" sx={{ lineHeight: 1.6 }}>
-      <Typography component="span" variant="body2" sx={{ fontWeight: 600, color: "text.secondary" }}>
+      <Typography
+        component="span"
+        variant="body2"
+        sx={{ fontWeight: 600, color: "text.secondary" }}
+      >
         {label}:{" "}
       </Typography>
       {children}

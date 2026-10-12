@@ -211,7 +211,11 @@ function MuiAppShellInner({
           flexShrink: 0,
         }}
       >
-        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          sx={{ fontWeight: 700, lineHeight: 1.2, flex: 1, minWidth: 0 }}
+        >
           {dict.appName}
         </Typography>
         <ColorModeToggle
@@ -219,7 +223,12 @@ function MuiAppShellInner({
           lightModeLabel={dict.lightMode}
           size="small"
         />
-        <IconButton aria-label={dict.close} onClick={() => setMobileOpen(false)} edge="end" size="small">
+        <IconButton
+          aria-label={dict.close}
+          onClick={() => setMobileOpen(false)}
+          edge="end"
+          size="small"
+        >
           <MdClose size={22} />
         </IconButton>
       </Toolbar>
@@ -257,7 +266,10 @@ function MuiAppShellInner({
             sx={drawerItemSx()}
           >
             <ListItemIcon sx={{ minWidth: 40, color: "primary.main" }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} slotProps={{ primary: { sx: { fontWeight: 500 } } }} />
+            <ListItemText
+              primary={item.label}
+              slotProps={{ primary: { sx: { fontWeight: 500 } } }}
+            />
           </ListItemButton>
         ))}
         {compactActionsReady && compactActions ? (
@@ -285,7 +297,10 @@ function MuiAppShellInner({
                   <ListItemIcon sx={{ minWidth: 40, color: "primary.main" }}>
                     <MdSettings size={22} aria-hidden />
                   </ListItemIcon>
-                  <ListItemText primary={dict.myAccount} slotProps={{ primary: { sx: { fontWeight: 500 } } }} />
+                  <ListItemText
+                    primary={dict.myAccount}
+                    slotProps={{ primary: { sx: { fontWeight: 500 } } }}
+                  />
                 </ListItemButton>
                 <ListItemButton
                   onClick={() => {
@@ -297,7 +312,10 @@ function MuiAppShellInner({
                   <ListItemIcon sx={{ minWidth: 40, color: "primary.main" }}>
                     <MdLogout size={22} aria-hidden />
                   </ListItemIcon>
-                  <ListItemText primary={dict.logout} slotProps={{ primary: { sx: { fontWeight: 500 } } }} />
+                  <ListItemText
+                    primary={dict.logout}
+                    slotProps={{ primary: { sx: { fontWeight: 500 } } }}
+                  />
                 </ListItemButton>
               </>
             ) : (
@@ -311,7 +329,10 @@ function MuiAppShellInner({
                 <ListItemIcon sx={{ minWidth: 40, color: "primary.main" }}>
                   <MdPerson size={22} aria-hidden />
                 </ListItemIcon>
-                <ListItemText primary={dict.login} slotProps={{ primary: { sx: { fontWeight: 500 } } }} />
+                <ListItemText
+                  primary={dict.login}
+                  slotProps={{ primary: { sx: { fontWeight: 500 } } }}
+                />
               </ListItemButton>
             )}
           </>
@@ -321,7 +342,15 @@ function MuiAppShellInner({
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", width: "100%", minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
       <AppBar position="sticky" color="inherit" elevation={0}>
         <Container maxWidth="lg" disableGutters sx={{ px: { xs: 2, sm: 3 } }}>
           <Box>
@@ -456,7 +485,13 @@ function MuiAppShellInner({
                     }}
                   >
                     {auth.status === "loading" ? (
-                      <Skeleton variant="circular" width={32} height={32} animation="wave" aria-hidden />
+                      <Skeleton
+                        variant="circular"
+                        width={32}
+                        height={32}
+                        animation="wave"
+                        aria-hidden
+                      />
                     ) : (
                       <AuthButton
                         locale={locale}
@@ -538,7 +573,11 @@ function MuiAppShellInner({
         }}
       >
         <Container maxWidth="lg" disableGutters sx={{ px: { xs: 2, sm: 3 } }}>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: "md", lineHeight: 1.45 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ maxWidth: "md", lineHeight: 1.45 }}
+          >
             {dict.footer}
           </Typography>
         </Container>

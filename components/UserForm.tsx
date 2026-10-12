@@ -176,79 +176,89 @@ export function UserForm({
         home: dict.home,
       }}
     >
-    <>
-      {error ? (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      ) : null}
-      <Box component="form" onSubmit={save} noValidate>
-        <Stack spacing={2}>
-          <TextField
-            label={dict.username}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            disabled={pending || isEdit}
-          />
-          <TextField
-            label={dict.email}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={pending}
-          />
-          <TextField
-            label={dict.firstName}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            disabled={pending}
-          />
-          <TextField
-            label={dict.lastName}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={pending}
-          />
-          {isEdit ? (
-            <FormControlLabel
-              control={<Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} disabled={pending} />}
-              label={dict.isActive}
+      <>
+        {error ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        ) : null}
+        <Box component="form" onSubmit={save} noValidate>
+          <Stack spacing={2}>
+            <TextField
+              label={dict.username}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              disabled={pending || isEdit}
             />
-          ) : null}
-          <FormGroup>
-            {ALL_ASSIGNABLE_ROLES.map((role) => (
+            <TextField
+              label={dict.email}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={pending}
+            />
+            <TextField
+              label={dict.firstName}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={pending}
+            />
+            <TextField
+              label={dict.lastName}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              disabled={pending}
+            />
+            {isEdit ? (
               <FormControlLabel
-                key={role}
                 control={
-                  <Checkbox
-                    checked={roles.has(role)}
-                    onChange={() => toggleRole(role)}
+                  <Switch
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
                     disabled={pending}
                   />
                 }
-                label={formatRole(role, dict)}
+                label={dict.isActive}
               />
-            ))}
-          </FormGroup>
-          <FormActions>
-            <Button type="submit" variant="contained" disabled={pending || (!isEdit && !username.trim())}>
-              {dict.save}
-            </Button>
-            <Button type="button" variant="outlined" onClick={handleCancel} disabled={pending}>
-              {dict.cancel}
-            </Button>
-          </FormActions>
-        </Stack>
-      </Box>
-      <GeneratedPasswordDialog
-        open={passwordDialogOpen}
-        password={generatedPassword}
-        onClose={closePasswordDialog}
-        dict={dict}
-      />
-    </>
+            ) : null}
+            <FormGroup>
+              {ALL_ASSIGNABLE_ROLES.map((role) => (
+                <FormControlLabel
+                  key={role}
+                  control={
+                    <Checkbox
+                      checked={roles.has(role)}
+                      onChange={() => toggleRole(role)}
+                      disabled={pending}
+                    />
+                  }
+                  label={formatRole(role, dict)}
+                />
+              ))}
+            </FormGroup>
+            <FormActions>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={pending || (!isEdit && !username.trim())}
+              >
+                {dict.save}
+              </Button>
+              <Button type="button" variant="outlined" onClick={handleCancel} disabled={pending}>
+                {dict.cancel}
+              </Button>
+            </FormActions>
+          </Stack>
+        </Box>
+        <GeneratedPasswordDialog
+          open={passwordDialogOpen}
+          password={generatedPassword}
+          onClose={closePasswordDialog}
+          dict={dict}
+        />
+      </>
     </AccessGate>
   );
 }

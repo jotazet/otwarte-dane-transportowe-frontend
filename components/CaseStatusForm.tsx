@@ -93,35 +93,38 @@ export function CaseStatusForm({
         home: dict.home,
       }}
     >
-    <CrudFormCard error={error} onSubmit={save}>
-      <Stack spacing={2}>
-        <InlineSelect
-          fullWidth
-          disabled={pending}
-          label={dict.latestStatus}
-          value={status}
-          onChange={setStatus}
-          options={CASE_STATUS_VALUES.map((v) => ({ value: v, label: caseStatusLabel(v, dict.caseStatusLabels) }))}
-        />
-        <TextField
-          label={dict.description}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          multiline
-          minRows={3}
-          disabled={pending}
-        />
-        <CrudFormActions
-          saveLabel={dict.save}
-          cancelHref={cancelHref}
-          cancelLabel={dict.cancel}
-          pending={pending}
-          deleteLabel={statusId != null ? dict.delete : undefined}
-          onDelete={statusId != null ? () => void remove() : undefined}
-        />
-      </Stack>
-    </CrudFormCard>
-    {confirmDialog}
+      <CrudFormCard error={error} onSubmit={save}>
+        <Stack spacing={2}>
+          <InlineSelect
+            fullWidth
+            disabled={pending}
+            label={dict.latestStatus}
+            value={status}
+            onChange={setStatus}
+            options={CASE_STATUS_VALUES.map((v) => ({
+              value: v,
+              label: caseStatusLabel(v, dict.caseStatusLabels),
+            }))}
+          />
+          <TextField
+            label={dict.description}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            multiline
+            minRows={3}
+            disabled={pending}
+          />
+          <CrudFormActions
+            saveLabel={dict.save}
+            cancelHref={cancelHref}
+            cancelLabel={dict.cancel}
+            pending={pending}
+            deleteLabel={statusId != null ? dict.delete : undefined}
+            onDelete={statusId != null ? () => void remove() : undefined}
+          />
+        </Stack>
+      </CrudFormCard>
+      {confirmDialog}
     </AccessGate>
   );
 }

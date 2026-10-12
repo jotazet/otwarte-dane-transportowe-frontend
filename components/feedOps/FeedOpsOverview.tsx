@@ -90,13 +90,48 @@ export function FeedOpsOverview({
   if (loading) return <LoadingBlock label={dict.loading} />;
 
   const cards: { value: number; label: string; color: StatColor; onClick?: () => void }[] = [
-    { value: rows.length, label: dict.feedOpsStatTotal, color: "text.primary", onClick: () => onSelectStatus("") },
-    { value: stats.byStatus.active, label: dict.feedOpsStatActive, color: "success.main", onClick: () => onSelectStatus("active") },
-    { value: stats.byStatus.delayed, label: dict.feedOpsStatDelayed, color: "warning.main", onClick: () => onSelectStatus("delayed") },
-    { value: stats.byStatus.auto_paused, label: dict.feedOpsStatAutoPaused, color: "error.main", onClick: () => onSelectStatus("auto_paused") },
-    { value: stats.byStatus.manual_paused, label: dict.feedOpsStatManualPaused, color: "text.primary", onClick: () => onSelectStatus("manual_paused") },
-    { value: stats.withErrors, label: dict.feedOpsStatWithErrors, color: "error.main", onClick: onSelectErrors },
-    { value: stats.totalErrors7d, label: dict.feedOpsStatErrors7d, color: "error.main", onClick: onSelectErrors },
+    {
+      value: rows.length,
+      label: dict.feedOpsStatTotal,
+      color: "text.primary",
+      onClick: () => onSelectStatus(""),
+    },
+    {
+      value: stats.byStatus.active,
+      label: dict.feedOpsStatActive,
+      color: "success.main",
+      onClick: () => onSelectStatus("active"),
+    },
+    {
+      value: stats.byStatus.delayed,
+      label: dict.feedOpsStatDelayed,
+      color: "warning.main",
+      onClick: () => onSelectStatus("delayed"),
+    },
+    {
+      value: stats.byStatus.auto_paused,
+      label: dict.feedOpsStatAutoPaused,
+      color: "error.main",
+      onClick: () => onSelectStatus("auto_paused"),
+    },
+    {
+      value: stats.byStatus.manual_paused,
+      label: dict.feedOpsStatManualPaused,
+      color: "text.primary",
+      onClick: () => onSelectStatus("manual_paused"),
+    },
+    {
+      value: stats.withErrors,
+      label: dict.feedOpsStatWithErrors,
+      color: "error.main",
+      onClick: onSelectErrors,
+    },
+    {
+      value: stats.totalErrors7d,
+      label: dict.feedOpsStatErrors7d,
+      color: "error.main",
+      onClick: onSelectErrors,
+    },
   ];
 
   return (
@@ -107,7 +142,12 @@ export function FeedOpsOverview({
       <Grid container spacing={2}>
         {cards.map((card) => (
           <Grid size={{ xs: 6, sm: 4, md: 3 }} key={card.label}>
-            <StatCard value={card.value} label={card.label} color={card.color} onClick={card.onClick} />
+            <StatCard
+              value={card.value}
+              label={card.label}
+              color={card.color}
+              onClick={card.onClick}
+            />
           </Grid>
         ))}
       </Grid>

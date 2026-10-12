@@ -1,4 +1,8 @@
-import type { CombinedSubmissionsBundle, FeedSubmissionListItem, RealtimeSubmissionListItem } from "@/lib/api/types";
+import type {
+  CombinedSubmissionsBundle,
+  FeedSubmissionListItem,
+  RealtimeSubmissionListItem,
+} from "@/lib/api/types";
 import { normalizeList } from "@/lib/api/types";
 
 export const submissionsPaths = {
@@ -22,7 +26,9 @@ export function parseCombinedSubmissions(data: CombinedSubmissionsBundle | null 
   };
 }
 
-export function parseFeedSubmissionList(data: FeedSubmissionListItem[] | { results?: FeedSubmissionListItem[] }) {
+export function parseFeedSubmissionList(
+  data: FeedSubmissionListItem[] | { results?: FeedSubmissionListItem[] },
+) {
   return normalizeList(data);
 }
 
@@ -32,7 +38,9 @@ export function parseRealtimeSubmissionList(
   return normalizeList(data);
 }
 
-export function buildListQuery(params: Record<string, string | number | boolean | undefined | null>) {
+export function buildListQuery(
+  params: Record<string, string | number | boolean | undefined | null>,
+) {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null || v === "") continue;

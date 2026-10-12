@@ -13,20 +13,19 @@ export function dataCatalog(locale: string, dict: Dictionary): BreadcrumbItem[] 
   return [{ label: dict.data }];
 }
 
-export function dataFeedDetail(locale: string, dict: Dictionary, orgId: number, label: string): BreadcrumbItem[] {
+export function dataFeedDetail(
+  locale: string,
+  dict: Dictionary,
+  orgId: number,
+  label: string,
+): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.data, href: p.data },
-    { label },
-  ];
+  return [{ label: dict.data, href: p.data }, { label }];
 }
 
 export function dataMySubmissionsList(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.data, href: p.data },
-    { label: dict.myFeeds },
-  ];
+  return [{ label: dict.data, href: p.data }, { label: dict.myFeeds }];
 }
 
 export function dataMySubmissions(locale: string, dict: Dictionary): BreadcrumbItem[] {
@@ -38,18 +37,12 @@ export function dataMySubmissions(locale: string, dict: Dictionary): BreadcrumbI
 }
 
 export function dataMySubmissionsNew(locale: string, dict: Dictionary): BreadcrumbItem[] {
-  return [
-    ...dataMySubmissions(locale, dict),
-    { label: dict.addNewFeed },
-  ];
+  return [...dataMySubmissions(locale, dict), { label: dict.addNewFeed }];
 }
 
 export function dataQueue(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.data, href: p.data },
-    { label: dict.submissions },
-  ];
+  return [{ label: dict.data, href: p.data }, { label: dict.submissions }];
 }
 
 export function dataFeedOps(locale: string, dict: Dictionary): BreadcrumbItem[] {
@@ -72,10 +65,7 @@ export function casesRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
 
 export function casesAddOrganization(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.cases, href: p.cases },
-    { label: dict.addOrganization },
-  ];
+  return [{ label: dict.cases, href: p.cases }, { label: dict.addOrganization }];
 }
 
 export function casesOrganization(
@@ -121,10 +111,7 @@ export function casesStatusEdit(
 
 export function casesProvidersList(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.cases, href: p.cases },
-    { label: dict.providers },
-  ];
+  return [{ label: dict.cases, href: p.cases }, { label: dict.providers }];
 }
 
 export function casesProviders(locale: string, dict: Dictionary): BreadcrumbItem[] {
@@ -154,21 +141,25 @@ export function blogRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
 
 export function blogNew(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.blog, href: p.blog },
-    { label: dict.createPost },
-  ];
+  return [{ label: dict.blog, href: p.blog }, { label: dict.createPost }];
 }
 
-export function blogPost(locale: string, dict: Dictionary, postId: number, title: string): BreadcrumbItem[] {
+export function blogPost(
+  locale: string,
+  dict: Dictionary,
+  postId: number,
+  title: string,
+): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.blog, href: p.blog },
-    { label: title },
-  ];
+  return [{ label: dict.blog, href: p.blog }, { label: title }];
 }
 
-export function blogEdit(locale: string, dict: Dictionary, postId: number, title: string): BreadcrumbItem[] {
+export function blogEdit(
+  locale: string,
+  dict: Dictionary,
+  postId: number,
+  title: string,
+): BreadcrumbItem[] {
   const p = paths(locale);
   return [
     { label: dict.blog, href: p.blog },
@@ -183,18 +174,17 @@ export function usersRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
 
 export function userNew(locale: string, dict: Dictionary): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.users, href: p.users },
-    { label: dict.addUser },
-  ];
+  return [{ label: dict.users, href: p.users }, { label: dict.addUser }];
 }
 
-export function userDetail(locale: string, dict: Dictionary, userId: number, label: string): BreadcrumbItem[] {
+export function userDetail(
+  locale: string,
+  dict: Dictionary,
+  userId: number,
+  label: string,
+): BreadcrumbItem[] {
   const p = paths(locale);
-  return [
-    { label: dict.users, href: p.users },
-    { label },
-  ];
+  return [{ label: dict.users, href: p.users }, { label }];
 }
 
 export function infoRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {

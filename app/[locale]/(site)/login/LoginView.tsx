@@ -47,8 +47,7 @@ export function LoginView({
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
-  const destination =
-    returnUrl && returnUrl.startsWith(`/${locale}`) ? returnUrl : `/${locale}`;
+  const destination = returnUrl && returnUrl.startsWith(`/${locale}`) ? returnUrl : `/${locale}`;
 
   React.useEffect(() => {
     if (auth.status === "authenticated") router.replace(destination);

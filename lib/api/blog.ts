@@ -54,7 +54,10 @@ export async function fetchBlogPosts(options?: {
     posts,
     count: meta && typeof meta === "object" && "count" in meta ? (meta.count as number) : null,
     next: meta && typeof meta === "object" && "next" in meta ? (meta.next as string | null) : null,
-    previous: meta && typeof meta === "object" && "previous" in meta ? (meta.previous as string | null) : null,
+    previous:
+      meta && typeof meta === "object" && "previous" in meta
+        ? (meta.previous as string | null)
+        : null,
   };
 }
 
@@ -66,10 +69,7 @@ export async function fetchBlogPosts(options?: {
 export async function fetchAllBlogPosts(opts?: {
   revalidate?: number;
 }): Promise<BlogPostListItem[]> {
-  return await fetchAllPages<BlogPostListItem>(
-    (p) => getJson(p, opts),
-    "/api/blog/posts/",
-  );
+  return await fetchAllPages<BlogPostListItem>((p) => getJson(p, opts), "/api/blog/posts/");
 }
 
 export async function fetchBlogPost(id: number): Promise<BlogPost> {
@@ -90,11 +90,8 @@ export async function reactToPost(postId: number, reaction: string | null) {
  *
  * Zwraca mapę `{ "<postId>": "<reaction>" }`; brak klucza = brak reakcji.
  */
-export async function fetchMyReactions(
-  postIds: number[],
-): Promise<Record<string, string>> {
+export async function fetchMyReactions(postIds: number[]): Promise<Record<string, string>> {
   if (!postIds.length) return {};
   const q = new URLSearchParams({ post_ids: postIds.join(",") });
   return await getJson<Record<string, string>>(`/api/blog/reactions/mine/?${q}`);
 }
-

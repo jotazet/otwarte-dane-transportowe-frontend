@@ -34,7 +34,11 @@ export function ColorModeToggle({
           "&:hover": { bgcolor: "action.hover" },
         }}
       >
-        {isDark ? <MdLightMode size={iconSize} aria-hidden /> : <MdDarkMode size={iconSize} aria-hidden />}
+        {isDark ? (
+          <MdLightMode size={iconSize} aria-hidden />
+        ) : (
+          <MdDarkMode size={iconSize} aria-hidden />
+        )}
       </IconButton>
     </Tooltip>
   );

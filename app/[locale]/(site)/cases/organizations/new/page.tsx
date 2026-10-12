@@ -20,7 +20,11 @@ export default async function OrganizationNewPage({
 
   return (
     <AppPage locale={locale} backLabel={dict.back} breadcrumbs={casesAddOrganization(locale, dict)}>
-      <PageHeader title={dict.addOrganization} subtitle={dict.casesSubtitle} icon={<MdApartment size={28} aria-hidden />} />
+      <PageHeader
+        title={dict.addOrganization}
+        subtitle={dict.casesSubtitle}
+        icon={<MdApartment size={28} aria-hidden />}
+      />
       <OrganizationForm locale={locale} dict={dict} />
     </AppPage>
   );

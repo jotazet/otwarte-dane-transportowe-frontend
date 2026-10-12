@@ -61,7 +61,11 @@ export default async function FeedCatalogDetailPage({
     .filter((g) => g.rows.length);
 
   return (
-    <AppPage locale={locale} backLabel={dict.back} breadcrumbs={dataFeedDetail(locale, dict, orgId, orgLabel)}>
+    <AppPage
+      locale={locale}
+      backLabel={dict.back}
+      breadcrumbs={dataFeedDetail(locale, dict, orgId, orgLabel)}
+    >
       <FeedCatalogDetailHeader organization={organization} dict={dict} locale={locale} />
       <FeedCatalogDetailBody dict={dict} groups={groups} />
     </AppPage>
@@ -78,8 +82,6 @@ function refreshTimesText(feed: {
   download_time_1?: string | null;
   download_time_2?: string | null;
 }) {
-  const times = [text(feed.download_time_1), text(feed.download_time_2)].filter(
-    (t) => t !== "-",
-  );
+  const times = [text(feed.download_time_1), text(feed.download_time_2)].filter((t) => t !== "-");
   return times.length ? times.join(", ") : "-";
 }

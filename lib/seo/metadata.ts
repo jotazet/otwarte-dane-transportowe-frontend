@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 
-const SITE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
 
 const OG_LOCALES: Record<Locale, string> = {
   pl: "pl_PL",
@@ -95,7 +94,10 @@ export function buildSiteFallbackMetadata(dict: Dictionary): Metadata {
 }
 
 export function stripHtml(value: string): string {
-  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function truncateDescription(value: string, maxLength = 160): string {

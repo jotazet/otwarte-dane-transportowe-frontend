@@ -171,7 +171,8 @@ export function RealtimeSubmissionDetail({
   async function saveMeta() {
     if (!row || auth.status !== "authenticated" || !perms.user) return;
     const user = perms.user;
-    const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
+    const isOwner =
+      user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
     const sourcePerms = perms.feedSource({
       isOwner,
       currentStage: row.current_stage,
@@ -225,7 +226,9 @@ export function RealtimeSubmissionDetail({
     if (!row) return;
     setError(null);
     try {
-      await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), { stage: Number(stage) });
+      await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), {
+        stage: Number(stage),
+      });
       await load();
     } catch (e) {
       setError(formatApiError(e));
@@ -288,19 +291,14 @@ export function RealtimeSubmissionDetail({
 
   if (forbidden) {
     return (
-      <SubmissionDetailAuthGate
-        locale={locale}
-        dict={dict}
-        error={error}
-        hasData
-        forbidden
-      >
+      <SubmissionDetailAuthGate locale={locale} dict={dict} error={error} hasData forbidden>
         <></>
       </SubmissionDetailAuthGate>
     );
   }
 
-  const isOwner = user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
+  const isOwner =
+    user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const sourcePerms = perms.feedSource({
     isOwner,
     currentStage: row.current_stage,
@@ -310,8 +308,13 @@ export function RealtimeSubmissionDetail({
   const showHelperPanel = hasHelperAccess(user) || user.isDjangoAdmin;
   const canSaveProvider =
     !sourcePerms.canHelperReviewOnly &&
-    (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta || sourcePerms.canAdminSourceOnStage2Plus);
-  const fieldsLocked = sourcePerms.canEditLimitedMeta && !sourcePerms.canEditFullSource && !sourcePerms.canAdminSourceOnStage2Plus;
+    (sourcePerms.canEditFullSource ||
+      sourcePerms.canEditLimitedMeta ||
+      sourcePerms.canAdminSourceOnStage2Plus);
+  const fieldsLocked =
+    sourcePerms.canEditLimitedMeta &&
+    !sourcePerms.canEditFullSource &&
+    !sourcePerms.canAdminSourceOnStage2Plus;
 
   return (
     <Stack spacing={2}>
@@ -332,8 +335,8 @@ export function RealtimeSubmissionDetail({
             RT #{row.id} - {row.protocol}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {dict.organizations}: {row.transport_organization} • {dict.staticSubmissionId}: {row.static_submission ?? "-"} •{" "}
-            {dict.author}: {row.submitted_by_username ?? "-"}
+            {dict.organizations}: {row.transport_organization} • {dict.staticSubmissionId}:{" "}
+            {row.static_submission ?? "-"} • {dict.author}: {row.submitted_by_username ?? "-"}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
             {dict.stage}: {row.current_stage_label}
@@ -373,8 +376,7 @@ export function RealtimeSubmissionDetail({
       {showHelperPanel && row.current_stage >= 4
         ? (row.endpoints ?? [])
             .filter(
-              (ep) =>
-                typeof ep.id === "number" && (ep.hide_original || ep.fetch_status != null),
+              (ep) => typeof ep.id === "number" && (ep.hide_original || ep.fetch_status != null),
             )
             .map((ep) => (
               <FeedFetchHealthPanel
@@ -391,19 +393,40 @@ export function RealtimeSubmissionDetail({
         : null}
 
       {!sourcePerms.canHelperReviewOnly && (isOwner || user.isDjangoAdmin) ? (
-      <FormSection title={dict.endpoints}>
+        <FormSection title={dict.endpoints}>
           <Stack spacing={2}>
-            <TextField label={dict.name} value={name} onChange={(e) => setName(e.target.value)} disabled={fieldsLocked} />
-            <TextField label={dict.note} value={note} onChange={(e) => setNote(e.target.value)} multiline minRows={2} />
-            <TextField label={dict.license} value={license} onChange={(e) => setLicense(e.target.value)} />
+            <TextField
+              label={dict.name}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={fieldsLocked}
+            />
+            <TextField
+              label={dict.note}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              multiline
+              minRows={2}
+            />
+            <TextField
+              label={dict.license}
+              value={license}
+              onChange={(e) => setLicense(e.target.value)}
+            />
             {endpointsDraft.map((ep, idx) => (
-              <Stack key={ep.id ?? idx} spacing={1} sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
+              <Stack
+                key={ep.id ?? idx}
+                spacing={1}
+                sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}
+              >
                 <TextField
                   label={dict.feedTypes}
                   value={ep.endpoint_type}
                   onChange={(e) => {
                     const v = e.target.value;
-                    setEndpointsDraft((prev) => prev.map((x, i) => (i === idx ? { ...x, endpoint_type: v } : x)));
+                    setEndpointsDraft((prev) =>
+                      prev.map((x, i) => (i === idx ? { ...x, endpoint_type: v } : x)),
+                    );
                   }}
                   disabled={fieldsLocked}
                 />
@@ -412,7 +435,9 @@ export function RealtimeSubmissionDetail({
                   value={ep.url}
                   onChange={(e) => {
                     const v = e.target.value;
-                    setEndpointsDraft((prev) => prev.map((x, i) => (i === idx ? { ...x, url: v } : x)));
+                    setEndpointsDraft((prev) =>
+                      prev.map((x, i) => (i === idx ? { ...x, url: v } : x)),
+                    );
                   }}
                   disabled={fieldsLocked}
                 />
@@ -424,7 +449,13 @@ export function RealtimeSubmissionDetail({
                     const v = e.target.value;
                     setEndpointsDraft((prev) =>
                       prev.map((x, i) =>
-                        i === idx ? { ...x, interval: v, hide_original: isNoSourceUpdate(v) ? false : x.hide_original } : x,
+                        i === idx
+                          ? {
+                              ...x,
+                              interval: v,
+                              hide_original: isNoSourceUpdate(v) ? false : x.hide_original,
+                            }
+                          : x,
                       ),
                     );
                   }}
@@ -446,7 +477,9 @@ export function RealtimeSubmissionDetail({
                   onChange={(v) => {
                     setEndpointsDraft((prev) =>
                       prev.map((x, i) =>
-                        i === idx ? { ...x, auth_type: v, hide_original: hideOriginalOnAuthChange(v) } : x,
+                        i === idx
+                          ? { ...x, auth_type: v, hide_original: hideOriginalOnAuthChange(v) }
+                          : x,
                       ),
                     );
                   }}
@@ -459,7 +492,9 @@ export function RealtimeSubmissionDetail({
                     value={ep.auth_value}
                     onChange={(e) => {
                       const v = e.target.value;
-                      setEndpointsDraft((prev) => prev.map((x, i) => (i === idx ? { ...x, auth_value: v } : x)));
+                      setEndpointsDraft((prev) =>
+                        prev.map((x, i) => (i === idx ? { ...x, auth_value: v } : x)),
+                      );
                     }}
                     helperText={dict.authValueNewOnly + " - " + dict.authValueHint}
                     autoComplete="new-password"
@@ -473,7 +508,13 @@ export function RealtimeSubmissionDetail({
                     control={
                       <Switch
                         checked={ep.is_original}
-                        onChange={(e) => setEndpointsDraft((prev) => prev.map((x, i) => (i === idx ? { ...x, is_original: e.target.checked } : x)))}
+                        onChange={(e) =>
+                          setEndpointsDraft((prev) =>
+                            prev.map((x, i) =>
+                              i === idx ? { ...x, is_original: e.target.checked } : x,
+                            ),
+                          )
+                        }
                         disabled={fieldsLocked}
                       />
                     }
@@ -485,7 +526,9 @@ export function RealtimeSubmissionDetail({
                         checked={resolveHideOriginal(ep.auth_type, ep.hide_original)}
                         onChange={(e) =>
                           setEndpointsDraft((prev) =>
-                            prev.map((x, i) => (i === idx ? { ...x, hide_original: e.target.checked } : x)),
+                            prev.map((x, i) =>
+                              i === idx ? { ...x, hide_original: e.target.checked } : x,
+                            ),
                           )
                         }
                         disabled={
@@ -532,7 +575,7 @@ export function RealtimeSubmissionDetail({
               )}
             </Stack>
           ) : null}
-      </FormSection>
+        </FormSection>
       ) : null}
       {confirmDialog}
     </Stack>

@@ -1,5 +1,6 @@
 /** DRF paginated list or plain array. */
-export type ApiListResponse<T> = T[] | { results?: T[]; count?: number; next?: string | null; previous?: string | null };
+export type ApiListResponse<T> =
+  T[] | { results?: T[]; count?: number; next?: string | null; previous?: string | null };
 
 export function normalizeList<T>(data: ApiListResponse<T> | null | undefined): T[] {
   if (!data) return [];
@@ -25,7 +26,9 @@ export async function fetchAllPages<T>(
   const all: T[] = [];
   const sep = basePath.includes("?") ? "&" : "?";
   for (let page = 1; page <= FETCH_ALL_MAX_PAGES; page++) {
-    const data = await get<ApiListResponse<T>>(`${basePath}${sep}page=${page}&page_size=${pageSize}`);
+    const data = await get<ApiListResponse<T>>(
+      `${basePath}${sep}page=${page}&page_size=${pageSize}`,
+    );
     if (Array.isArray(data)) return data;
     all.push(...(data.results ?? []));
     if (!data.next) break;

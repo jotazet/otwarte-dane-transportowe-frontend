@@ -25,13 +25,7 @@ function paletteScheme(isLight: boolean) {
 }
 
 const sharedTypography = {
-  fontFamily: [
-    "var(--font-roboto)",
-    "Roboto",
-    '"Helvetica Neue"',
-    "Arial",
-    "sans-serif",
-  ].join(","),
+  fontFamily: ["var(--font-roboto)", "Roboto", '"Helvetica Neue"', "Arial", "sans-serif"].join(","),
   h1: { fontWeight: 500 },
   h2: { fontWeight: 500 },
   h3: { fontWeight: 500 },

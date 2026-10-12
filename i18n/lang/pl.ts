@@ -41,8 +41,7 @@ export const dictPl = {
   organizations: "Organizacje",
   providers: "Dostawcy danych",
   caseStatuses: "Statusy spraw",
-  footer:
-    "Otwarte Dane Transportowe (ODT), Jakub Zydroń, Licencja MIT",
+  footer: "Otwarte Dane Transportowe (ODT), Jakub Zydroń, Licencja MIT",
   postList: "Lista wpisów",
   postDetails: "Szczegóły wpisu",
   reactions: "Reakcje",
@@ -200,7 +199,8 @@ export const dictPl = {
   staticSubmission: "Zgłoszenie statyczne",
   staticSubmissionSelectHint:
     "Wybierz zgłoszenie statyczne, do którego należy realtime. Wymagane dla GTFS-RT i SIRI.",
-  staticSubmissionMustBePublished: "Wybrane zgłoszenie statyczne nie jest zaakceptowane/opublikowane.",
+  staticSubmissionMustBePublished:
+    "Wybrane zgłoszenie statyczne nie jest zaakceptowane/opublikowane.",
   dataType: "Typ danych",
   protocol: "Protokół",
   endpoints: "Endpointy",
@@ -228,8 +228,7 @@ export const dictPl = {
   confirmDeletePost: "Usunąć ten wpis?",
   confirmDeleteSubmission: "Usunąć to zgłoszenie?",
   organizationName: "Nazwa organizacji",
-  caseHint:
-    "Statusy dodajesz osobno - każdy nowy etap to kolejny wpis w historii sprawy.",
+  caseHint: "Statusy dodajesz osobno - każdy nowy etap to kolejny wpis w historii sprawy.",
   createProvider: "Nowy dostawca",
   linkProviders: "Powiąż dostawców",
   saveLinks: "Zapisz powiązania",
@@ -243,13 +242,15 @@ export const dictPl = {
   fileTooLarge: "Plik jest za duży.",
   providerName: "Nazwa dostawcy",
   postTitle: "Tytuł",
-  blogPostFormHint: "Tytuł do 24 znaków, maksymalnie 5 tagów po 16 znaków. Treść w formacie Markdown.",
+  blogPostFormHint:
+    "Tytuł do 24 znaków, maksymalnie 5 tagów po 16 znaków. Treść w formacie Markdown.",
   blogTagsHint: "Tagi oddzielone przecinkami.",
   blogImageUrl: "Adres URL obrazu (opcjonalnie)",
   postContent: "Treść wpisu",
   blogMarkdownHint: "Obsługiwany format Markdown (nagłówki, listy, linki, kod itd.).",
   staticSubmissionId: "ID zgłoszenia statycznego",
-  staticSubmissionIdHint: "Opcjonalnie - jeśli realtime dotyczy tego samego pakietu co istniejące zgłoszenie statyczne.",
+  staticSubmissionIdHint:
+    "Opcjonalnie - jeśli realtime dotyczy tego samego pakietu co istniejące zgłoszenie statyczne.",
   yes: "Tak",
   no: "Nie",
   hideOriginal: "Ukryj oryginalny adres URL",

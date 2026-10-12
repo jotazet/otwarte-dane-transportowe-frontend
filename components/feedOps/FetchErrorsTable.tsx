@@ -244,7 +244,11 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
-            labels={{ prev: dict.paginationPrev, next: dict.paginationNext, page: dict.paginationPage }}
+            labels={{
+              prev: dict.paginationPrev,
+              next: dict.paginationNext,
+              page: dict.paginationPage,
+            }}
           />
         </>
       ) : null}

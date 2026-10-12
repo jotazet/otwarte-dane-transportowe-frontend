@@ -19,9 +19,7 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const localeInPath = locales.find(
-    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
-  );
+  const localeInPath = locales.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
 
   if (localeInPath) {
     const rest = pathname.slice(`/${localeInPath}`.length) || "/";

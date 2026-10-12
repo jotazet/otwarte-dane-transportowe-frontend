@@ -35,7 +35,13 @@ export function CrudFormActions({
           {cancelLabel}
         </Button>
         {onDelete && deleteLabel ? (
-          <Button color="error" variant="outlined" type="button" onClick={onDelete} disabled={pending}>
+          <Button
+            color="error"
+            variant="outlined"
+            type="button"
+            onClick={onDelete}
+            disabled={pending}
+          >
             {deleteLabel}
           </Button>
         ) : null}

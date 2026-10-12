@@ -35,7 +35,12 @@ export function OrganizationProvidersPanel({
   locale: string;
   dict: Dictionary;
   organizationId: number;
-  linked: { id?: number; name?: string | null; website?: string | null; contact_email?: string | null }[];
+  linked: {
+    id?: number;
+    name?: string | null;
+    website?: string | null;
+    contact_email?: string | null;
+  }[];
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();
@@ -93,7 +98,13 @@ export function OrganizationProvidersPanel({
         <Typography variant="h6" sx={{ flex: 1 }}>
           {dict.providers}
         </Typography>
-        <Button component={NextLink} href={`/${locale}/cases/data-providers/new`} prefetch={false} variant="outlined" size="small">
+        <Button
+          component={NextLink}
+          href={`/${locale}/cases/data-providers/new`}
+          prefetch={false}
+          variant="outlined"
+          size="small"
+        >
           {dict.createProvider}
         </Button>
       </Stack>
@@ -113,7 +124,13 @@ export function OrganizationProvidersPanel({
         )}
         disabled={saving}
       />
-      <Button variant="contained" size="small" onClick={() => void saveLinks()} disabled={saving} sx={{ alignSelf: "flex-start" }}>
+      <Button
+        variant="contained"
+        size="small"
+        onClick={() => void saveLinks()}
+        disabled={saving}
+        sx={{ alignSelf: "flex-start" }}
+      >
         {dict.saveLinks}
       </Button>
 

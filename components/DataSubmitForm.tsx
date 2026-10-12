@@ -91,7 +91,11 @@ const ENDPOINT_TYPES_GBFS = [
 
 function emptyEndpoint(protocol: ProtocolChoice): RtEndpointDraft {
   const options =
-    protocol === "gtfs_rt" ? ENDPOINT_TYPES_GTFS_RT : protocol === "siri" ? ENDPOINT_TYPES_SIRI : ENDPOINT_TYPES_GBFS;
+    protocol === "gtfs_rt"
+      ? ENDPOINT_TYPES_GTFS_RT
+      : protocol === "siri"
+        ? ENDPOINT_TYPES_SIRI
+        : ENDPOINT_TYPES_GBFS;
   return {
     uid: nextEndpointUid(),
     endpoint_type: String(options[0]),
@@ -158,7 +162,9 @@ export function DataSubmitForm({
   const [staticAuthValue, setStaticAuthValue] = React.useState("");
 
   const [rtOrgId, setRtOrgId] = React.useState<OrgSelect>(
-    typeof initialOrganizationId === "number" && Number.isFinite(initialOrganizationId) ? initialOrganizationId : "",
+    typeof initialOrganizationId === "number" && Number.isFinite(initialOrganizationId)
+      ? initialOrganizationId
+      : "",
   );
   const [rtStaticSubId, setRtStaticSubId] = React.useState<number | "">("");
   const [eligibleStatics, setEligibleStatics] = React.useState<EligibleStaticRow[]>([]);
@@ -168,7 +174,9 @@ export function DataSubmitForm({
   const [rtName, setRtName] = React.useState("");
   const [rtNote, setRtNote] = React.useState("");
   const [rtLicense, setRtLicense] = React.useState("");
-  const [rtEndpoints, setRtEndpoints] = React.useState<RtEndpointDraft[]>([emptyEndpoint("gtfs_rt")]);
+  const [rtEndpoints, setRtEndpoints] = React.useState<RtEndpointDraft[]>([
+    emptyEndpoint("gtfs_rt"),
+  ]);
 
   React.useEffect(() => {
     if (staticSource !== "file") return;
@@ -182,7 +190,11 @@ export function DataSubmitForm({
 
   React.useEffect(() => {
     const options =
-      protocol === "gtfs_rt" ? ENDPOINT_TYPES_GTFS_RT : protocol === "siri" ? ENDPOINT_TYPES_SIRI : ENDPOINT_TYPES_GBFS;
+      protocol === "gtfs_rt"
+        ? ENDPOINT_TYPES_GTFS_RT
+        : protocol === "siri"
+          ? ENDPOINT_TYPES_SIRI
+          : ENDPOINT_TYPES_GBFS;
     const defaultEndpointType = String(options[0]);
     const isValidEndpointType = (value: string) => options.includes(value as never);
 
@@ -195,7 +207,9 @@ export function DataSubmitForm({
           prev.length
             ? prev.map((e) => ({
                 ...e,
-                endpoint_type: isValidEndpointType(e.endpoint_type) ? e.endpoint_type : defaultEndpointType,
+                endpoint_type: isValidEndpointType(e.endpoint_type)
+                  ? e.endpoint_type
+                  : defaultEndpointType,
               }))
             : [emptyEndpoint(protocol)],
         );
@@ -337,7 +351,11 @@ export function DataSubmitForm({
           note: staticNote.trim() || null,
           static_entry,
         };
-        created = await apiJson<{ id: number }>("POST", "/api/data_manager/feed-submissions/", body);
+        created = await apiJson<{ id: number }>(
+          "POST",
+          "/api/data_manager/feed-submissions/",
+          body,
+        );
       } else {
         const form = new FormData();
         form.set("transport_organization", String(staticOrgId));
@@ -349,7 +367,11 @@ export function DataSubmitForm({
         if (staticLicense.trim()) form.set("static_entry.license", staticLicense.trim());
         form.set("static_entry.file", staticFile!);
 
-        created = await apiForm<{ id: number }>("POST", "/api/data_manager/feed-submissions/", form);
+        created = await apiForm<{ id: number }>(
+          "POST",
+          "/api/data_manager/feed-submissions/",
+          form,
+        );
       }
       router.push(submissionDetailPath(locale, redirectContext, "feed", created.id));
       router.refresh();
@@ -389,7 +411,11 @@ export function DataSubmitForm({
       if (protocol !== "gbfs" && staticId !== null && Number.isFinite(staticId)) {
         body.static_submission = staticId;
       }
-      const created = await apiJson<{ id: number }>("POST", "/api/data_manager/realtime-submissions/", body);
+      const created = await apiJson<{ id: number }>(
+        "POST",
+        "/api/data_manager/realtime-submissions/",
+        body,
+      );
       router.push(submissionDetailPath(locale, redirectContext, "realtime", created.id));
       router.refresh();
     } catch (err) {
@@ -414,410 +440,484 @@ export function DataSubmitForm({
         home: dict.home,
       }}
     >
-    <Card>
-      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-          <Tab label={dict.tabStaticSubmission} />
-          <Tab label={dict.tabRealtimeSubmission} />
-        </Tabs>
-        {error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : null}
+      <Card>
+        <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
+            <Tab label={dict.tabStaticSubmission} />
+            <Tab label={dict.tabRealtimeSubmission} />
+          </Tabs>
+          {error ? (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          ) : null}
 
-        {tab === 0 ? (
-          <Box component="form" onSubmit={submitStatic}>
-            <Stack spacing={2}>
-              <Typography variant="body2" color="text.secondary">
-                {dict.staticSubmissionHint}
-              </Typography>
-              <InlineSelect
-                fullWidth
-                required
-                disabled={pending}
-                label={dict.organizations}
-                value={staticOrgId === "" ? "" : String(staticOrgId)}
-                onChange={(v) => {
-                  setStaticOrgId(v === "" ? "" : Number(v));
-                }}
-                options={[
-                  { value: "", label: "" },
-                  ...orgs.map((o) => ({
-                    value: String(o.id),
-                    label: `${text(o.transport_organization)} - ${text(o.region)}`,
-                  })),
-                ]}
-              />
-              <InlineSelect
-                fullWidth
-                disabled={pending}
-                label={dict.dataType}
-                value={dataType}
-                onChange={(v) => setDataType(v as DataTypeChoice)}
-                options={DATA_TYPES.map((t) => ({ value: t, label: t }))}
-              />
-              <TextField label={dict.name} value={staticName} onChange={(e) => setStaticName(e.target.value)} disabled={pending} required={staticSource === "file"} />
-              <TextField label={dict.note} value={staticNote} onChange={(e) => setStaticNote(e.target.value)} disabled={pending} multiline minRows={2} />
-
-              <Stack spacing={0.5}>
-                <Typography variant="subtitle2">{dict.staticSource}</Typography>
-                <SourceModeToggle
-                  value={staticSource}
-                  onChange={(v) => {
-                    setStaticSource(v);
-                    setError(null);
-                  }}
-                  urlLabel={dict.staticSourceUrl}
-                  fileLabel={dict.staticSourceFile}
-                  disabled={pending}
-                />
-              </Stack>
-
-              {staticSource === "url" ? (
-                <TextField
-                  label={dict.feedUrl}
-                  value={staticUrl}
-                  onChange={(e) => setStaticUrl(e.target.value)}
-                  disabled={pending}
-                  helperText={dict.feedUrlHint}
-                  required
-                />
-              ) : (
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { sm: "center" } }}>
-                  <Button variant="outlined" component="label" disabled={pending}>
-                    {dict.chooseFile}
-                    <input
-                      type="file"
-                      hidden
-                      accept=".zip,application/zip"
-                      onChange={(e) => {
-                        const f = e.currentTarget.files?.[0] ?? null;
-                        setStaticFile(f);
-                      }}
-                    />
-                  </Button>
-                  <Typography variant="body2" color="text.secondary">
-                    {staticFile ? staticFile.name : dict.noFileSelected}
-                  </Typography>
-                </Stack>
-              )}
-
-              {staticSource === "url" ? (
-                <>
-                  <InlineSelect
-                    fullWidth
-                    disabled={pending}
-                    label={dict.authType}
-                    value={staticAuthType}
-                    onChange={(v) => {
-                      setStaticAuthType(v);
-                      setStaticHide(hideOriginalOnAuthChange(v));
-                    }}
-                    options={authTypeSelectOptions}
-                  />
-                  {staticAuthType ? (
-                    <PasswordTextField
-                      label={dict.authValue}
-                      value={staticAuthValue}
-                      onChange={(e) => setStaticAuthValue(e.target.value)}
-                      disabled={pending}
-                      helperText={dict.authValueHint}
-                      autoComplete="new-password"
-                      showPasswordLabel={dict.showPassword}
-                      hidePasswordLabel={dict.hidePassword}
-                    />
-                  ) : null}
-                </>
-              ) : null}
-
-              {staticSource === "url" ? (
-                <>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                    <TextField
-                      label={dict.downloadTime1Utc}
-                      value={staticTime1}
-                      onChange={(e) => setStaticTime1(e.target.value)}
-                      disabled={pending}
-                      required
-                    />
-                    {staticTime2Enabled ? (
-                      <TextField
-                        label={dict.downloadTime2UtcOptional}
-                        value={staticTime2}
-                        onChange={(e) => setStaticTime2(e.target.value)}
-                        disabled={pending}
-                      />
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="text"
-                        disabled={pending}
-                        onClick={() => setStaticTime2Enabled(true)}
-                        sx={{ alignSelf: { sm: "center" }, textTransform: "none" }}
-                      >
-                        {dict.addSecondDownloadTime}
-                      </Button>
-                    )}
-                    <TextField
-                      label={dict.license}
-                      value={staticLicense}
-                      onChange={(e) => setStaticLicense(e.target.value)}
-                      disabled={pending}
-                      fullWidth
-                    />
-                  </Stack>
-                  {staticTime2Enabled ? (
-                    <Button
-                      type="button"
-                      variant="text"
-                      disabled={pending}
-                      onClick={() => setStaticTime2Enabled(false)}
-                      sx={{ textTransform: "none", alignSelf: "flex-start" }}
-                    >
-                      {dict.removeSecondDownloadTime}
-                    </Button>
-                  ) : null}
-                </>
-              ) : (
-                <TextField
-                  label={dict.license}
-                  value={staticLicense}
-                  onChange={(e) => setStaticLicense(e.target.value)}
-                  disabled={pending}
+          {tab === 0 ? (
+            <Box component="form" onSubmit={submitStatic}>
+              <Stack spacing={2}>
+                <Typography variant="body2" color="text.secondary">
+                  {dict.staticSubmissionHint}
+                </Typography>
+                <InlineSelect
                   fullWidth
+                  required
+                  disabled={pending}
+                  label={dict.organizations}
+                  value={staticOrgId === "" ? "" : String(staticOrgId)}
+                  onChange={(v) => {
+                    setStaticOrgId(v === "" ? "" : Number(v));
+                  }}
+                  options={[
+                    { value: "", label: "" },
+                    ...orgs.map((o) => ({
+                      value: String(o.id),
+                      label: `${text(o.transport_organization)} - ${text(o.region)}`,
+                    })),
+                  ]}
                 />
-              )}
-              <Stack direction="row" spacing={2}>
-                <FormControlLabel control={<Switch checked={staticOriginal} onChange={(e) => setStaticOriginal(e.target.checked)} disabled={pending} />} label={dict.original} />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={resolveHideOriginal(staticAuthType, staticHide)}
-                      onChange={(e) => setStaticHide(e.target.checked)}
-                      disabled={
-                        pending || isHideOriginalLockedByAuth(staticAuthType) || staticSource === "file"
-                      }
-                    />
-                  }
-                  label={dict.hideOriginal}
+                <InlineSelect
+                  fullWidth
+                  disabled={pending}
+                  label={dict.dataType}
+                  value={dataType}
+                  onChange={(v) => setDataType(v as DataTypeChoice)}
+                  options={DATA_TYPES.map((t) => ({ value: t, label: t }))}
                 />
-              </Stack>
-              <Button type="submit" variant="contained" disabled={pending}>
-                {dict.submit}
-              </Button>
-            </Stack>
-          </Box>
-        ) : (
-          <Box component="form" onSubmit={submitRealtime}>
-            <Stack spacing={2}>
-              <Typography variant="body2" color="text.secondary">
-                {dict.realtimeSubmissionHint}
-              </Typography>
-              <InlineSelect
-                fullWidth
-                required
-                disabled={pending}
-                label={dict.organizations}
-                value={rtOrgId === "" ? "" : String(rtOrgId)}
-                onChange={(v) => {
-                  setRtOrgId(v === "" ? "" : Number(v));
-                }}
-                options={[
-                  { value: "", label: "" },
-                  ...orgs.map((o) => ({
-                    value: String(o.id),
-                    label: `${text(o.transport_organization)} - ${text(o.region)}`,
-                  })),
-                ]}
-              />
-              <InlineSelect
-                fullWidth
-                disabled={pending}
-                label={dict.protocol}
-                value={protocol}
-                onChange={(v) => setProtocol(v as ProtocolChoice)}
-                options={PROTOCOLS.map((p) => ({ value: p, label: p }))}
-              />
-              {protocol !== "gbfs" ? (
-                <Stack spacing={0.5}>
-                  {eligibleLoading ? (
-                    <Typography variant="body2" color="text.secondary">
-                      {dict.loadingEligibleStatic}
-                    </Typography>
-                  ) : null}
-                  {eligibleError ? <Alert severity="warning">{eligibleError}</Alert> : null}
-                  <InlineSelect
-                    fullWidth
-                    disabled={pending || eligibleLoading || !eligibleStatics.length}
-                    required={protocol === "gtfs_rt" || protocol === "siri"}
-                    label={dict.staticSubmission}
-                    value={rtStaticSubId === "" ? "" : String(rtStaticSubId)}
-                    onChange={(v) => {
-                      setRtStaticSubId(v === "" ? "" : Number(v));
-                    }}
-                    options={[
-                      { value: "", label: "" },
-                      ...eligibleStatics.map((s) => ({
-                        value: String(s.id),
-                        label: `#${s.id} - ${s.name ? text(s.name) : dict.unnamed} - ${s.data_type} (${(s.allowed_realtime_protocols ?? []).join(", ")})`,
-                      })),
-                    ]}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {dict.staticSubmissionSelectHint}
-                  </Typography>
-                </Stack>
-              ) : null}
-              <TextField label={dict.name} value={rtName} onChange={(e) => setRtName(e.target.value)} disabled={pending} />
-              <TextField label={dict.note} value={rtNote} onChange={(e) => setRtNote(e.target.value)} disabled={pending} multiline minRows={2} />
-              <TextField label={dict.license} value={rtLicense} onChange={(e) => setRtLicense(e.target.value)} disabled={pending} />
+                <TextField
+                  label={dict.name}
+                  value={staticName}
+                  onChange={(e) => setStaticName(e.target.value)}
+                  disabled={pending}
+                  required={staticSource === "file"}
+                />
+                <TextField
+                  label={dict.note}
+                  value={staticNote}
+                  onChange={(e) => setStaticNote(e.target.value)}
+                  disabled={pending}
+                  multiline
+                  minRows={2}
+                />
 
-              <Typography variant="subtitle2">{dict.endpoints}</Typography>
-              {rtEndpoints.map((ep, idx) => (
-                <Stack key={ep.uid} spacing={1} sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
-                  <Stack direction={{ xs: "column", md: "row" }} spacing={1} sx={{ alignItems: { md: "center" } }}>
-                    <InlineSelect
-                      label={dict.feedTypes}
-                      value={ep.endpoint_type}
-                      onChange={(v) => {
-                        setRtEndpoints((rows) => rows.map((r, i) => (i === idx ? { ...r, endpoint_type: v } : r)));
-                      }}
-                      disabled={pending}
-                      sx={{ minWidth: 220 }}
-                      options={endpointTypeOptions.map((t) => ({ value: t, label: t }))}
-                    />
-                    <TextField
-                      label={dict.feedUrl}
-                      value={ep.url}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setRtEndpoints((rows) => rows.map((r, i) => (i === idx ? { ...r, url: v } : r)));
-                      }}
-                      disabled={pending}
-                      sx={{ flex: 1 }}
-                    />
-                    <TextField
-                      label={dict.sourceUpdateInterval}
-                      type="number"
-                      value={ep.interval}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setRtEndpoints((rows) =>
-                          rows.map((r, i) =>
-                            i === idx
-                              ? { ...r, interval: v, hide_original: isNoSourceUpdate(v) ? false : r.hide_original }
-                              : r,
-                          ),
-                        );
-                      }}
-                      disabled={pending}
-                      required
-                      slotProps={{
-                        htmlInput: {
-                          min: SOURCE_UPDATE_INTERVAL_MIN,
-                          max: SOURCE_UPDATE_INTERVAL_MAX,
-                          step: 1,
-                          inputMode: "numeric",
-                        },
-                      }}
-                      sx={{ minWidth: 160 }}
-                    />
-                    <IconButton
-                      aria-label={dict.delete}
-                      color="error"
-                      disabled={pending || rtEndpoints.length <= 1}
-                      onClick={() => setRtEndpoints((rows) => rows.filter((_, i) => i !== idx))}
-                    >
-                      <MdDelete />
-                    </IconButton>
+                <Stack spacing={0.5}>
+                  <Typography variant="subtitle2">{dict.staticSource}</Typography>
+                  <SourceModeToggle
+                    value={staticSource}
+                    onChange={(v) => {
+                      setStaticSource(v);
+                      setError(null);
+                    }}
+                    urlLabel={dict.staticSourceUrl}
+                    fileLabel={dict.staticSourceFile}
+                    disabled={pending}
+                  />
+                </Stack>
+
+                {staticSource === "url" ? (
+                  <TextField
+                    label={dict.feedUrl}
+                    value={staticUrl}
+                    onChange={(e) => setStaticUrl(e.target.value)}
+                    disabled={pending}
+                    helperText={dict.feedUrlHint}
+                    required
+                  />
+                ) : (
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={2}
+                    sx={{ alignItems: { sm: "center" } }}
+                  >
+                    <Button variant="outlined" component="label" disabled={pending}>
+                      {dict.chooseFile}
+                      <input
+                        type="file"
+                        hidden
+                        accept=".zip,application/zip"
+                        onChange={(e) => {
+                          const f = e.currentTarget.files?.[0] ?? null;
+                          setStaticFile(f);
+                        }}
+                      />
+                    </Button>
+                    <Typography variant="body2" color="text.secondary">
+                      {staticFile ? staticFile.name : dict.noFileSelected}
+                    </Typography>
                   </Stack>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                )}
+
+                {staticSource === "url" ? (
+                  <>
                     <InlineSelect
-                      label={dict.authType}
-                      value={ep.auth_type}
-                      onChange={(v) => {
-                        setRtEndpoints((rows) =>
-                          rows.map((r, i) =>
-                            i === idx
-                              ? { ...r, auth_type: v, hide_original: hideOriginalOnAuthChange(v) }
-                              : r,
-                          ),
-                        );
-                      }}
+                      fullWidth
                       disabled={pending}
-                      sx={{ minWidth: 200 }}
+                      label={dict.authType}
+                      value={staticAuthType}
+                      onChange={(v) => {
+                        setStaticAuthType(v);
+                        setStaticHide(hideOriginalOnAuthChange(v));
+                      }}
                       options={authTypeSelectOptions}
                     />
-                    {ep.auth_type ? (
+                    {staticAuthType ? (
                       <PasswordTextField
                         label={dict.authValue}
-                        value={ep.auth_value}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setRtEndpoints((rows) => rows.map((r, i) => (i === idx ? { ...r, auth_value: v } : r)));
-                        }}
+                        value={staticAuthValue}
+                        onChange={(e) => setStaticAuthValue(e.target.value)}
                         disabled={pending}
                         helperText={dict.authValueHint}
-                        sx={{ flex: 1 }}
                         autoComplete="new-password"
                         showPasswordLabel={dict.showPassword}
                         hidePasswordLabel={dict.hidePassword}
                       />
                     ) : null}
-                  </Stack>
-                  <Stack direction="row" spacing={2}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={ep.is_original}
-                          onChange={(e) => setRtEndpoints((rows) => rows.map((r, i) => (i === idx ? { ...r, is_original: e.target.checked } : r)))}
+                  </>
+                ) : null}
+
+                {staticSource === "url" ? (
+                  <>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                      <TextField
+                        label={dict.downloadTime1Utc}
+                        value={staticTime1}
+                        onChange={(e) => setStaticTime1(e.target.value)}
+                        disabled={pending}
+                        required
+                      />
+                      {staticTime2Enabled ? (
+                        <TextField
+                          label={dict.downloadTime2UtcOptional}
+                          value={staticTime2}
+                          onChange={(e) => setStaticTime2(e.target.value)}
                           disabled={pending}
                         />
-                      }
-                      label={dict.original}
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={resolveHideOriginal(ep.auth_type, ep.hide_original)}
-                          onChange={(e) =>
-                            setRtEndpoints((rows) =>
-                              rows.map((r, i) => (i === idx ? { ...r, hide_original: e.target.checked } : r)),
-                            )
-                          }
-                          disabled={
-                            pending ||
-                            isHideOriginalLockedByAuth(ep.auth_type) ||
-                            isNoSourceUpdate(ep.interval)
-                          }
-                        />
-                      }
-                      label={dict.hideOriginal}
-                    />
-                  </Stack>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="text"
+                          disabled={pending}
+                          onClick={() => setStaticTime2Enabled(true)}
+                          sx={{ alignSelf: { sm: "center" }, textTransform: "none" }}
+                        >
+                          {dict.addSecondDownloadTime}
+                        </Button>
+                      )}
+                      <TextField
+                        label={dict.license}
+                        value={staticLicense}
+                        onChange={(e) => setStaticLicense(e.target.value)}
+                        disabled={pending}
+                        fullWidth
+                      />
+                    </Stack>
+                    {staticTime2Enabled ? (
+                      <Button
+                        type="button"
+                        variant="text"
+                        disabled={pending}
+                        onClick={() => setStaticTime2Enabled(false)}
+                        sx={{ textTransform: "none", alignSelf: "flex-start" }}
+                      >
+                        {dict.removeSecondDownloadTime}
+                      </Button>
+                    ) : null}
+                  </>
+                ) : (
+                  <TextField
+                    label={dict.license}
+                    value={staticLicense}
+                    onChange={(e) => setStaticLicense(e.target.value)}
+                    disabled={pending}
+                    fullWidth
+                  />
+                )}
+                <Stack direction="row" spacing={2}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={staticOriginal}
+                        onChange={(e) => setStaticOriginal(e.target.checked)}
+                        disabled={pending}
+                      />
+                    }
+                    label={dict.original}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={resolveHideOriginal(staticAuthType, staticHide)}
+                        onChange={(e) => setStaticHide(e.target.checked)}
+                        disabled={
+                          pending ||
+                          isHideOriginalLockedByAuth(staticAuthType) ||
+                          staticSource === "file"
+                        }
+                      />
+                    }
+                    label={dict.hideOriginal}
+                  />
                 </Stack>
-              ))}
-              <Button
-                type="button"
-                variant="outlined"
-                startIcon={<MdAdd />}
-                disabled={pending}
-                onClick={() =>
-                  setRtEndpoints((rows) => [...rows, { ...emptyEndpoint(protocol), endpoint_type: String(endpointTypeOptions[0]) }])
-                }
-              >
-                {dict.addEndpoint}
-              </Button>
+                <Button type="submit" variant="contained" disabled={pending}>
+                  {dict.submit}
+                </Button>
+              </Stack>
+            </Box>
+          ) : (
+            <Box component="form" onSubmit={submitRealtime}>
+              <Stack spacing={2}>
+                <Typography variant="body2" color="text.secondary">
+                  {dict.realtimeSubmissionHint}
+                </Typography>
+                <InlineSelect
+                  fullWidth
+                  required
+                  disabled={pending}
+                  label={dict.organizations}
+                  value={rtOrgId === "" ? "" : String(rtOrgId)}
+                  onChange={(v) => {
+                    setRtOrgId(v === "" ? "" : Number(v));
+                  }}
+                  options={[
+                    { value: "", label: "" },
+                    ...orgs.map((o) => ({
+                      value: String(o.id),
+                      label: `${text(o.transport_organization)} - ${text(o.region)}`,
+                    })),
+                  ]}
+                />
+                <InlineSelect
+                  fullWidth
+                  disabled={pending}
+                  label={dict.protocol}
+                  value={protocol}
+                  onChange={(v) => setProtocol(v as ProtocolChoice)}
+                  options={PROTOCOLS.map((p) => ({ value: p, label: p }))}
+                />
+                {protocol !== "gbfs" ? (
+                  <Stack spacing={0.5}>
+                    {eligibleLoading ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {dict.loadingEligibleStatic}
+                      </Typography>
+                    ) : null}
+                    {eligibleError ? <Alert severity="warning">{eligibleError}</Alert> : null}
+                    <InlineSelect
+                      fullWidth
+                      disabled={pending || eligibleLoading || !eligibleStatics.length}
+                      required={protocol === "gtfs_rt" || protocol === "siri"}
+                      label={dict.staticSubmission}
+                      value={rtStaticSubId === "" ? "" : String(rtStaticSubId)}
+                      onChange={(v) => {
+                        setRtStaticSubId(v === "" ? "" : Number(v));
+                      }}
+                      options={[
+                        { value: "", label: "" },
+                        ...eligibleStatics.map((s) => ({
+                          value: String(s.id),
+                          label: `#${s.id} - ${s.name ? text(s.name) : dict.unnamed} - ${s.data_type} (${(s.allowed_realtime_protocols ?? []).join(", ")})`,
+                        })),
+                      ]}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {dict.staticSubmissionSelectHint}
+                    </Typography>
+                  </Stack>
+                ) : null}
+                <TextField
+                  label={dict.name}
+                  value={rtName}
+                  onChange={(e) => setRtName(e.target.value)}
+                  disabled={pending}
+                />
+                <TextField
+                  label={dict.note}
+                  value={rtNote}
+                  onChange={(e) => setRtNote(e.target.value)}
+                  disabled={pending}
+                  multiline
+                  minRows={2}
+                />
+                <TextField
+                  label={dict.license}
+                  value={rtLicense}
+                  onChange={(e) => setRtLicense(e.target.value)}
+                  disabled={pending}
+                />
 
-              <Button type="submit" variant="contained" disabled={pending}>
-                {dict.submit}
-              </Button>
-            </Stack>
-          </Box>
-        )}
-      </CardContent>
-    </Card>
+                <Typography variant="subtitle2">{dict.endpoints}</Typography>
+                {rtEndpoints.map((ep, idx) => (
+                  <Stack
+                    key={ep.uid}
+                    spacing={1}
+                    sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}
+                  >
+                    <Stack
+                      direction={{ xs: "column", md: "row" }}
+                      spacing={1}
+                      sx={{ alignItems: { md: "center" } }}
+                    >
+                      <InlineSelect
+                        label={dict.feedTypes}
+                        value={ep.endpoint_type}
+                        onChange={(v) => {
+                          setRtEndpoints((rows) =>
+                            rows.map((r, i) => (i === idx ? { ...r, endpoint_type: v } : r)),
+                          );
+                        }}
+                        disabled={pending}
+                        sx={{ minWidth: 220 }}
+                        options={endpointTypeOptions.map((t) => ({ value: t, label: t }))}
+                      />
+                      <TextField
+                        label={dict.feedUrl}
+                        value={ep.url}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setRtEndpoints((rows) =>
+                            rows.map((r, i) => (i === idx ? { ...r, url: v } : r)),
+                          );
+                        }}
+                        disabled={pending}
+                        sx={{ flex: 1 }}
+                      />
+                      <TextField
+                        label={dict.sourceUpdateInterval}
+                        type="number"
+                        value={ep.interval}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setRtEndpoints((rows) =>
+                            rows.map((r, i) =>
+                              i === idx
+                                ? {
+                                    ...r,
+                                    interval: v,
+                                    hide_original: isNoSourceUpdate(v) ? false : r.hide_original,
+                                  }
+                                : r,
+                            ),
+                          );
+                        }}
+                        disabled={pending}
+                        required
+                        slotProps={{
+                          htmlInput: {
+                            min: SOURCE_UPDATE_INTERVAL_MIN,
+                            max: SOURCE_UPDATE_INTERVAL_MAX,
+                            step: 1,
+                            inputMode: "numeric",
+                          },
+                        }}
+                        sx={{ minWidth: 160 }}
+                      />
+                      <IconButton
+                        aria-label={dict.delete}
+                        color="error"
+                        disabled={pending || rtEndpoints.length <= 1}
+                        onClick={() => setRtEndpoints((rows) => rows.filter((_, i) => i !== idx))}
+                      >
+                        <MdDelete />
+                      </IconButton>
+                    </Stack>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                      <InlineSelect
+                        label={dict.authType}
+                        value={ep.auth_type}
+                        onChange={(v) => {
+                          setRtEndpoints((rows) =>
+                            rows.map((r, i) =>
+                              i === idx
+                                ? { ...r, auth_type: v, hide_original: hideOriginalOnAuthChange(v) }
+                                : r,
+                            ),
+                          );
+                        }}
+                        disabled={pending}
+                        sx={{ minWidth: 200 }}
+                        options={authTypeSelectOptions}
+                      />
+                      {ep.auth_type ? (
+                        <PasswordTextField
+                          label={dict.authValue}
+                          value={ep.auth_value}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setRtEndpoints((rows) =>
+                              rows.map((r, i) => (i === idx ? { ...r, auth_value: v } : r)),
+                            );
+                          }}
+                          disabled={pending}
+                          helperText={dict.authValueHint}
+                          sx={{ flex: 1 }}
+                          autoComplete="new-password"
+                          showPasswordLabel={dict.showPassword}
+                          hidePasswordLabel={dict.hidePassword}
+                        />
+                      ) : null}
+                    </Stack>
+                    <Stack direction="row" spacing={2}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={ep.is_original}
+                            onChange={(e) =>
+                              setRtEndpoints((rows) =>
+                                rows.map((r, i) =>
+                                  i === idx ? { ...r, is_original: e.target.checked } : r,
+                                ),
+                              )
+                            }
+                            disabled={pending}
+                          />
+                        }
+                        label={dict.original}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={resolveHideOriginal(ep.auth_type, ep.hide_original)}
+                            onChange={(e) =>
+                              setRtEndpoints((rows) =>
+                                rows.map((r, i) =>
+                                  i === idx ? { ...r, hide_original: e.target.checked } : r,
+                                ),
+                              )
+                            }
+                            disabled={
+                              pending ||
+                              isHideOriginalLockedByAuth(ep.auth_type) ||
+                              isNoSourceUpdate(ep.interval)
+                            }
+                          />
+                        }
+                        label={dict.hideOriginal}
+                      />
+                    </Stack>
+                  </Stack>
+                ))}
+                <Button
+                  type="button"
+                  variant="outlined"
+                  startIcon={<MdAdd />}
+                  disabled={pending}
+                  onClick={() =>
+                    setRtEndpoints((rows) => [
+                      ...rows,
+                      { ...emptyEndpoint(protocol), endpoint_type: String(endpointTypeOptions[0]) },
+                    ])
+                  }
+                >
+                  {dict.addEndpoint}
+                </Button>
+
+                <Button type="submit" variant="contained" disabled={pending}>
+                  {dict.submit}
+                </Button>
+              </Stack>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
     </AccessGate>
   );
 }

@@ -19,7 +19,9 @@ export function paths(locale: string) {
     dataFeed: (orgId: number) => `${base}/data/feeds/${orgId}`,
     mySubmissions: `${base}/data/my-submissions`,
     mySubmissionsNew: (orgId?: number) =>
-      orgId != null ? `${base}/data/my-submissions/new?organization=${orgId}` : `${base}/data/my-submissions/new`,
+      orgId != null
+        ? `${base}/data/my-submissions/new?organization=${orgId}`
+        : `${base}/data/my-submissions/new`,
     mySubmissionFeed: (id: number) => `${base}/data/my-submissions/feed/${id}`,
     mySubmissionRealtime: (id: number) => `${base}/data/my-submissions/realtime/${id}`,
     queue: `${base}/data/queue`,
@@ -36,7 +38,12 @@ export function paths(locale: string) {
 
 export type SubmissionListContext = "my" | "queue";
 
-export function submissionDetailPath(locale: string, ctx: SubmissionListContext, kind: "feed" | "realtime", id: number) {
+export function submissionDetailPath(
+  locale: string,
+  ctx: SubmissionListContext,
+  kind: "feed" | "realtime",
+  id: number,
+) {
   const p = paths(locale);
   if (ctx === "queue") return kind === "feed" ? p.queueFeed(id) : p.queueRealtime(id);
   return kind === "feed" ? p.mySubmissionFeed(id) : p.mySubmissionRealtime(id);
@@ -47,7 +54,11 @@ export function submissionListPath(locale: string, ctx: SubmissionListContext) {
 }
 
 /** Nav active matching - avoid highlighting catalog when on my-submissions or queue. */
-export function navActiveHref(pathname: string, locale: string, candidates: string[]): string | null {
+export function navActiveHref(
+  pathname: string,
+  locale: string,
+  candidates: string[],
+): string | null {
   const hits = candidates.filter((href) => {
     if (href === `/${locale}/data`) {
       if (

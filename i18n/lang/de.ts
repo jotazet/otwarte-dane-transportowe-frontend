@@ -17,8 +17,7 @@ export const dictDe: Dictionary = {
   browseData: "Daten ansehen",
   learnMore: "Mehr erfahren",
   sectionOverview: "Hauptbereiche",
-  blogIntro:
-    "Neuigkeiten, Gedanken und Mitteilungen – zum Lesen in einer freien Minute.",
+  blogIntro: "Neuigkeiten, Gedanken und Mitteilungen – zum Lesen in einer freien Minute.",
   casesIntro:
     "Fallstatus und Verlauf der Schritte, die unternommen wurden, um Zugang zu Daten zu erhalten.",
   dataIntro:
@@ -45,18 +44,14 @@ export const dictDe: Dictionary = {
   organizations: "Organisationen",
   providers: "Datenanbieter",
   caseStatuses: "Fallstatus",
-  footer:
-    "Otwarte Dane Transportowe (ODT), Jakub Zydroń, MIT-Lizenz",
+  footer: "Otwarte Dane Transportowe (ODT), Jakub Zydroń, MIT-Lizenz",
   postList: "Beitragsliste",
   postDetails: "Beitragsdetails",
   reactions: "Reaktionen",
   blogEditor: "Blog-Editor",
-  organizationsDesc:
-    "Region, Website, Kontakt, Datenanbieter und der neueste Status.",
-  providersDesc:
-    "Personen und Institutionen, von denen Verkehrsdaten bezogen werden.",
-  caseStatusesDesc:
-    "Statusverlauf: Anfrage, Ablehnung, erhalten, Erinnerung und mehr.",
+  organizationsDesc: "Region, Website, Kontakt, Datenanbieter und der neueste Status.",
+  providersDesc: "Personen und Institutionen, von denen Verkehrsdaten bezogen werden.",
+  caseStatusesDesc: "Statusverlauf: Anfrage, Ablehnung, erhalten, Erinnerung und mehr.",
   caseStatusLabels: {
     none: "Keiner",
     requested: "Datenanfrage",
@@ -70,10 +65,8 @@ export const dictDe: Dictionary = {
     phone_call: "Telefonanruf",
     other: "Sonstiges",
   },
-  staticFeedsDesc:
-    "GTFS, NeTEx und andere statische Feeds mit Lizenz- und Aktualisierungsdatum.",
-  realtimeFeedsDesc:
-    "GTFS-RT-, SIRI- und GBFS-Endpoints, gruppiert nach Verkehrsorganisationen.",
+  staticFeedsDesc: "GTFS, NeTEx und andere statische Feeds mit Lizenz- und Aktualisierungsdatum.",
+  realtimeFeedsDesc: "GTFS-RT-, SIRI- und GBFS-Endpoints, gruppiert nach Verkehrsorganisationen.",
   openDataTitle: "Offene Daten",
   openDataDesc:
     "Die Offenheit der Daten ist für Fahrgäste, Städte und Entwickler von Bedeutung, da sie die Entwicklung von Fahrgastinformationssystemen sowie das Bewusstsein für die in einer bestimmten Region verfügbaren Verkehrsmittel fördert.",
@@ -137,7 +130,8 @@ export const dictDe: Dictionary = {
   account: "Konto",
   myAccount: "Mein Konto",
   loginTitle: "Anmelden",
-  loginSubtitle: "Melde dich mit deinem ODT-Konto an, um Feeds hinzuzufügen und Inhalte zu verwalten.",
+  loginSubtitle:
+    "Melde dich mit deinem ODT-Konto an, um Feeds hinzuzufügen und Inhalte zu verwalten.",
   username: "Benutzername",
   password: "Passwort",
   showPassword: "Passwort anzeigen",
@@ -207,7 +201,8 @@ export const dictDe: Dictionary = {
   staticSubmission: "Statische Einreichung",
   staticSubmissionSelectHint:
     "Wähle die statische Einreichung, zu der dieses Realtime gehört. Pflicht für GTFS-RT und SIRI.",
-  staticSubmissionMustBePublished: "Die ausgewählte statische Einreichung ist nicht akzeptiert/veröffentlicht.",
+  staticSubmissionMustBePublished:
+    "Die ausgewählte statische Einreichung ist nicht akzeptiert/veröffentlicht.",
   dataType: "Datentyp",
   protocol: "Protokoll",
   endpoints: "Endpoints",
@@ -256,8 +251,7 @@ export const dictDe: Dictionary = {
   postContent: "Beitragstext",
   blogMarkdownHint: "Markdown wird unterstützt (Überschriften, Listen, Links, Code usw.).",
   staticSubmissionId: "Statische Einreichungs-ID",
-  staticSubmissionIdHint:
-    "Optional - Realtime mit bestehender statischer Einreichung verknüpfen.",
+  staticSubmissionIdHint: "Optional - Realtime mit bestehender statischer Einreichung verknüpfen.",
   yes: "Ja",
   no: "Nein",
   hideOriginal: "Original-URL verbergen",

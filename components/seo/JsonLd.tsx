@@ -13,10 +13,7 @@ export function WebSiteJsonLd({ locale, dict }: { locale: Locale; dict: Dictiona
   };
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }}
-    />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }} />
   );
 }
 

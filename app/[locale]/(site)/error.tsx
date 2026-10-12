@@ -14,7 +14,12 @@ function dictFor(locale: Locale) {
   return dictPl;
 }
 
-export default function SiteError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function SiteError({
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   const pathname = usePathname() || "/pl";
   const seg = pathname.split("/")[1];
   const locale = (locales.includes(seg as Locale) ? seg : "pl") as Locale;
