@@ -96,7 +96,7 @@ export function AuthButton({
           aria-expanded={open}
           sx={{ flexShrink: 0 }}
         >
-          <Avatar sx={{ width: 32, height: 32, fontWeight: 800, bgcolor: "primary.main" }}>
+          <Avatar sx={{ width: 32, height: 32, fontWeight: 700, bgcolor: "primary.main" }}>
             {initials || <MdPerson size={18} aria-hidden />}
           </Avatar>
         </IconButton>

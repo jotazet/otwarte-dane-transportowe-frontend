@@ -88,11 +88,11 @@ export function LoginView({
               <Stack spacing={1} sx={{ alignItems: "center", textAlign: "center" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <OdtLogo sx={{ fontSize: 40, color: "primary.main" }} />
-                  <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: "-0.02em" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: "-0.02em" }}>
                     ODT
                   </Typography>
                 </Box>
-                <Typography variant="h4" component="h1" sx={{ fontWeight: 800 }}>
+                <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
                   {labels.title}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
@@ -135,7 +135,7 @@ export function LoginView({
                     size="large"
                     disabled={pending || !username.trim() || !password}
                     startIcon={<MdLock size={20} aria-hidden />}
-                    sx={{ fontWeight: 800, textTransform: "none", borderRadius: 2 }}
+                    sx={{ fontWeight: 700, textTransform: "none", borderRadius: 2 }}
                   >
                     {labels.login}
                   </Button>

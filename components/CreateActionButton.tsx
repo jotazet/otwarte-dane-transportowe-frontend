@@ -24,7 +24,7 @@ export function CreateActionButton({
         prefetch={false}
         variant="contained"
         startIcon={<MdAdd size={20} aria-hidden />}
-        sx={{ textTransform: "none", fontWeight: 800, borderRadius: 2 }}
+        sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
       >
         {label}
       </Button>

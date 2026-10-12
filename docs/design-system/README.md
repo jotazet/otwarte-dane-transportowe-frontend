@@ -11,7 +11,7 @@
 | Status | success, warning, error, info per scheme, see [ADR 0003](../architecture/decisions/0003-scheme-specific-palette-colors-for-wcag-aa.md) |
 | Secondary | `#174EA6` (light), `#8AB4F8` (dark) |
 | Text | `#202124` / `#5F6368` (light), `#E8EAED` / `#9AA0A6` (dark) |
-| Font | Roboto via `next/font` (`--font-roboto`), headings weight 500 |
+| Font | Roboto via `next/font` (`--font-roboto`), weights 300, 400, 500, 600 and 700 loaded (use no others); headings weight 500 |
 | Radius | 12 by default; cards 16; buttons 24 |
 | Motion | none: the theme sets transition timeouts to 0 (including Dialog, Drawer and Tooltip) and turns off the Skeleton animation; don't override them per component |
 
