@@ -8,7 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { usePathname } from "next/navigation";
 import { MdLanguage } from "react-icons/md";
 
-import type { Locale } from "@/i18n/locales";
+import { locales, type Locale } from "@/i18n/locales";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   pl: "Polski",
@@ -61,46 +61,19 @@ export function LocaleSwitcher({
         },
       }}
     >
-      <MenuItem
-        component="a"
-        href={hrefForLocale(pathname, "pl")}
-        hrefLang="pl"
-        lang="pl"
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "pl"}
-      >
-        Polski
-      </MenuItem>
-      <MenuItem
-        component="a"
-        href={hrefForLocale(pathname, "en")}
-        hrefLang="en"
-        lang="en"
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "en"}
-      >
-        English
-      </MenuItem>
-      <MenuItem
-        component="a"
-        href={hrefForLocale(pathname, "de")}
-        hrefLang="de"
-        lang="de"
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "de"}
-      >
-        Deutsch
-      </MenuItem>
-      <MenuItem
-        component="a"
-        href={hrefForLocale(pathname, "bg")}
-        hrefLang="bg"
-        lang="bg"
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "bg"}
-      >
-        Български
-      </MenuItem>
+      {locales.map((target) => (
+        <MenuItem
+          key={target}
+          component="a"
+          href={hrefForLocale(pathname, target)}
+          hrefLang={target}
+          lang={target}
+          onClick={() => setAnchorEl(null)}
+          selected={locale === target}
+        >
+          {LOCALE_LABELS[target]}
+        </MenuItem>
+      ))}
     </Menu>
   );
 

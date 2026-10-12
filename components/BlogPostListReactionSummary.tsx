@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import type { Dictionary } from "@/i18n/getDictionary";
-import { blogReactionOrder, reactionMdIcons } from "@/lib/reactionIcons";
+import { blogReactionOrder, reactionCountLabel, reactionMdIcons } from "@/lib/reactionIcons";
 
 export function BlogPostListReactionSummary({
   summary,
@@ -36,9 +36,7 @@ export function BlogPostListReactionSummary({
               spacing={0.5}
               useFlexGap
               role="img"
-              aria-label={dict.blogReactionCountLabel
-                .replace("{reaction}", dict.blogReactionLabels[key])
-                .replace("{count}", String(n))}
+              aria-label={reactionCountLabel(dict, key, n)}
               sx={{
                 alignItems: "center",
                 color: "text.secondary",

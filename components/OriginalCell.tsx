@@ -10,7 +10,7 @@ export function OriginalCell({
   value,
   dict,
 }: {
-  value: boolean | null;
+  value: boolean | null | undefined;
   dict: Pick<Dictionary, "yes" | "no">;
 }) {
   if (value == null) return <Typography component="span">-</Typography>;

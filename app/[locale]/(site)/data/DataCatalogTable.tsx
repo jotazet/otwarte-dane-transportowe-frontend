@@ -10,11 +10,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
-import { MdCancel, MdCheckCircle, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 
+import { OriginalCell } from "@/components/OriginalCell";
 import { TableCard } from "@/components/TableCard";
 import { TableFilterSelect } from "@/components/TableFilterSelect";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -26,30 +26,6 @@ import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 import { FeedCatalogOrganizationListItem } from "@/lib/api/dataCatalog";
 
 type SortColumn = "organization" | "region";
-
-function BoolCell({
-  value,
-  yesLabel,
-  noLabel,
-}: {
-  value: boolean | null | undefined;
-  yesLabel: string;
-  noLabel: string;
-}) {
-  if (value == null) return <Typography component="span">-</Typography>;
-  return (
-    <Box
-      component="span"
-      sx={{ display: "inline-flex", color: value ? "primary.main" : "text.secondary" }}
-    >
-      {value ? (
-        <MdCheckCircle size={22} role="img" aria-label={yesLabel} />
-      ) : (
-        <MdCancel size={22} role="img" aria-label={noLabel} />
-      )}
-    </Box>
-  );
-}
 
 export function DataCatalogTable({
   locale,
@@ -217,7 +193,7 @@ export function DataCatalogTable({
               <TableCell>{(org.static_types ?? []).join(", ") || "-"}</TableCell>
               <TableCell>{(org.dynamic_types ?? []).join(", ") || "-"}</TableCell>
               <TableCell>
-                <BoolCell value={org.is_public} yesLabel={dict.yes} noLabel={dict.no} />
+                <OriginalCell value={org.is_public} dict={dict} />
               </TableCell>
               {canManage ? (
                 <TableCell>
