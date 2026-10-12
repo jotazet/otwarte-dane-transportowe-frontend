@@ -26,13 +26,14 @@ docker compose up -d --build
 ## 3. Verification
 
 ```bash
-# the API URL should be present in the built bundle:
-docker exec odt-frontend sh -c "grep -rao 'v2.api.odt.org.pl' .next/ | head"
-# and the default localhost:8000 should NOT be:
-docker exec odt-frontend sh -c "grep -rao 'http://localhost:8000' .next/ | head"
-# the landing page returns 200:
+# the API host from .env must be in the built bundle (it is absent when the build did not get it):
+API_HOST=$(grep '^NEXT_PUBLIC_API_BASE_URL=' .env | cut -d= -f2- | sed 's#^https\?://##')
+docker exec odt-frontend sh -c "grep -rlo '$API_HOST' .next/ | wc -l"   # more than 0
+# the landing page returns 200 (use your FRONTEND_PORT):
 curl -i http://localhost:3000/pl
 ```
+
+Don't check for the absence of `http://localhost:8000`: it is always in the bundle as the fallback after `||` in `lib/config.ts` and `next.config.ts`, even when the API URL was inlined correctly.
 
 ## 4. Reverse proxy + TLS
 
