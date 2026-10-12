@@ -5,7 +5,6 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdLanguage } from "react-icons/md";
 
@@ -43,6 +42,8 @@ export function LocaleSwitcher({
     onClick: (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget),
   };
 
+  // Plain links on purpose: a client-side navigation keeps the root layout, so `<html lang>`
+  // would stay on the previous locale.
   const menu = (
     <Menu
       anchorEl={anchorEl}
@@ -61,32 +62,40 @@ export function LocaleSwitcher({
       }}
     >
       <MenuItem
-        component={Link}
+        component="a"
         href={hrefForLocale(pathname, "pl")}
+        hrefLang="pl"
+        lang="pl"
         onClick={() => setAnchorEl(null)}
         selected={locale === "pl"}
       >
         Polski
       </MenuItem>
       <MenuItem
-        component={Link}
+        component="a"
         href={hrefForLocale(pathname, "en")}
+        hrefLang="en"
+        lang="en"
         onClick={() => setAnchorEl(null)}
         selected={locale === "en"}
       >
         English
       </MenuItem>
       <MenuItem
-        component={Link}
+        component="a"
         href={hrefForLocale(pathname, "de")}
+        hrefLang="de"
+        lang="de"
         onClick={() => setAnchorEl(null)}
         selected={locale === "de"}
       >
         Deutsch
       </MenuItem>
       <MenuItem
-        component={Link}
+        component="a"
         href={hrefForLocale(pathname, "bg")}
+        hrefLang="bg"
+        lang="bg"
         onClick={() => setAnchorEl(null)}
         selected={locale === "bg"}
       >
