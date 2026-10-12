@@ -213,6 +213,30 @@ export const dictBg: Dictionary = {
   published: "Публикувано",
   rejectionCause: "Причина за отхвърляне",
   rejectionCauseHint: "По избор - посочи при отхвърляне на заявката.",
+  realtimeRejectionReasons: {
+    "realtime.static_submission_missing":
+      "Фийдът в реално време не е свързан със статична заявка. За GTFS-RT и SIRI изберете публикувана статична заявка.",
+    "realtime.static_submission_not_published":
+      "Свързаната статична заявка все още не е публикувана. Фийдът в реално време може да бъде проверен едва след публикуването на статичния фийд.",
+    "realtime.no_endpoints": "Заявката няма ендпойнти. Добавете поне един ендпойнт.",
+    "realtime.endpoint_http_error":
+      "Ендпойнтът „{endpoint}“ върна HTTP грешка {status}. Проверете URL адреса и данните за оторизация.",
+    "realtime.endpoint_content_empty": "Ендпойнтът „{endpoint}“ върна празен отговор.",
+    "realtime.endpoint_content_invalid":
+      "Отговорът на ендпойнта „{endpoint}“ не е валиден {protocol} фийд.",
+    "realtime.endpoint_too_large":
+      "Отговорът на ендпойнта „{endpoint}“ надвишава допустимия размер за фийдове в реално време.",
+    "realtime.endpoint_url_blocked":
+      "Адресът на ендпойнта „{endpoint}“ не отговаря на правилата за сигурност на ODT: името на хоста не съществува, адресът не е публичен или пренасочването не е разрешено.",
+    "realtime.endpoint_timeout": "Ендпойнтът „{endpoint}“ не отговори навреме.",
+    "realtime.endpoint_unreachable":
+      "Не може да се осъществи връзка с ендпойнта „{endpoint}“. Проверете дали сървърът е достъпен от интернет.",
+    "realtime.endpoint_fetch_failed":
+      "Данните от ендпойнта „{endpoint}“ не можаха да бъдат изтеглени.",
+    "realtime.endpoint_cache_failed":
+      "Първото копие на данните от ендпойнта „{endpoint}“ не можа да бъде записано на сървъра на ODT. Опитайте отново по-късно.",
+  },
+  realtimeRejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
   applyStage: "Приложи етап",
   rejectSubmission: "Отхвърли",
   reviewSubmission: "Проверка на заявката",

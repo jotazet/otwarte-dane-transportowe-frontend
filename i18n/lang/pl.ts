@@ -212,6 +212,30 @@ export const dictPl = {
   published: "Opublikowane",
   rejectionCause: "Przyczyna odrzucenia",
   rejectionCauseHint: "Opcjonalnie - podaj przy odrzuceniu zgłoszenia.",
+  realtimeRejectionReasons: {
+    "realtime.static_submission_missing":
+      "Feed realtime nie jest powiązany ze zgłoszeniem statycznym. Dla GTFS-RT i SIRI wybierz opublikowane zgłoszenie statyczne.",
+    "realtime.static_submission_not_published":
+      "Powiązane zgłoszenie statyczne nie zostało jeszcze opublikowane. Feed realtime można zweryfikować dopiero po publikacji feedu statycznego.",
+    "realtime.no_endpoints":
+      "Zgłoszenie nie ma żadnych endpointów. Dodaj co najmniej jeden endpoint.",
+    "realtime.endpoint_http_error":
+      "Endpoint „{endpoint}” zwrócił błąd HTTP {status}. Sprawdź adres URL i dane autoryzacji.",
+    "realtime.endpoint_content_empty": "Endpoint „{endpoint}” zwrócił pustą odpowiedź.",
+    "realtime.endpoint_content_invalid":
+      "Odpowiedź endpointu „{endpoint}” nie jest poprawnym feedem {protocol}.",
+    "realtime.endpoint_too_large":
+      "Odpowiedź endpointu „{endpoint}” przekracza dopuszczalny rozmiar feedu realtime.",
+    "realtime.endpoint_url_blocked":
+      "Adres endpointu „{endpoint}” nie spełnia zasad bezpieczeństwa ODT: nazwa hosta nie istnieje, adres nie jest publiczny albo przekierowanie jest niedozwolone.",
+    "realtime.endpoint_timeout": "Endpoint „{endpoint}” nie odpowiedział w wyznaczonym czasie.",
+    "realtime.endpoint_unreachable":
+      "Nie udało się połączyć z endpointem „{endpoint}”. Sprawdź, czy serwer jest dostępny z internetu.",
+    "realtime.endpoint_fetch_failed": "Nie udało się pobrać danych z endpointu „{endpoint}”.",
+    "realtime.endpoint_cache_failed":
+      "Nie udało się zapisać pierwszej kopii danych z endpointu „{endpoint}” na serwerze ODT. Spróbuj ponownie później.",
+  },
+  realtimeRejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
   applyStage: "Zastosuj etap",
   rejectSubmission: "Odrzuć",
   reviewSubmission: "Weryfikacja zgłoszenia",
