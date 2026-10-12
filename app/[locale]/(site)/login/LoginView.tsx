@@ -34,8 +34,8 @@ export function LoginView({
     backHome: string;
     invalidCredentials: string;
     loginFailed: string;
-    showPassword?: string;
-    hidePassword?: string;
+    showPassword: string;
+    hidePassword: string;
   };
 }) {
   const auth = useAuth();
