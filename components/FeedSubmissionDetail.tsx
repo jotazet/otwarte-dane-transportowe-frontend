@@ -409,7 +409,7 @@ export function FeedSubmissionDetail({
           {showAdminSourceTab ? (
             <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
               <Tab label={dict.providerEditTab ?? dict.save} />
-              <Tab label={dict.adminSourceEditTab ?? "Edycja administracyjna"} />
+              <Tab label={dict.adminSourceEditTab} />
             </Tabs>
           ) : null}
 
@@ -585,7 +585,7 @@ export function FeedSubmissionDetail({
       ) : null}
 
       {row.history?.length ? (
-        <FormSection title={dict.historyTitle ?? "Historia"}>
+        <FormSection title={dict.historyTitle}>
           <HistoryTimeline
             events={row.history}
             title=""
