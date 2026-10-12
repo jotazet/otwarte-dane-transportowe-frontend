@@ -24,19 +24,21 @@ export type ProxyFeedListItem = FetchHealthFields & {
   endpoint_type?: string | null;
 };
 
+/** A record from `fetch-errors/`; see the backend's docs/domain/feed-workflow.md. */
 export type FeedFetchError = {
   id: number;
   source?: FetchErrorSource | string | null;
+  static_entry?: number | null;
+  endpoint_rt?: number | null;
+  /** FeedSubmission (static) or RealtimeSubmission (realtime) id; older backends omit it. */
+  submission_id?: number | null;
   error_type?: string | null;
   endpoint_type?: string | null;
   message?: string | null;
-  created_at?: string | null;
-  status_code?: number | null;
-  url?: string | null;
-  feed_submission?: number | null;
-  realtime_submission?: number | null;
+  occurred_at?: string | null;
+  http_status_code?: number | null;
+  url_attempted?: string | null;
   organization?: string | null;
-  region?: string | null;
   feed_name?: string | null;
 };
 

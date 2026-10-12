@@ -99,7 +99,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
   }
 
   function feedCell(row: FeedFetchError) {
-    const submissionId = row.feed_submission ?? row.realtime_submission ?? null;
+    const submissionId = row.submission_id ?? null;
     const label =
       row.feed_name?.trim() ||
       (submissionId != null ? formatSubmissionFeedLabel(submissionId) : "-");
@@ -110,7 +110,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
           href={submissionDetailPath(
             locale,
             "queue",
-            row.realtime_submission != null ? "realtime" : "feed",
+            row.source === "realtime" ? "realtime" : "feed",
             submissionId,
           )}
           prefetch={false}
@@ -197,7 +197,6 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
               <TableHead>
                 <TableRow sx={tableHeadRowSx}>
                   <TableCell sx={{ minWidth: 160 }}>{dict.fetchErrorDate}</TableCell>
-                  <TableCell>{dict.region}</TableCell>
                   <TableCell>{dict.organizations}</TableCell>
                   <TableCell>{dict.fetchErrorSource}</TableCell>
                   <TableCell>{dict.fetchErrorType}</TableCell>
@@ -208,8 +207,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id} hover sx={tableZebraRowSx}>
-                    <TableCell>{formatDateTime(row.created_at, locale)}</TableCell>
-                    <TableCell>{text(row.region)}</TableCell>
+                    <TableCell>{formatDateTime(row.occurred_at, locale)}</TableCell>
                     <TableCell>{text(row.organization)}</TableCell>
                     <TableCell>{sourceLabel(row.source)}</TableCell>
                     <TableCell>{errorTypeLabel(row.error_type)}</TableCell>
