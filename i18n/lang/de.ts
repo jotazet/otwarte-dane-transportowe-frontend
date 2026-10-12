@@ -231,6 +231,9 @@ export const dictDe: Dictionary = {
     3: "Stufe 3: Freigabe",
     4: "Stufe 4: Veröffentlicht",
   },
+  submissionStagePendingApprovalNote:
+    "{stage} – die Einreichung wartet auf die Entscheidung des ODT-Teams.",
+  submissionStagePublishedNote: "{stage} – der Feed ist im Katalog sichtbar.",
   status: "Status",
   rejected: "Abgelehnt",
   published: "Veröffentlicht",

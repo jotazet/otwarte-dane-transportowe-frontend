@@ -227,6 +227,8 @@ export const dictPl = {
     3: "Etap 3: zatwierdzenie",
     4: "Etap 4: opublikowano",
   },
+  submissionStagePendingApprovalNote: "{stage} – zgłoszenie czeka na decyzję zespołu ODT.",
+  submissionStagePublishedNote: "{stage} – feed jest widoczny w katalogu.",
   status: "Status",
   rejected: "Odrzucone",
   published: "Opublikowane",

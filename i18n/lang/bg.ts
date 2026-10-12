@@ -228,6 +228,8 @@ export const dictBg: Dictionary = {
     3: "Етап 3: одобрение",
     4: "Етап 4: публикувано",
   },
+  submissionStagePendingApprovalNote: "{stage} – заявката очаква решение на екипа на ODT.",
+  submissionStagePublishedNote: "{stage} – фийдът е видим в каталога.",
   status: "Статус",
   rejected: "Отхвърлено",
   published: "Публикувано",

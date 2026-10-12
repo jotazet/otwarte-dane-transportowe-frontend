@@ -323,6 +323,7 @@ export function FeedSubmissionDetail({
         rejectionCause={row.rejection_cause}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
+        dict={dict}
       />
 
       <Card>

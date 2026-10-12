@@ -332,6 +332,7 @@ export function RealtimeSubmissionDetail({
         rejectionReasons={rejectionReasons}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
+        dict={dict}
       />
 
       <Card>

@@ -225,6 +225,9 @@ export const dictEn: Dictionary = {
     3: "Stage 3: Approval",
     4: "Stage 4: Published",
   },
+  submissionStagePendingApprovalNote:
+    "{stage} – the submission is awaiting a decision by the ODT team.",
+  submissionStagePublishedNote: "{stage} – the feed is visible in the catalog.",
   status: "Status",
   rejected: "Rejected",
   published: "Published",
