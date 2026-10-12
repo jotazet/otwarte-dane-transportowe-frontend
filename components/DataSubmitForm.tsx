@@ -501,19 +501,17 @@ export function DataSubmitForm({
                   minRows={2}
                 />
 
-                <Stack spacing={0.5}>
-                  <Typography variant="subtitle2">{dict.staticSource}</Typography>
-                  <SourceModeToggle
-                    value={staticSource}
-                    onChange={(v) => {
-                      setStaticSource(v);
-                      setError(null);
-                    }}
-                    urlLabel={dict.staticSourceUrl}
-                    fileLabel={dict.staticSourceFile}
-                    disabled={pending}
-                  />
-                </Stack>
+                <SourceModeToggle
+                  label={dict.staticSource}
+                  value={staticSource}
+                  onChange={(v) => {
+                    setStaticSource(v);
+                    setError(null);
+                  }}
+                  urlLabel={dict.staticSourceUrl}
+                  fileLabel={dict.staticSourceFile}
+                  disabled={pending}
+                />
 
                 {staticSource === "url" ? (
                   <TextField
