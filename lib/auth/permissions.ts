@@ -127,9 +127,9 @@ export type FeedSourceEditContext = {
   isRejected: boolean;
 };
 
-/** DP full edit at stage 1 or when rejected. */
-export function canProviderEditFullSource(ctx: FeedSourceEditContext) {
-  return ctx.isOwner && (ctx.currentStage <= 1 || ctx.isRejected);
+/** Full edit at stage 1 or when rejected: the owner or the Admin role, as on the backend. */
+export function canEditFullSource(ctx: FeedSourceEditContext) {
+  return (ctx.isOwner || ctx.isDjangoAdmin) && (ctx.currentStage <= 1 || ctx.isRejected);
 }
 
 /** DP limited edit at stages 2–4 (note, license, download times / interval only). */
@@ -144,7 +144,7 @@ export function canAdminEditSourceOnPublishedStages(ctx: FeedSourceEditContext) 
 
 export function canEditFeedSourceFields(ctx: FeedSourceEditContext) {
   if (ctx.isHelper && !ctx.isDjangoAdmin) return false;
-  if (canProviderEditFullSource(ctx)) return true;
+  if (canEditFullSource(ctx)) return true;
   if (canAdminEditSourceOnPublishedStages(ctx)) return true;
   return false;
 }
