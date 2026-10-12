@@ -27,8 +27,8 @@ export function DataProviderForm({
   providerId?: number;
   initial?: {
     name?: string | null;
-    website?: string | null;
-    contact_email?: string | null;
+    website?: string;
+    contact_email?: string;
   };
 }) {
   const { apiJson } = useAuth();
@@ -56,8 +56,8 @@ export function DataProviderForm({
     try {
       const body = {
         name: name.trim(),
-        website: website.trim() || null,
-        contact_email: email.trim() || null,
+        website: website.trim(),
+        contact_email: email.trim(),
       };
       if (providerId == null) {
         await apiJson("POST", casesPaths.dataProviders, body);

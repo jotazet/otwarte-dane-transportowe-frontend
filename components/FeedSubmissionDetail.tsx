@@ -44,22 +44,22 @@ import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes
 
 type StaticEntry = FetchHealthFields & {
   id: number;
-  url?: string | null;
+  url?: string;
   file?: string | null;
-  license?: string | null;
+  license?: string;
   download_time_1?: string | null;
   download_time_2?: string | null;
   is_original?: boolean;
   hide_original?: boolean;
-  auth_type?: string | null;
+  auth_type?: string;
 };
 
 type FeedDetail = {
   id: number;
   transport_organization: number;
   data_type: string;
-  name?: string | null;
-  note?: string | null;
+  name?: string;
+  note?: string;
   current_stage: number;
   current_stage_label: string;
   is_rejected: boolean;
@@ -210,9 +210,9 @@ export function FeedSubmissionDetail({
     if (!row || !canEditMeta) return;
     setError(null);
     try {
-      const body: Record<string, unknown> = { note: subNote.trim() || null };
+      const body: Record<string, unknown> = { note: subNote.trim() };
       if (sourcePerms.canEditFullSource || (isDjangoAdmin && tab === 1)) {
-        body.name = subName.trim() || null;
+        body.name = subName.trim();
       }
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), body);
       await load();
@@ -231,7 +231,7 @@ export function FeedSubmissionDetail({
         sourcePerms.canEditFullSource ||
         sourcePerms.canAdminSourceOnStage2Plus
       ) {
-        static_entry.license = license.trim() || null;
+        static_entry.license = license.trim();
         // Godziny pobierania dotyczą tylko feedów z URL — backend odrzuca je dla wpisów plikowych.
         if (!isFileEntry && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
           static_entry.download_time_1 = dt1.trim() || "02:00:00";
@@ -247,7 +247,7 @@ export function FeedSubmissionDetail({
           static_entry.auth_type = authType;
           if (authValue.trim()) static_entry.auth_value = authValue.trim();
         } else {
-          static_entry.auth_type = null;
+          static_entry.auth_type = "";
         }
       }
       await auth.apiJson("PATCH", submissionsPaths.feedDetail(row.id), { static_entry });

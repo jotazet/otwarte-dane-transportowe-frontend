@@ -30,9 +30,9 @@ export function OrganizationForm({
   initial?: {
     region?: string | null;
     transport_organization?: string | null;
-    website?: string | null;
-    contact_email?: string | null;
-    phone_number?: string | null;
+    website?: string;
+    contact_email?: string;
+    phone_number?: string;
     is_public?: boolean | null;
   };
 }) {
@@ -66,9 +66,9 @@ export function OrganizationForm({
       const body = {
         region: region.trim(),
         transport_organization: name.trim(),
-        website: website.trim() || null,
-        contact_email: contactEmail.trim() || null,
-        phone_number: phone.trim() || null,
+        website: website.trim(),
+        contact_email: contactEmail.trim(),
+        phone_number: phone.trim(),
         is_public: isPublic,
       };
       let id: number;

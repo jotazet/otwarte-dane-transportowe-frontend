@@ -24,29 +24,29 @@ export type TransportOrganizationListItem = {
 };
 
 export type TransportOrganizationDetail = Omit<TransportOrganizationListItem, "data_providers"> & {
-  website?: string | null;
-  contact_email?: string | null;
-  phone_number?: string | null;
+  website?: string;
+  contact_email?: string;
+  phone_number?: string;
   statuses?: {
     id?: number;
     status?: string | null;
     status_display?: string | null;
     date?: string | null;
-    description?: string | null;
+    description?: string;
   }[];
   data_providers?: {
     id?: number;
     name?: string | null;
-    website?: string | null;
-    contact_email?: string | null;
+    website?: string;
+    contact_email?: string;
   }[];
 };
 
 export type DataProviderRecord = {
   id: number;
   name: string;
-  website?: string | null;
-  contact_email?: string | null;
+  website?: string;
+  contact_email?: string;
 };
 
 export async function fetchTransportOrganizations(opts?: {
@@ -75,7 +75,7 @@ export async function fetchCaseStatus(id: number): Promise<{
   case: number;
   status: string;
   date?: string | null;
-  description?: string | null;
+  description?: string;
 }> {
   return await getJson(casesPaths.caseStatus(id));
 }

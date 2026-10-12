@@ -22,9 +22,9 @@ function MetaItem({ label, children }: { label: string; children: ReactNode }) {
 
 type OrganizationContactFields = {
   region?: string | null;
-  contact_email?: string | null;
-  phone_number?: string | null;
-  website?: string | null;
+  contact_email?: string;
+  phone_number?: string;
+  website?: string;
 };
 
 export function OrganizationMeta({
