@@ -75,7 +75,7 @@ export function UserDetailBody({
     } finally {
       setLoading(false);
     }
-  }, [auth, userId]);
+  }, [auth, userId, dict]);
 
   React.useEffect(() => {
     if (auth.status !== "authenticated") return;

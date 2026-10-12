@@ -142,6 +142,12 @@ export const dictPl = {
   tryAgain: "Spróbuj ponownie",
   apiErrorConnection: "Nie udało się połączyć z serwerem ODT. Spróbuj ponownie za chwilę.",
   apiErrorLoginRequired: "Sesja wygasła. Zaloguj się ponownie.",
+  apiErrorInvalidData:
+    "Przesłane dane są niepoprawne. Sprawdź wprowadzone wartości i spróbuj ponownie.",
+  apiErrorForbidden: "Brak uprawnień do wykonania tej operacji.",
+  apiErrorNotFound: "Nie znaleziono danych, mogły zostać usunięte. Odśwież stronę.",
+  apiErrorRateLimited: "Przekroczono limit zapytań do serwera. Spróbuj ponownie za chwilę.",
+  apiErrorGeneric: "Nie udało się wykonać operacji. Spróbuj ponownie za chwilę.",
   addFeed: "Dodaj feed",
   myFeeds: "Moje feedy",
   myFeedsSectionList: "Twoje zgłoszenia",

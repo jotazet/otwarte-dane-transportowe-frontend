@@ -143,7 +143,7 @@ export function RealtimeSubmissionDetail({
     } catch (e) {
       setError(formatApiError(e, dict));
     }
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`
   // chroniącą przed setState po unmount i nadpisaniem nowszej odpowiedzi starszą.
@@ -162,7 +162,7 @@ export function RealtimeSubmissionDetail({
     return () => {
       cancelled = true;
     };
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   const listHref = submissionListPath(locale, listContext);
 

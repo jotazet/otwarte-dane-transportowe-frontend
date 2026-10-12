@@ -90,7 +90,7 @@ export function ProxyFeedsTable({
     } finally {
       setLoading(false);
     }
-  }, [apiJson, page]);
+  }, [apiJson, page, dict]);
 
   React.useEffect(() => {
     void (async () => {

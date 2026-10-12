@@ -162,7 +162,7 @@ export function SubmissionsTableHub({
       setFeeds([]);
       setRts([]);
     }
-  }, [apiJson, auth.status, filterOrgId]);
+  }, [apiJson, auth.status, filterOrgId, dict]);
 
   React.useEffect(() => {
     void (async () => {

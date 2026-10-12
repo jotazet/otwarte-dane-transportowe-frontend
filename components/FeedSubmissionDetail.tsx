@@ -137,7 +137,7 @@ export function FeedSubmissionDetail({
     } catch (e) {
       setError(formatApiError(e, dict));
     }
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   // Ładowanie początkowe / przy zmianie parametrów — z flagą `cancelled`.
   React.useEffect(() => {
@@ -155,7 +155,7 @@ export function FeedSubmissionDetail({
     return () => {
       cancelled = true;
     };
-  }, [apiJson, authStatus, submissionId, applyDetail]);
+  }, [apiJson, authStatus, submissionId, applyDetail, dict]);
 
   if (auth.status !== "authenticated" || !row) {
     return (

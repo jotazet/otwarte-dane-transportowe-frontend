@@ -255,7 +255,7 @@ export function DataSubmitForm({
     return () => {
       cancelled = true;
     };
-  }, [apiJson, auth.status, auth.user?.roles, protocol, rtOrgId]);
+  }, [apiJson, auth.status, auth.user?.roles, protocol, rtOrgId, dict]);
 
   const orgNameById = React.useMemo(() => {
     const m = new Map<number, string>();

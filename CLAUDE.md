@@ -81,7 +81,8 @@ Create directories only when there is code for them.
 - Components receive the dictionary as a prop, narrowed to what they use (`Pick<Dictionary, …>`), together with `locale`.
 - Placeholders use `{name}` replaced in code. Never build sentences or counts by concatenating strings; phrase counts so they need no plural form ("Liczba feedów: 5").
 - Rich text in dictionaries goes through `renderRichText` (`lib/richText.tsx`), never `dangerouslySetInnerHTML`.
-- Format dates through `lib/format.ts`, never by hand or with bare `toLocaleString()`.
+- Format dates through `lib/format.ts`, never by hand or with bare `toLocaleString()`. Date-times are shown in `Europe/Warsaw`, the same on the server and in the browser.
+- Show a failed request with `formatApiError(err, dict)`, never `err.message`: it maps the HTTP status to a translated message.
 
 ## Accessibility
 

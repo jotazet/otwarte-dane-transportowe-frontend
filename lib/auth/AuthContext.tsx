@@ -2,13 +2,7 @@
 
 import * as React from "react";
 
-import {
-  ApiError,
-  fetchWithTimeout,
-  formatApiErrorResponse,
-  postJson,
-  UPLOAD_TIMEOUT_MS,
-} from "@/lib/api/http";
+import { ApiError, fetchWithTimeout, postJson, UPLOAD_TIMEOUT_MS } from "@/lib/api/http";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
@@ -229,7 +223,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
+      if (!tokens?.access) throw new ApiError(401, "Login required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access));
       if (res.status === 401) {
@@ -237,8 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access));
       }
       if (!res.ok) {
-        const msg = await formatApiErrorResponse(res);
-        throw new ApiError(res.status, msg);
+        throw new ApiError(res.status, `HTTP ${res.status}`);
       }
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
@@ -262,7 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
+      if (!tokens?.access) throw new ApiError(401, "Login required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
@@ -270,8 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
-        const msg = await formatApiErrorResponse(res);
-        throw new ApiError(res.status, msg);
+        throw new ApiError(res.status, `HTTP ${res.status}`);
       }
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
@@ -291,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!tokens?.access || isJwtExpired(tokens.access)) {
         tokens = (await refreshAccess()) ?? null;
       }
-      if (!tokens?.access) throw new ApiError(401, "Login required", "client.login_required");
+      if (!tokens?.access) throw new ApiError(401, "Login required");
 
       let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
@@ -299,8 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
-        const msg = await formatApiErrorResponse(res);
-        throw new ApiError(res.status, msg);
+        throw new ApiError(res.status, `HTTP ${res.status}`);
       }
       return res.blob();
     },

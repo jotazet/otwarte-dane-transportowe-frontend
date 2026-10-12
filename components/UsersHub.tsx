@@ -65,7 +65,7 @@ export function UsersHub({ locale, dict }: { locale: string; dict: Dictionary })
     } finally {
       setLoading(false);
     }
-  }, [auth]);
+  }, [auth, dict]);
 
   React.useEffect(() => {
     void (async () => {

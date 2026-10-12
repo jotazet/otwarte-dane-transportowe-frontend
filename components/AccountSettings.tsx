@@ -59,7 +59,7 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
     } finally {
       setLoading(false);
     }
-  }, [apiJson]);
+  }, [apiJson, dict]);
 
   React.useEffect(() => {
     void (async () => {

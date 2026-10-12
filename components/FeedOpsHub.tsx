@@ -82,7 +82,7 @@ export function FeedOpsHub({
     } finally {
       setOverviewLoading(false);
     }
-  }, [apiJson, authStatus]);
+  }, [apiJson, authStatus, dict]);
 
   React.useEffect(() => {
     if (tab !== "overview") return;

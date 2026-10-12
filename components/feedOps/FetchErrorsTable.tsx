@@ -77,7 +77,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
     } finally {
       setLoading(false);
     }
-  }, [apiJson, days, page, errorType, source]);
+  }, [apiJson, days, page, errorType, source, dict]);
 
   React.useEffect(() => {
     void (async () => {
