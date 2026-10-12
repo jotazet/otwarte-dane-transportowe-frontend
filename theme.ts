@@ -35,6 +35,27 @@ const sharedTypography = {
 } as const;
 
 const sharedComponents = {
+  MuiButtonBase: {
+    styleOverrides: {
+      // Without the ripple MUI shows no keyboard focus at all (nav links, TableSortLabel).
+      // The outline is inset so overflow containers such as the desktop nav don't clip it.
+      root: ({
+        ownerState,
+        theme,
+      }: {
+        ownerState: { disableRipple?: boolean };
+        theme: ReturnType<typeof createTheme>;
+      }) =>
+        ownerState.disableRipple
+          ? {
+              "&.Mui-focusVisible": {
+                outline: `2px solid ${theme.vars?.palette.primary.main ?? theme.palette.primary.main}`,
+                outlineOffset: "-2px",
+              },
+            }
+          : null,
+    },
+  },
   MuiDialog: {
     defaultProps: {
       disableScrollLock: true,
