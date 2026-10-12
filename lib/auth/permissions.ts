@@ -127,14 +127,34 @@ export type FeedSourceEditContext = {
   isRejected: boolean;
 };
 
+/**
+ * A Helper without the Admin role may only confirm or reject, even on their own
+ * submission: the backend answers any content change with 403.
+ */
+export function canHelperReviewOnly(
+  ctx: Pick<FeedSourceEditContext, "isHelper" | "isDjangoAdmin">,
+) {
+  return ctx.isHelper && !ctx.isDjangoAdmin;
+}
+
 /** Full edit at stage 1 or when rejected: the owner or the Admin role, as on the backend. */
 export function canEditFullSource(ctx: FeedSourceEditContext) {
-  return (ctx.isOwner || ctx.isDjangoAdmin) && (ctx.currentStage <= 1 || ctx.isRejected);
+  return (
+    !canHelperReviewOnly(ctx) &&
+    (ctx.isOwner || ctx.isDjangoAdmin) &&
+    (ctx.currentStage <= 1 || ctx.isRejected)
+  );
 }
 
 /** DP limited edit at stages 2–4 (note, license, download times / interval only). */
 export function canProviderEditLimitedMeta(ctx: FeedSourceEditContext) {
-  return ctx.isOwner && ctx.currentStage >= 2 && ctx.currentStage <= 4 && !ctx.isRejected;
+  return (
+    !canHelperReviewOnly(ctx) &&
+    ctx.isOwner &&
+    ctx.currentStage >= 2 &&
+    ctx.currentStage <= 4 &&
+    !ctx.isRejected
+  );
 }
 
 /** Django Admin group may edit URL/file/auth on stages 2–4. Staff without Admin cannot. */
@@ -143,16 +163,9 @@ export function canAdminEditSourceOnPublishedStages(ctx: FeedSourceEditContext) 
 }
 
 export function canEditFeedSourceFields(ctx: FeedSourceEditContext) {
-  if (ctx.isHelper && !ctx.isDjangoAdmin) return false;
   if (canEditFullSource(ctx)) return true;
   if (canAdminEditSourceOnPublishedStages(ctx)) return true;
   return false;
-}
-
-export function canHelperReviewOnly(
-  ctx: Pick<FeedSourceEditContext, "isHelper" | "isDjangoAdmin">,
-) {
-  return ctx.isHelper && !ctx.isDjangoAdmin;
 }
 
 export function canBlogEditPost(
