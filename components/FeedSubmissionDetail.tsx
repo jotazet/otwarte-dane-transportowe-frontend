@@ -193,12 +193,15 @@ export function FeedSubmissionDetail({
   };
   const sourcePerms = perms.feedSource(sourceCtx);
 
+  // A Helper without the Admin role may only confirm or reject, even on their
+  // own submission: the backend answers any content change with 403.
   const canEditMeta =
-    (isOwner && (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta)) ||
-    (isDjangoAdmin &&
-      (sourcePerms.canEditFullSource ||
-        sourcePerms.canAdminSourceOnStage2Plus ||
-        sourcePerms.canEditLimitedMeta));
+    !sourcePerms.canHelperReviewOnly &&
+    ((isOwner && (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta)) ||
+      (isDjangoAdmin &&
+        (sourcePerms.canEditFullSource ||
+          sourcePerms.canAdminSourceOnStage2Plus ||
+          sourcePerms.canEditLimitedMeta)));
 
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =
