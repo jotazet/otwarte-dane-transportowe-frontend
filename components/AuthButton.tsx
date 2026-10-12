@@ -47,14 +47,7 @@ export function AuthButton({
 
   if (auth.status === "loading") {
     return (
-      <Skeleton
-        variant="circular"
-        width={32}
-        height={32}
-        animation="wave"
-        sx={{ flexShrink: 0 }}
-        aria-hidden
-      />
+      <Skeleton variant="circular" width={32} height={32} sx={{ flexShrink: 0 }} aria-hidden />
     );
   }
 

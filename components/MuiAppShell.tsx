@@ -281,10 +281,10 @@ function MuiAppShellInner({
             {auth.status === "loading" ? (
               <ListItemButton disabled sx={drawerItemSx()}>
                 <ListItemIcon sx={{ minWidth: 40 }}>
-                  <Skeleton variant="circular" width={22} height={22} animation="wave" />
+                  <Skeleton variant="circular" width={22} height={22} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={<Skeleton width="60%" animation="wave" />}
+                  primary={<Skeleton width="60%" />}
                   slotProps={{ primary: { sx: { fontWeight: 500 } } }}
                 />
               </ListItemButton>
@@ -490,13 +490,7 @@ function MuiAppShellInner({
                     }}
                   >
                     {auth.status === "loading" ? (
-                      <Skeleton
-                        variant="circular"
-                        width={32}
-                        height={32}
-                        animation="wave"
-                        aria-hidden
-                      />
+                      <Skeleton variant="circular" width={32} height={32} aria-hidden />
                     ) : (
                       <AuthButton
                         locale={locale}

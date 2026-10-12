@@ -249,8 +249,8 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
           <Box sx={{ maxWidth: 720 }}>
             {isLoading ? (
               <>
-                <Skeleton variant="text" width="55%" height={48} animation="wave" />
-                <Skeleton variant="text" width="80%" height={32} animation="wave" sx={{ mt: 2 }} />
+                <Skeleton variant="text" width="55%" height={48} />
+                <Skeleton variant="text" width="80%" height={32} sx={{ mt: 2 }} />
               </>
             ) : isAuthenticated ? (
               <>

@@ -78,14 +78,28 @@ const sharedComponents = {
           : null,
     },
   },
+  // Dialog, Drawer and Tooltip pass their own timeouts, which override the
+  // MuiFade/MuiSlide/MuiGrow defaults below, so they need theirs set to 0 as well.
   MuiDialog: {
     defaultProps: {
       disableScrollLock: true,
+      transitionDuration: 0,
     },
   },
   MuiDrawer: {
     defaultProps: {
       disableScrollLock: true,
+      transitionDuration: 0,
+    },
+  },
+  MuiTooltip: {
+    defaultProps: {
+      slotProps: { transition: { timeout: 0 } },
+    },
+  },
+  MuiSkeleton: {
+    defaultProps: {
+      animation: false,
     },
   },
   MuiPopover: {
