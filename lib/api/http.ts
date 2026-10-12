@@ -41,12 +41,26 @@ async function parseJsonOk<T>(res: Response): Promise<T> {
   }
 }
 
+/**
+ * The visitor's IP for a server-side request, so the backend rate-limits each visitor
+ * instead of the whole site under the frontend server's address. Our reverse proxy
+ * puts the client IP last in X-Forwarded-For; entries to its left come from the client.
+ * The request must reach that proxy directly, not through the CDN (`API_HOSTNAME`).
+ */
+async function visitorIpHeaders(): Promise<Record<string, string>> {
+  const { headers } = await import("next/headers");
+  const ip = (await headers()).get("x-forwarded-for")?.split(",").at(-1)?.trim();
+  return ip ? { "X-Forwarded-For": ip } : {};
+}
+
 export async function getJson<T>(path: string, opts?: { revalidate?: number }): Promise<T> {
   const useIsr =
     typeof opts?.revalidate === "number" && Number.isFinite(opts.revalidate) && opts.revalidate > 0;
+  // A cached (ISR) response is shared by every visitor, so it must not carry one's IP.
+  const forwarded = typeof window === "undefined" && !useIsr ? await visitorIpHeaders() : {};
 
   const res = await fetchWithTimeout(`${apiBaseUrl()}${path}`, {
-    headers: { Accept: "application/json" },
+    headers: { Accept: "application/json", ...forwarded },
     ...(useIsr ? { next: { revalidate: opts!.revalidate } } : { cache: "no-store" as const }),
   });
   if (!res.ok) throw new ApiError(res.status, `GET ${path} failed: ${res.status}`);
