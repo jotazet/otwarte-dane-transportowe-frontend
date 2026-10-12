@@ -60,7 +60,7 @@ export function FeedCatalogDetailBody({
                       <TableRow key={idx} hover>
                         <TableCell sx={{ fontWeight: 600 }}>{row.type}</TableCell>
                         <TableCell>
-                          <OriginalCell value={row.original} />
+                          <OriginalCell value={row.original} dict={dict} />
                         </TableCell>
                         <TableCell>{row.interval}</TableCell>
                         <TableCell>{row.license}</TableCell>

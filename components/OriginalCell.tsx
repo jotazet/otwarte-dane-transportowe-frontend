@@ -1,15 +1,29 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
 import { MdCancel, MdCheckCircle } from "react-icons/md";
 
-export function OriginalCell({ value }: { value: boolean | null }) {
-  const theme = useTheme();
+import type { Dictionary } from "@/i18n/getDictionary";
+
+export function OriginalCell({
+  value,
+  dict,
+}: {
+  value: boolean | null;
+  dict: Pick<Dictionary, "yes" | "no">;
+}) {
   if (value == null) return <Typography component="span">-</Typography>;
-  return value ? (
-    <MdCheckCircle size={22} color={theme.palette.primary.main} aria-hidden />
-  ) : (
-    <MdCancel size={22} color={theme.palette.text.secondary} aria-hidden />
+  return (
+    <Box
+      component="span"
+      sx={{ display: "inline-flex", color: value ? "primary.main" : "text.secondary" }}
+    >
+      {value ? (
+        <MdCheckCircle size={22} role="img" aria-label={dict.yes} />
+      ) : (
+        <MdCancel size={22} role="img" aria-label={dict.no} />
+      )}
+    </Box>
   );
 }

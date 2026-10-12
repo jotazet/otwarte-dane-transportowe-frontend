@@ -11,7 +11,6 @@ import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
 import { MdCancel, MdCheckCircle, MdEdit } from "react-icons/md";
@@ -28,13 +27,27 @@ import { FeedCatalogOrganizationListItem } from "@/lib/api/dataCatalog";
 
 type SortColumn = "organization" | "region";
 
-function BoolCell({ value }: { value: boolean | null | undefined }) {
-  const theme = useTheme();
+function BoolCell({
+  value,
+  yesLabel,
+  noLabel,
+}: {
+  value: boolean | null | undefined;
+  yesLabel: string;
+  noLabel: string;
+}) {
   if (value == null) return <Typography component="span">-</Typography>;
-  return value ? (
-    <MdCheckCircle size={22} color={theme.palette.primary.main} aria-hidden />
-  ) : (
-    <MdCancel size={22} color={theme.palette.text.secondary} aria-hidden />
+  return (
+    <Box
+      component="span"
+      sx={{ display: "inline-flex", color: value ? "primary.main" : "text.secondary" }}
+    >
+      {value ? (
+        <MdCheckCircle size={22} role="img" aria-label={yesLabel} />
+      ) : (
+        <MdCancel size={22} role="img" aria-label={noLabel} />
+      )}
+    </Box>
   );
 }
 
@@ -54,6 +67,8 @@ export function DataCatalogTable({
     all: string;
     actions: string;
     edit: string;
+    yes: string;
+    no: string;
   };
 }) {
   const auth = useAuth();
@@ -202,7 +217,7 @@ export function DataCatalogTable({
               <TableCell>{(org.static_types ?? []).join(", ") || "-"}</TableCell>
               <TableCell>{(org.dynamic_types ?? []).join(", ") || "-"}</TableCell>
               <TableCell>
-                <BoolCell value={org.is_public} />
+                <BoolCell value={org.is_public} yesLabel={dict.yes} noLabel={dict.no} />
               </TableCell>
               {canManage ? (
                 <TableCell>
