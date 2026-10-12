@@ -8,8 +8,9 @@ function paletteScheme(isLight: boolean) {
   const contrastText = isLight ? "#FFFFFF" : "#202124";
   return {
     palette: {
-      // Dark text sits on dark-scheme fills, so their hover shade (`dark`) must stay light.
-      ...(isLight ? {} : { tonalOffset: { light: 0.2, dark: 0.1 } }),
+      // 0.2 is MUI's default. Dark text sits on dark-scheme fills, so their hover shade
+      // (`dark`) must stay light.
+      tonalOffset: isLight ? 0.2 : { light: 0.2, dark: 0.1 },
       primary: {
         main: isLight ? "#1967D2" : "#8AB4F8",
         contrastText,
@@ -78,23 +79,14 @@ const sharedComponents = {
           : null,
     },
   },
-  // Dialog, Drawer and Tooltip pass their own timeouts, which override the
-  // MuiFade/MuiSlide/MuiGrow defaults below, so they need theirs set to 0 as well.
   MuiDialog: {
     defaultProps: {
       disableScrollLock: true,
-      transitionDuration: 0,
     },
   },
   MuiDrawer: {
     defaultProps: {
       disableScrollLock: true,
-      transitionDuration: 0,
-    },
-  },
-  MuiTooltip: {
-    defaultProps: {
-      slotProps: { transition: { timeout: 0 } },
     },
   },
   MuiSkeleton: {
@@ -106,23 +98,15 @@ const sharedComponents = {
     defaultProps: {
       disableScrollLock: true,
       disablePortal: true,
-      transitionDuration: 0,
-    },
-    styleOverrides: {
-      paper: {
-        transition: "none",
-      },
     },
   },
   MuiMenu: {
     defaultProps: {
       disableScrollLock: true,
       disablePortal: true,
-      transitionDuration: 0,
     },
     styleOverrides: {
       paper: ({ theme }: { theme: ReturnType<typeof createTheme> }) => ({
-        transition: "none",
         borderRadius: 12,
         border: `1px solid ${theme.vars?.palette.divider ?? theme.palette.divider}`,
         maxHeight: 320,
@@ -148,7 +132,6 @@ const sharedComponents = {
       MenuProps: {
         disablePortal: false,
         disableScrollLock: true,
-        transitionDuration: 0,
         anchorOrigin: { vertical: "bottom", horizontal: "left" },
         transformOrigin: { vertical: "top", horizontal: "left" },
         slotProps: {
@@ -202,13 +185,23 @@ const sharedComponents = {
       },
     },
   },
-  // Wyłączenie animacji przejść (spójne, natychmiastowe UI).
-  MuiGrow: { defaultProps: { timeout: 0 } },
-  MuiFade: { defaultProps: { timeout: 0 } },
-  MuiZoom: { defaultProps: { timeout: 0 } },
-  MuiSlide: { defaultProps: { timeout: 0 } },
-  MuiCollapse: { defaultProps: { timeout: 0 } },
 } as const;
+
+// No motion: components take their timeouts from these durations (Grow, Popover and Menu
+// from getAutoHeightDuration), and every CSS transition MUI generates becomes `none`.
+const noMotion = {
+  duration: {
+    shortest: 0,
+    shorter: 0,
+    short: 0,
+    standard: 0,
+    complex: 0,
+    enteringScreen: 0,
+    leavingScreen: 0,
+  },
+  getAutoHeightDuration: () => 0,
+  create: () => "none",
+};
 
 /** Google-style blues: Flutter `AppTheme`'s `#1A73E8` adjusted per scheme to meet WCAG AA. */
 export const appTheme = createTheme({
@@ -223,5 +216,6 @@ export const appTheme = createTheme({
     borderRadius: 12,
   },
   typography: sharedTypography,
+  transitions: noMotion,
   components: sharedComponents,
 });

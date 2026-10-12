@@ -13,7 +13,7 @@
 | Text | `#202124` / `#5F6368` (light), `#E8EAED` / `#9AA0A6` (dark) |
 | Font | Roboto via `next/font` (`--font-roboto`), weights 300, 400, 500, 600 and 700 loaded (use no others); headings weight 500 |
 | Radius | 12 by default; cards 16; buttons 24 |
-| Motion | none: the theme sets transition timeouts to 0 (including Dialog, Drawer and Tooltip) and turns off the Skeleton animation; don't override them per component |
+| Motion | none: `transitions` in the theme sets every duration to 0 and every CSS transition MUI generates to `none`, and the Skeleton animation is off; don't set timeouts per component |
 
 `app/globals.css` repeats the page background per color scheme so the first paint matches the theme; keep the two in sync.
 
