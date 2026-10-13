@@ -23,6 +23,7 @@
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
+- Code, URLs and raw API responses use `codeBlockSx` (monospace on the muted panel) and `MONOSPACE_FONT` from `lib/ui/codeSx.ts`.
 
 ## Using `ui-ux-pro-max`
 

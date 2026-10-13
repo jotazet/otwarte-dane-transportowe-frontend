@@ -7,6 +7,7 @@ export const dictBg: Dictionary = {
   cases: "Казуси",
   data: "Данни",
   info: "Информация",
+  developers: "Разработчици",
   language: "Език",
   darkMode: "Тъмен режим",
   lightMode: "Светъл режим",
@@ -430,4 +431,91 @@ export const dictBg: Dictionary = {
   metaBlogTitle: "Блог за обществения транспорт и отворените данни",
   metaBlogDescription:
     "Новини, размисли и съобщения за обществения транспорт, GTFS, NeTEx и отворените транспортни данни в Полша.",
+  metaDevelopersTitle:
+    "API за отворени транспортни данни – каталог с фийдове и планер на пътувания",
+  metaDevelopersDescription:
+    "Публичният API на ODT: каталог с фийдове GTFS, NeTEx, GTFS-RT, SIRI и GBFS и планер на пътувания със заминавания и позиции на превозните средства. Без регистрация и без ключ.",
+  developersTitle: "За разработчици",
+  developersSubtitle:
+    "Отворен API с данни за обществения транспорт в Полша: каталог с фийдове и планер на пътувания. Без регистрация и без ключ.",
+  developersOpenDocs: "Отвори документацията на API",
+  developersQuickStartTitle: "Бърз старт",
+  developersApiBaseUrl: "Адрес на API",
+  developersCopyApiBaseUrl: "Копирай адреса на API",
+  developersRequest: "Заявка",
+  developersExampleLabels: {
+    feeds: "Каталог с фийдове",
+    stopSearch: "Търсене на спирка",
+    status: "Състояние на планера",
+  },
+  developersCodeLanguage: "Език на примера",
+  developersCopyCode: "Копирай кода",
+  developersCopied: "Копирано",
+  developersSendRequest: "Изпрати заявката",
+  developersSendRequestHint:
+    "Отговорът идва директно от API. Заявката се отчита в лимита за IP адреса.",
+  developersResponse: "Отговор",
+  developersResponseEmpty: "Изпратете заявката, за да видите отговора на API.",
+  developersResponseLoading: "Заявката се изпраща…",
+  developersResponseTime: "{ms} ms",
+  developersResponseFailed:
+    "Неуспешна връзка с API. Проверете интернет връзката и опитайте отново.",
+  developersCopyResponse: "Копирай отговора",
+  developersAccessTitle: "Достъп и лимити",
+  developersNoSignUpTitle: "Без регистрация",
+  developersNoSignUpBody:
+    "Всеки ендпойнт работи без ключ. Лимитите на заявките се броят на минута, отделно за всеки IP адрес.",
+  developersApiKeyTitle: "API ключ",
+  developersApiKeyBody:
+    "С API ключ лимитите са по-високи. За да получите ключ, пишете на <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Изпращайте ключа в заглавката X-API-Key и никога не го поставяйте в кода на уебсайт.",
+  developersBrowserTitle: "Заявки от браузъра",
+  developersBrowserBody:
+    "API на планера приема заявки от всеки домейн (CORS), без вход и без бисквитки.",
+  developersLimitsTitle: "Лимити на планера без ключ",
+  developersLimitLabels: {
+    plan: "Планиране на маршрути",
+    realtime: "Заминавания, превозни средства и съобщения",
+    lookup: "Търсене и състояние на планера",
+  },
+  developersLimitPerMinute: "{count} / мин",
+  developersLimitsExceeded:
+    "При превишен лимит API връща код 429 със заглавка Retry-After, която посочва след колко секунди да повторите заявката.",
+  developersStatusTitle: "Състояние на планера",
+  developersStatusRefresh: "Обновява се всяка минута",
+  developersStatusStateLabels: {
+    available: "Работи",
+    maintenance: "Техническа пауза",
+    disabled: "Изключен",
+    no_graph: "Няма данни",
+    unknown: "Няма отговор",
+  },
+  developersStatusStateBodies: {
+    available: "Планирането на маршрути, заминаванията и търсенето на спирки отговарят.",
+    maintenance:
+      "Данните за разписанията се обновяват, обикновено през нощта. Търсенето на спирки работи, а планирането на маршрути ще се възстанови след обновяването.",
+    disabled: "Публичният API на планера все още не е достъпен. Каталогът с фийдове работи.",
+    no_graph: "Планерът все още няма данни за разписанията. Каталогът с фийдове работи.",
+    unknown: "Състоянието на планера не можа да бъде проверено. Опитайте отново след малко.",
+  },
+  developersStatusUpdatedAt: "Последно обновяване на данните",
+  developersStatusFeedCount: "Фийдове в планера",
+  developersStatusStaleCount: "Фийдове в по-стара версия",
+  developersStatusEngine: "Двигател",
+  developersStatusMap: "Карта на улиците",
+  developersStatusMapValue: "OpenStreetMap (ODbL)",
+  developersCoverageLabel: "Курсове в движение с позиция на превозното средство",
+  developersCoverageCount: "{withPosition} от {underWay}",
+  developersCoverageUnavailable: "В момента няма данни за позициите на превозните средства.",
+  developersFeedsTitle: "Състояние на фийдовете в планера",
+  developersFeedsOrganization: "Организация",
+  developersFeedsId: "Идентификатор на фийда",
+  developersFeedsVersion: "Версия",
+  developersFeedsVersionAt: "Изтеглено",
+  developersFeedOutcomeLabels: {
+    fresh: "Актуална",
+    stale: "По-стара",
+  },
+  developersFeedsStaleHint:
+    "По-стара версия влиза в планера, когато най-новата не може да бъде използвана. Тя не получава данни в реално време.",
+  developersFeedsEmpty: "В планера все още няма фийдове.",
 };

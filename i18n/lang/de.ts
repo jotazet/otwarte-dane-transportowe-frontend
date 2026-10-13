@@ -7,6 +7,7 @@ export const dictDe: Dictionary = {
   cases: "Fälle",
   data: "Daten",
   info: "Informationen",
+  developers: "Entwickler",
   language: "Sprache",
   darkMode: "Dunkelmodus",
   lightMode: "Hellmodus",
@@ -434,4 +435,91 @@ export const dictDe: Dictionary = {
   metaBlogTitle: "Blog über öffentlichen Verkehr und offene Daten",
   metaBlogDescription:
     "Neuigkeiten, Gedanken und Mitteilungen über öffentlichen Verkehr, GTFS, NeTEx und offene Verkehrsdaten in Polen.",
+  metaDevelopersTitle: "API für offene Verkehrsdaten – Feed-Katalog und Reiseplaner",
+  metaDevelopersDescription:
+    "Die öffentliche API von ODT: ein Katalog von GTFS-, NeTEx-, GTFS-RT-, SIRI- und GBFS-Feeds und ein Reiseplaner mit Abfahrten und Fahrzeugpositionen. Ohne Registrierung und ohne Schlüssel.",
+  developersTitle: "Für Entwickler",
+  developersSubtitle:
+    "Eine offene API mit Daten des öffentlichen Verkehrs in Polen: Feed-Katalog und Reiseplaner. Ohne Registrierung und ohne Schlüssel.",
+  developersOpenDocs: "API-Dokumentation öffnen",
+  developersQuickStartTitle: "Schnellstart",
+  developersApiBaseUrl: "API-Adresse",
+  developersCopyApiBaseUrl: "API-Adresse kopieren",
+  developersRequest: "Anfrage",
+  developersExampleLabels: {
+    feeds: "Feed-Katalog",
+    stopSearch: "Haltestellensuche",
+    status: "Planerstatus",
+  },
+  developersCodeLanguage: "Sprache des Beispiels",
+  developersCopyCode: "Code kopieren",
+  developersCopied: "Kopiert",
+  developersSendRequest: "Anfrage senden",
+  developersSendRequestHint:
+    "Die Antwort kommt direkt von der API. Die Anfrage zählt zum Limit der IP-Adresse.",
+  developersResponse: "Antwort",
+  developersResponseEmpty: "Senden Sie die Anfrage, um die Antwort der API zu sehen.",
+  developersResponseLoading: "Anfrage wird gesendet…",
+  developersResponseTime: "{ms} ms",
+  developersResponseFailed:
+    "Die Verbindung zur API ist fehlgeschlagen. Prüfen Sie die Internetverbindung und versuchen Sie es erneut.",
+  developersCopyResponse: "Antwort kopieren",
+  developersAccessTitle: "Zugang und Limits",
+  developersNoSignUpTitle: "Ohne Registrierung",
+  developersNoSignUpBody:
+    "Jeder Endpoint funktioniert ohne Schlüssel. Die Anfragelimits gelten pro Minute und für jede IP-Adresse einzeln.",
+  developersApiKeyTitle: "API-Schlüssel",
+  developersApiKeyBody:
+    "Mit einem API-Schlüssel gelten höhere Limits. Schreiben Sie dafür an <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Senden Sie den Schlüssel im Header X-API-Key und binden Sie ihn nie in den Code einer Website ein.",
+  developersBrowserTitle: "Anfragen aus dem Browser",
+  developersBrowserBody:
+    "Die Planer-API nimmt Anfragen von jeder Domain an (CORS), ohne Anmeldung und ohne Cookies.",
+  developersLimitsTitle: "Planer-Limits ohne Schlüssel",
+  developersLimitLabels: {
+    plan: "Routenplanung",
+    realtime: "Abfahrten, Fahrzeuge und Meldungen",
+    lookup: "Suche und Planerstatus",
+  },
+  developersLimitPerMinute: "{count} / Min.",
+  developersLimitsExceeded:
+    "Bei Überschreitung eines Limits antwortet die API mit Status 429 und dem Header Retry-After, der die Wartezeit in Sekunden angibt.",
+  developersStatusTitle: "Planerstatus",
+  developersStatusRefresh: "Jede Minute aktualisiert",
+  developersStatusStateLabels: {
+    available: "In Betrieb",
+    maintenance: "Wartung",
+    disabled: "Abgeschaltet",
+    no_graph: "Keine Daten",
+    unknown: "Keine Antwort",
+  },
+  developersStatusStateBodies: {
+    available: "Routenplanung, Abfahrten und Haltestellensuche antworten.",
+    maintenance:
+      "Die Fahrplandaten werden aktualisiert, meist nachts. Die Haltestellensuche funktioniert, die Routenplanung ist nach der Aktualisierung wieder verfügbar.",
+    disabled:
+      "Die öffentliche Planer-API ist noch nicht freigegeben. Der Feed-Katalog funktioniert.",
+    no_graph: "Der Planer hat noch keine Fahrplandaten. Der Feed-Katalog funktioniert.",
+    unknown: "Der Planerstatus konnte nicht abgefragt werden. Versuchen Sie es in Kürze erneut.",
+  },
+  developersStatusUpdatedAt: "Letzte Datenaktualisierung",
+  developersStatusFeedCount: "Feeds im Planer",
+  developersStatusStaleCount: "Feeds in älterer Version",
+  developersStatusEngine: "Routing-Engine",
+  developersStatusMap: "Straßenkarte",
+  developersStatusMapValue: "OpenStreetMap (ODbL)",
+  developersCoverageLabel: "Fahrten unterwegs mit Fahrzeugposition",
+  developersCoverageCount: "{withPosition} von {underWay}",
+  developersCoverageUnavailable: "Derzeit keine Daten zu Fahrzeugpositionen.",
+  developersFeedsTitle: "Status der Feeds im Planer",
+  developersFeedsOrganization: "Organisation",
+  developersFeedsId: "Feed-ID",
+  developersFeedsVersion: "Version",
+  developersFeedsVersionAt: "Abgerufen",
+  developersFeedOutcomeLabels: {
+    fresh: "Aktuell",
+    stale: "Älter",
+  },
+  developersFeedsStaleHint:
+    "Eine ältere Version kommt in den Planer, wenn die neueste nicht verwendet werden konnte. Sie erhält keine Echtzeitdaten.",
+  developersFeedsEmpty: "Im Planer sind noch keine Feeds.",
 };

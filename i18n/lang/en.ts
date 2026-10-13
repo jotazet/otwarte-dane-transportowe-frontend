@@ -7,6 +7,7 @@ export const dictEn: Dictionary = {
   cases: "Cases",
   data: "Data",
   info: "Information",
+  developers: "Developers",
   language: "Language",
   darkMode: "Dark mode",
   lightMode: "Light mode",
@@ -426,4 +427,90 @@ export const dictEn: Dictionary = {
   metaBlogTitle: "Blog on public transport and open data",
   metaBlogDescription:
     "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",
+  metaDevelopersTitle: "Open transport data API – feed catalogue and journey planner",
+  metaDevelopersDescription:
+    "ODT's public API: a catalogue of GTFS, NeTEx, GTFS-RT, SIRI and GBFS feeds and a journey planner with departures and vehicle positions. No sign-up or key needed.",
+  developersTitle: "For developers",
+  developersSubtitle:
+    "An open API with public transport data for Poland: the feed catalogue and the journey planner. No sign-up, no key.",
+  developersOpenDocs: "Open API documentation",
+  developersQuickStartTitle: "Quick start",
+  developersApiBaseUrl: "API base URL",
+  developersCopyApiBaseUrl: "Copy API base URL",
+  developersRequest: "Request",
+  developersExampleLabels: {
+    feeds: "Feed catalogue",
+    stopSearch: "Stop search",
+    status: "Planner status",
+  },
+  developersCodeLanguage: "Example language",
+  developersCopyCode: "Copy code",
+  developersCopied: "Copied",
+  developersSendRequest: "Send request",
+  developersSendRequestHint:
+    "The response comes straight from the API. The request counts towards the limit for the IP address.",
+  developersResponse: "Response",
+  developersResponseEmpty: "Send the request to see the API response.",
+  developersResponseLoading: "Sending request…",
+  developersResponseTime: "{ms} ms",
+  developersResponseFailed:
+    "Could not connect to the API. Check the internet connection and try again.",
+  developersCopyResponse: "Copy response",
+  developersAccessTitle: "Access and limits",
+  developersNoSignUpTitle: "No sign-up",
+  developersNoSignUpBody:
+    "Every endpoint works without a key. Rate limits are counted per minute, separately for each IP address.",
+  developersApiKeyTitle: "API key",
+  developersApiKeyBody:
+    "An API key gives higher limits. To get one, write to <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Send the key in the X-API-Key header and never put it in a website's code.",
+  developersBrowserTitle: "Requests from the browser",
+  developersBrowserBody:
+    "The planner API accepts requests from any domain (CORS), without login or cookies.",
+  developersLimitsTitle: "Planner limits without a key",
+  developersLimitLabels: {
+    plan: "Trip planning",
+    realtime: "Departures, vehicles and alerts",
+    lookup: "Search and planner status",
+  },
+  developersLimitPerMinute: "{count} / min",
+  developersLimitsExceeded:
+    "Over a limit, the API returns status 429 with a Retry-After header giving the number of seconds to wait before retrying.",
+  developersStatusTitle: "Planner status",
+  developersStatusRefresh: "Refreshed every minute",
+  developersStatusStateLabels: {
+    available: "Running",
+    maintenance: "Maintenance",
+    disabled: "Switched off",
+    no_graph: "No data",
+    unknown: "No response",
+  },
+  developersStatusStateBodies: {
+    available: "Trip planning, departures and stop search are answering.",
+    maintenance:
+      "Timetable data is being updated, usually at night. Stop search works; trip planning returns when the update finishes.",
+    disabled: "The public planner API is not available yet. The feed catalogue works.",
+    no_graph: "The planner has no timetable data yet. The feed catalogue works.",
+    unknown: "Could not check the planner status. Try again in a moment.",
+  },
+  developersStatusUpdatedAt: "Data last updated",
+  developersStatusFeedCount: "Feeds in the planner",
+  developersStatusStaleCount: "Feeds in an older version",
+  developersStatusEngine: "Engine",
+  developersStatusMap: "Street map",
+  developersStatusMapValue: "OpenStreetMap (ODbL)",
+  developersCoverageLabel: "Trips under way with a vehicle position",
+  developersCoverageCount: "{withPosition} of {underWay}",
+  developersCoverageUnavailable: "No vehicle position data at the moment.",
+  developersFeedsTitle: "Feed status in the planner",
+  developersFeedsOrganization: "Organization",
+  developersFeedsId: "Feed ID",
+  developersFeedsVersion: "Version",
+  developersFeedsVersionAt: "Fetched",
+  developersFeedOutcomeLabels: {
+    fresh: "Current",
+    stale: "Older",
+  },
+  developersFeedsStaleHint:
+    "An older version goes into the planner when the newest one could not be used. It receives no live data.",
+  developersFeedsEmpty: "There are no feeds in the planner yet.",
 };
