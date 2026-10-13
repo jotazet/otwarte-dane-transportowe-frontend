@@ -10,6 +10,7 @@ export function isLoginRequiredPath(rest: string): boolean {
   if (path === "/data/my-submissions" || path.startsWith("/data/my-submissions/")) return true;
   if (path === "/data/queue" || path.startsWith("/data/queue/")) return true;
   if (path === "/data/feed-ops" || path.startsWith("/data/feed-ops/")) return true;
+  if (path === "/data/planner") return true;
   if (path === "/users" || path.startsWith("/users/")) return true;
   if (path === "/cases/organizations/new") return true;
   if (/^\/cases\/organizations\/\d+\/edit$/.test(path)) return true;

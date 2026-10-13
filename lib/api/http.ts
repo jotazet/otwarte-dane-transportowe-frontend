@@ -1,13 +1,30 @@
 import { apiBaseUrl } from "@/lib/config";
 
-/** A failed request. `status` is 0 when the server could not be reached. */
+/**
+ * A failed request. `status` is 0 when the server could not be reached; `code` is the
+ * backend's error code when the body has the `{code, details}` shape (backend ADR 0006).
+ */
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    public readonly code?: string,
   ) {
     super(message);
   }
+}
+
+/** The `code` of a failed response's `{code, details}` body, if it has one. */
+export async function readErrorCode(res: Response): Promise<string | undefined> {
+  try {
+    const body: unknown = await res.json();
+    if (body && typeof body === "object" && "code" in body && typeof body.code === "string") {
+      return body.code;
+    }
+  } catch {
+    // Not JSON: no code.
+  }
+  return undefined;
 }
 
 /** Domyślny limit czasu żądania (ms). Zapobiega wiszącemu UI przy awarii backendu. */

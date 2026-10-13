@@ -2,7 +2,13 @@
 
 import * as React from "react";
 
-import { ApiError, fetchWithTimeout, postJson, UPLOAD_TIMEOUT_MS } from "@/lib/api/http";
+import {
+  ApiError,
+  fetchWithTimeout,
+  postJson,
+  readErrorCode,
+  UPLOAD_TIMEOUT_MS,
+} from "@/lib/api/http";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
@@ -231,7 +237,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access));
       }
       if (!res.ok) {
-        throw new ApiError(res.status, `HTTP ${res.status}`);
+        throw new ApiError(res.status, `HTTP ${res.status}`, await readErrorCode(res));
       }
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
