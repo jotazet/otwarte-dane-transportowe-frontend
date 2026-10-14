@@ -23,6 +23,7 @@ import { StatTiles } from "@/components/plannerAdmin/StatTiles";
 import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
   endpointLabel,
+  isBanActive,
   plannerAdminPaths,
   rangeInterval,
   rangeQuery,
@@ -117,7 +118,7 @@ function IpDetailsView({ ctx, ip }: { ctx: PlannerAdminContext; ip: string }) {
       [apiJson],
     ),
   );
-  const ban = bans.data?.find((b) => networkContains(b.network, ip)) ?? null;
+  const ban = bans.data?.find((b) => isBanActive(b) && networkContains(b.network, ip)) ?? null;
   const keyName = details.data?.log.find((e) => e.api_key_name)?.api_key_name ?? null;
 
   const unban = async () => {

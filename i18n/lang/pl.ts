@@ -970,6 +970,7 @@ export const dictPl = {
   plannerAdminColReason: "Powód",
   plannerAdminColExpires: "Wygasa",
   plannerAdminBanNoExpiry: "bez terminu",
+  plannerAdminBanExpired: "Wygasła: {date}",
   plannerAdminBanAddedBy: "Dodano przez: {user}",
   plannerAdminUnban: "Odblokuj",
   plannerAdminPublicApiTitle: "Publiczne API",

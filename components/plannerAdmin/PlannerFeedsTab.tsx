@@ -46,7 +46,10 @@ function isPending(
 export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
   const { core, dict } = ctx;
   const [adding, setAdding] = React.useState<"gtfs" | "gbfs" | null>(null);
-  const servedSince = core.status.active_build?.created_at ?? null;
+  // A rollback serves the graph of an older build, as the backend's public status counts it.
+  const active = core.status.active_build;
+  const built = core.builds.find((b) => b.id === active?.rollback_of) ?? active;
+  const servedSince = built?.created_at ?? null;
   const pending =
     core.feeds.some((f) => isPending(f, servedSince)) ||
     core.rentals.some((r) => isPending(r, servedSince));

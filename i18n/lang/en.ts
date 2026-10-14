@@ -970,6 +970,7 @@ export const dictEn: Dictionary = {
   plannerAdminColReason: "Reason",
   plannerAdminColExpires: "Expires",
   plannerAdminBanNoExpiry: "no expiry",
+  plannerAdminBanExpired: "Expired: {date}",
   plannerAdminBanAddedBy: "Added by: {user}",
   plannerAdminUnban: "Unblock",
   plannerAdminPublicApiTitle: "Public API",

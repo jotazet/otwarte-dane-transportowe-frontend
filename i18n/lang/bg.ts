@@ -979,6 +979,7 @@ export const dictBg: Dictionary = {
   plannerAdminColReason: "Причина",
   plannerAdminColExpires: "Изтича",
   plannerAdminBanNoExpiry: "безсрочно",
+  plannerAdminBanExpired: "Изтекла: {date}",
   plannerAdminBanAddedBy: "Добавено от: {user}",
   plannerAdminUnban: "Отблокирай",
   plannerAdminPublicApiTitle: "Публичен API",

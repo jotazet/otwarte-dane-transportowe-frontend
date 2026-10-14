@@ -993,6 +993,7 @@ export const dictDe: Dictionary = {
   plannerAdminColReason: "Grund",
   plannerAdminColExpires: "Läuft ab",
   plannerAdminBanNoExpiry: "unbefristet",
+  plannerAdminBanExpired: "Abgelaufen: {date}",
   plannerAdminBanAddedBy: "Hinzugefügt von: {user}",
   plannerAdminUnban: "Entsperren",
   plannerAdminPublicApiTitle: "Öffentliche API",

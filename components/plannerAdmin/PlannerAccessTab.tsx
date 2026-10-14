@@ -33,6 +33,7 @@ import {
 } from "@/components/plannerAdmin/shared";
 import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
+  isBanActive,
   LIMIT_GROUPS,
   LIMIT_SCOPES,
   plannerAdminPaths,
@@ -251,7 +252,10 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
             </TableHead>
             <TableBody>
               {bans.data.map((ban) => (
-                <TableRow key={ban.id}>
+                <TableRow
+                  key={ban.id}
+                  sx={isBanActive(ban) ? undefined : { "& td": { color: "text.secondary" } }}
+                >
                   <TableCell sx={{ fontFamily: MONOSPACE_FONT }}>{ban.network}</TableCell>
                   <TableCell>
                     {ban.reason || "-"}
@@ -262,9 +266,13 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
                     ) : null}
                   </TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {ban.expires_at
-                      ? formatDateTime(ban.expires_at, locale)
-                      : dict.plannerAdminBanNoExpiry}
+                    {!ban.expires_at
+                      ? dict.plannerAdminBanNoExpiry
+                      : isBanActive(ban)
+                        ? formatDateTime(ban.expires_at, locale)
+                        : fill(dict.plannerAdminBanExpired, {
+                            date: formatDateTime(ban.expires_at, locale),
+                          })}
                   </TableCell>
                   <TableCell align="right">
                     <Button size="small" onClick={() => void unban(ban)}>

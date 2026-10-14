@@ -158,6 +158,8 @@ export function PlannerAddFeedsDialog({
       await ctx.reload();
     }
     if (added === selectedIds.length) onClose();
+    // The dialog stays open: the added feeds must show as already in the planner.
+    else if (added) loaded.reload();
   };
 
   return (

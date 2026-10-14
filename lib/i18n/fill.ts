@@ -1,4 +1,6 @@
-/** Replaces every `{name}` placeholder of a dictionary string. */
+/** Replaces every `{name}` placeholder of a dictionary string, in one pass over the template. */
 export function fill(template: string, vars: Record<string, string | number>): string {
-  return Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), template);
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    Object.hasOwn(vars, key) ? String(vars[key]) : match,
+  );
 }

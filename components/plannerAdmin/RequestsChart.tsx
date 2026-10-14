@@ -84,7 +84,8 @@ export function RequestsChart({ buckets, series, interval, locale, dict }: Chart
   return (
     <Box sx={{ display: "grid", gridTemplateColumns: "44px minmax(0, 1fr)", columnGap: 1 }}>
       <Box aria-hidden sx={{ position: "relative", height: PLOT_HEIGHT }}>
-        {[top, top / 2, 0].map((v) => (
+        {/* The middle line keeps its label only when it is a whole number of requests. */}
+        {[top, ...(Number.isInteger(top / 2) ? [top / 2] : []), 0].map((v) => (
           <Typography
             key={v}
             variant="caption"

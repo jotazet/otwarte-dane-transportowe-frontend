@@ -50,9 +50,15 @@ import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
 import { DefinitionRows } from "@/components/layout/DefinitionRows";
 import { fill } from "@/lib/i18n/fill";
 
-/** Only the served graph and the newest other one are kept, so only that one can come back. */
+/**
+ * Only the served graph and the newest other one are kept, so only that one can come back.
+ * A rollback build reuses an older graph and has none of its own.
+ */
 export function restorableBuildId(builds: GraphBuild[]): number | null {
-  return builds.find((b) => b.status === "succeeded" && !b.is_active)?.id ?? null;
+  return (
+    builds.find((b) => b.status === "succeeded" && !b.is_active && b.rollback_of === null)?.id ??
+    null
+  );
 }
 
 export function PlannerBuildsTab({ ctx }: { ctx: PlannerAdminContext }) {

@@ -79,7 +79,7 @@ export type PlannerAdminContext = {
 };
 
 const BUILDS_PAGE_SIZE = 20;
-const OSM_PAGE_SIZE = 5;
+const OSM_PAGE_SIZE = 20;
 /** While a build or an OSM download runs, the panel refreshes itself this often. */
 const BUSY_REFRESH_MS = 20_000;
 
@@ -192,6 +192,18 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
     }, BUSY_REFRESH_MS);
     return () => window.clearInterval(timer);
   }, [apiJson, busy]);
+
+  // A finished build changes every feed's and rental source's result, which polling does not load.
+  const buildRunning = Boolean(core?.status.running_build);
+  const wasBuildRunning = React.useRef(buildRunning);
+  React.useEffect(() => {
+    const finished = wasBuildRunning.current && !buildRunning;
+    wasBuildRunning.current = buildRunning;
+    if (!finished) return;
+    void (async () => {
+      await reload();
+    })();
+  }, [buildRunning, reload]);
 
   const updateCore = React.useCallback(
     (update: (core: PlannerCore) => PlannerCore) => setCore((c) => (c ? update(c) : c)),

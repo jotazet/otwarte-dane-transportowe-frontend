@@ -189,6 +189,11 @@ export type IpBan = {
   created_at: string;
 };
 
+/** `ip-bans/` lists expired bans too; the backend no longer applies them. */
+export function isBanActive(ban: IpBan, now = Date.now()): boolean {
+  return ban.expires_at === null || Date.parse(ban.expires_at) > now;
+}
+
 export type RequestLogEntry = {
   id: number;
   created_at: string;
@@ -315,7 +320,7 @@ export async function fetchRecentErrors(
   );
   return pages
     .flatMap((p) => p.results)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
     .slice(0, RECENT_ERRORS_PER_CODE * 2);
 }
 

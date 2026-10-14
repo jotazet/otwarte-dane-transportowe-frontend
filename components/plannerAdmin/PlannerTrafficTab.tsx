@@ -346,7 +346,9 @@ function ClientsCard({
   );
 
   const q = query.trim().toLowerCase();
+  // Until the other kind loads, the previous rows stay in `clients.data`.
   const rows = (clients.data?.results ?? []).filter((c) => {
+    if ("client_ip" in c !== (by === "ip")) return false;
     if (!q) return true;
     const text =
       "client_ip" in c ? `${c.client_ip} ${c.user_agent}` : `${c.api_key.name} ${c.api_key.prefix}`;
@@ -378,6 +380,7 @@ function ClientsCard({
           <ToggleButtonGroup
             size="small"
             exclusive
+            aria-labelledby="planner-clients-title"
             value={by}
             onChange={(_, v: "ip" | "api_key" | null) => {
               if (!v) return;
@@ -511,7 +514,7 @@ function ClientsCard({
                   </TableRow>
                 ),
               )}
-              {rows.length === 0 && !lookup ? (
+              {rows.length === 0 && !lookup && !clients.loading ? (
                 <TableRow>
                   <TableCell colSpan={4}>
                     <Typography variant="body2" color="text.secondary">
@@ -571,6 +574,7 @@ function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRa
           <ToggleButtonGroup
             size="small"
             exclusive
+            aria-labelledby="planner-errors-title"
             value={group}
             onChange={(_, v: ErrorStatusGroup | null) => v && setGroup(v)}
           >
