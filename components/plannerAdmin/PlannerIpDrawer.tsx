@@ -11,25 +11,21 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { MdBlock } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import { PlannerBanDialog } from "@/components/plannerAdmin/PlannerBanDialog";
 import { DrawerSection, PlannerDrawer } from "@/components/plannerAdmin/PlannerDrawer";
-import { endpointLabel } from "@/components/plannerAdmin/PlannerTrafficTab";
 import { RequestsChart } from "@/components/plannerAdmin/RequestsChart";
-import { DefinitionRows, fill, plannerErrorMessage } from "@/components/plannerAdmin/shared";
+import { formatMs, liftBan, LoadState, RangeToggle } from "@/components/plannerAdmin/shared";
 import { StatTiles } from "@/components/plannerAdmin/StatTiles";
-import { useApiLoad } from "@/components/plannerAdmin/useApiLoad";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
+  endpointLabel,
   plannerAdminPaths,
   rangeInterval,
   rangeQuery,
-  TRAFFIC_RANGES,
   type EndpointStats,
   type IpBan,
   type IpClientStats,
@@ -43,6 +39,8 @@ import { formatDateTime, formatNumber, formatPercent } from "@/lib/format";
 import { defaultBanNetwork, isIpv6, networkContains } from "@/lib/ipNetwork";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { tableHeadRowSx } from "@/lib/ui/tableSx";
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { fill } from "@/lib/i18n/fill";
 
 type IpDetails = {
   client: IpClientStats | null;
@@ -124,12 +122,7 @@ function IpDetailsView({ ctx, ip }: { ctx: PlannerAdminContext; ip: string }) {
 
   const unban = async () => {
     if (!ban) return;
-    try {
-      await apiJson("DELETE", plannerAdminPaths.ipBan(ban.id));
-      ctx.notify(fill(dict.plannerAdminUnbanned, { network: ban.network }));
-    } catch (e) {
-      ctx.notify(plannerErrorMessage(e, dict), "error");
-    }
+    await liftBan(ctx, ban);
     bans.reload();
   };
 
@@ -197,24 +190,9 @@ function IpDetailsView({ ctx, ip }: { ctx: PlannerAdminContext; ip: string }) {
           >
             {dict.plannerAdminIpTrafficTitle}
           </Typography>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
-            value={range}
-            onChange={(_, v: TrafficRange | null) => v && setRange(v)}
-            aria-label={dict.plannerAdminRangeLabel}
-          >
-            {TRAFFIC_RANGES.map((r) => (
-              <ToggleButton key={r} value={r}>
-                {dict.plannerAdminRangeLabels[r]}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <RangeToggle value={range} onChange={setRange} dict={dict} />
         </Stack>
-        {details.error ? (
-          <Alert severity="error">{plannerErrorMessage(details.error, dict)}</Alert>
-        ) : null}
-        {details.loading && !d ? <LoadingBlock /> : null}
+        <LoadState loaded={details} dict={dict} />
         {d && !c ? (
           <Typography variant="body2" color="text.secondary">
             {dict.plannerAdminIpNoTraffic}
@@ -349,7 +327,7 @@ function IpDetailsView({ ctx, ip }: { ctx: PlannerAdminContext; ip: string }) {
                         align="right"
                         sx={{ fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}
                       >
-                        {fill(dict.plannerAdminMs, { value: formatNumber(e.latency_ms, locale) })}
+                        {formatMs(e.latency_ms, dict, locale)}
                       </TableCell>
                     </TableRow>
                   ))}

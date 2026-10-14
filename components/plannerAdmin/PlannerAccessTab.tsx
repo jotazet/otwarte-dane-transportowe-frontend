@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -18,18 +17,21 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { MdAdd, MdBlock } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import { PlannerApiKeyDialog } from "@/components/plannerAdmin/PlannerApiKeyDialog";
 import { PlannerBanDialog } from "@/components/plannerAdmin/PlannerBanDialog";
 import {
   CardHeading,
-  fill,
+  isPositiveInt,
+  liftBan,
+  LoadState,
   plannerErrorMessage,
   scrollTableSx,
   StateChip,
+  StatusPanel,
+  twoColumnGridSx,
 } from "@/components/plannerAdmin/shared";
-import { useApiLoad } from "@/components/plannerAdmin/useApiLoad";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
   LIMIT_GROUPS,
   LIMIT_SCOPES,
@@ -43,17 +45,11 @@ import { fetchAllPages } from "@/lib/api/types";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { tableHeadRowSx } from "@/lib/ui/tableSx";
+import { fill } from "@/lib/i18n/fill";
 
 export function PlannerAccessTab({ ctx }: { ctx: PlannerAdminContext }) {
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gap: 2,
-        alignItems: "start",
-        gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 1.85fr) minmax(0, 1fr)" },
-      }}
-    >
+    <Box sx={twoColumnGridSx}>
       <Stack spacing={2} sx={{ minWidth: 0 }}>
         <ApiKeysCard ctx={ctx} />
         <BansCard ctx={ctx} />
@@ -104,7 +100,6 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
         id="planner-keys-title"
         title={dict.plannerAdminKeysTitle}
         hint={dict.plannerAdminKeysHint}
-        dense
         action={
           <Button
             variant="contained"
@@ -115,16 +110,7 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
           </Button>
         }
       />
-      {keys.error ? (
-        <CardContent sx={{ pt: 0 }}>
-          <Alert severity="error">{plannerErrorMessage(keys.error, dict)}</Alert>
-        </CardContent>
-      ) : null}
-      {keys.loading && !keys.data ? (
-        <CardContent sx={{ pt: 0 }}>
-          <LoadingBlock />
-        </CardContent>
-      ) : null}
+      <LoadState loaded={keys} dict={dict} sx={{ mx: { xs: 2.5, sm: 3 }, mb: 2 }} />
       {keys.data?.length === 0 ? (
         <CardContent sx={{ pt: 0 }}>
           <Typography variant="body2" color="text.secondary">
@@ -219,12 +205,7 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
   );
 
   const unban = async (ban: IpBan) => {
-    try {
-      await apiJson("DELETE", plannerAdminPaths.ipBan(ban.id));
-      ctx.notify(fill(dict.plannerAdminUnbanned, { network: ban.network }));
-    } catch (e) {
-      ctx.notify(plannerErrorMessage(e, dict), "error");
-    }
+    await liftBan(ctx, ban);
     bans.reload();
   };
 
@@ -233,7 +214,6 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
       <CardHeading
         id="planner-bans-title"
         title={dict.plannerAdminBansTitle}
-        dense
         action={
           <Button
             variant="outlined"
@@ -245,16 +225,7 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
           </Button>
         }
       />
-      {bans.error ? (
-        <CardContent sx={{ pt: 0 }}>
-          <Alert severity="error">{plannerErrorMessage(bans.error, dict)}</Alert>
-        </CardContent>
-      ) : null}
-      {bans.loading && !bans.data ? (
-        <CardContent sx={{ pt: 0 }}>
-          <LoadingBlock />
-        </CardContent>
-      ) : null}
+      <LoadState loaded={bans} dict={dict} sx={{ mx: { xs: 2.5, sm: 3 }, mb: 2 }} />
       {bans.data?.length === 0 ? (
         <CardContent sx={{ pt: 0 }}>
           <Typography variant="body2" color="text.secondary">
@@ -328,11 +299,13 @@ function PublicApiCard({ ctx }: { ctx: PlannerAdminContext }) {
       if (!ok) return;
     }
     try {
-      await ctx.apiJson("PATCH", plannerAdminPaths.settings, { public_api_enabled: next });
+      const settings = await ctx.apiJson<PlannerSettings>("PATCH", plannerAdminPaths.settings, {
+        public_api_enabled: next,
+      });
+      ctx.updateCore((c) => ({ ...c, settings }));
     } catch (e) {
       ctx.notify(plannerErrorMessage(e, dict), "error");
     }
-    await ctx.reload();
   };
 
   return (
@@ -351,38 +324,13 @@ function PublicApiCard({ ctx }: { ctx: PlannerAdminContext }) {
             slotProps={{ input: { "aria-label": dict.plannerAdminPublicApiSwitch } }}
           />
         </Stack>
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{
-            alignItems: "flex-start",
-            mt: 1.5,
-            p: 1.5,
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 1,
-          }}
-        >
-          <Box
-            aria-hidden
-            sx={{
-              width: 10,
-              height: 10,
-              mt: 0.75,
-              borderRadius: "50%",
-              flexShrink: 0,
-              bgcolor: enabled ? "success.main" : "text.disabled",
-            }}
+        <Box sx={{ mt: 1.5 }}>
+          <StatusPanel
+            color={enabled ? "success.main" : "text.disabled"}
+            title={enabled ? dict.plannerAdminPublicApiStateOn : dict.plannerAdminPublicApiStateOff}
+            body={enabled ? dict.plannerAdminPublicApiOnBody : dict.plannerAdminPublicApiOffBody}
           />
-          <Box>
-            <Typography variant="subtitle1" component="p" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-              {enabled ? dict.plannerAdminPublicApiStateOn : dict.plannerAdminPublicApiStateOff}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {enabled ? dict.plannerAdminPublicApiOnBody : dict.plannerAdminPublicApiOffBody}
-            </Typography>
-          </Box>
-        </Stack>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -408,18 +356,18 @@ function LimitsCard({ ctx }: { ctx: PlannerAdminContext }) {
   const saved = limitDraft(ctx.core.settings);
   const fields = Object.keys(draft) as LimitField[];
   const dirty = fields.some((f) => draft[f] !== saved[f]);
-  const invalid = fields.some((f) => !/^[1-9]\d*$/.test(draft[f].trim()));
+  const invalid = fields.some((f) => !isPositiveInt(draft[f]));
 
   const submit = async () => {
     setSaving(true);
     try {
-      await ctx.apiJson(
+      const settings = await ctx.apiJson<PlannerSettings>(
         "PATCH",
         plannerAdminPaths.settings,
         Object.fromEntries(fields.map((f) => [f, Number(draft[f])])),
       );
+      ctx.updateCore((c) => ({ ...c, settings }));
       ctx.notify(dict.plannerAdminLimitsSaved);
-      await ctx.reload();
     } catch (e) {
       ctx.notify(plannerErrorMessage(e, dict), "error");
     } finally {
@@ -471,7 +419,7 @@ function LimitsCard({ ctx }: { ctx: PlannerAdminContext }) {
                           size="small"
                           value={draft[field]}
                           onChange={(e) => setDraft((d) => ({ ...d, [field]: e.target.value }))}
-                          error={!/^[1-9]\d*$/.test(draft[field].trim())}
+                          error={!isPositiveInt(draft[field])}
                           sx={{ width: 76 }}
                           slotProps={{
                             htmlInput: {

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -21,7 +20,6 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { MdBlock, MdChevronRight, MdClose, MdSearch } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import type { PlannerAdminDict } from "@/components/plannerAdmin/plannerAdminDict";
 import { PlannerBanDialog } from "@/components/plannerAdmin/PlannerBanDialog";
@@ -32,20 +30,20 @@ import {
   type ChartSeries,
 } from "@/components/plannerAdmin/RequestsChart";
 import {
-  clickableRowSx,
-  fill,
-  openOnEnter,
-  plannerErrorMessage,
+  CardHeading,
+  formatMs,
+  LoadState,
+  RangeToggle,
   StateChip,
 } from "@/components/plannerAdmin/shared";
-import { StatTiles } from "@/components/plannerAdmin/StatTiles";
-import { useApiLoad } from "@/components/plannerAdmin/useApiLoad";
+import { TrafficSummaryTiles } from "@/components/plannerAdmin/StatTiles";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
+  endpointLabel,
   fetchRecentErrors,
   plannerAdminPaths,
   rangeInterval,
   rangeQuery,
-  TRAFFIC_RANGES,
   type EndpointStats,
   type ErrorStatusGroup,
   type IpClientStats,
@@ -58,7 +56,8 @@ import type { PaginatedResponse } from "@/lib/api/types";
 import { formatDateTime, formatNumber, formatPercent } from "@/lib/format";
 import { defaultBanNetwork, isIpAddress } from "@/lib/ipNetwork";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
-import { tableHeadRowSx } from "@/lib/ui/tableSx";
+import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
+import { fill } from "@/lib/i18n/fill";
 
 const STATUS_SERIES = [
   ["ok", "chart.series1"],
@@ -68,11 +67,6 @@ const STATUS_SERIES = [
 ] as const;
 const ENDPOINT_COLORS = ["chart.series1", "chart.series2", "chart.series3"] as const;
 const ERROR_GROUPS: ErrorStatusGroup[] = ["all", "client", "rateLimited", "server"];
-
-/** URL names without the shared prefix: `planner-v1-plan` → `plan`. */
-export function endpointLabel(name: string): string {
-  return name.replace(/^planner-v1-/, "");
-}
 
 function chartSeries(data: StatsTimeseries, dict: PlannerAdminDict): ChartSeries[] {
   if (data.split === "status") {
@@ -105,19 +99,6 @@ function chartSeries(data: StatsTimeseries, dict: PlannerAdminDict): ChartSeries
     });
   }
   return series;
-}
-
-function LoadState({
-  loading,
-  error,
-  dict,
-}: {
-  loading: boolean;
-  error: unknown;
-  dict: PlannerAdminDict;
-}) {
-  if (error) return <Alert severity="error">{plannerErrorMessage(error, dict)}</Alert>;
-  return loading ? <LoadingBlock /> : null;
 }
 
 export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
@@ -160,26 +141,12 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
     ),
   );
 
-  const s = summary.data;
-  const errors = s ? s.client_errors + s.rate_limited + s.server_errors : 0;
   const chart = series.data ? chartSeries(series.data, dict) : [];
 
   return (
     <Stack spacing={2}>
       <Stack direction="row" sx={{ gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={range}
-          onChange={(_, v: TrafficRange | null) => v && setRange(v)}
-          aria-label={dict.plannerAdminRangeLabel}
-        >
-          {TRAFFIC_RANGES.map((r) => (
-            <ToggleButton key={r} value={r}>
-              {dict.plannerAdminRangeLabels[r]}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        <RangeToggle value={range} onChange={setRange} dict={dict} />
         {endpoint ? (
           <Chip
             color="primary"
@@ -195,27 +162,9 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
         )}
       </Stack>
 
-      <LoadState loading={summary.loading && !s} error={summary.error} dict={dict} />
-      {s ? (
-        <StatTiles
-          items={[
-            { label: dict.plannerAdminStatRequests, value: formatNumber(s.requests, locale) },
-            { label: dict.plannerAdminStatUniqueIps, value: formatNumber(s.unique_ips, locale) },
-            {
-              label: fill(dict.plannerAdminStatErrors, {
-                share: formatPercent(s.requests ? errors / s.requests : 0, locale, 1),
-              }),
-              value: formatNumber(errors, locale),
-            },
-            {
-              label: dict.plannerAdminStatP95,
-              value:
-                s.p95_latency_ms === null
-                  ? "-"
-                  : fill(dict.plannerAdminMs, { value: formatNumber(s.p95_latency_ms, locale) }),
-            },
-          ]}
-        />
+      <LoadState loaded={summary} dict={dict} />
+      {summary.data ? (
+        <TrafficSummaryTiles summary={summary.data} dict={dict} locale={locale} />
       ) : null}
 
       <Card component="section" aria-labelledby="planner-chart-title">
@@ -255,7 +204,7 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
               </Button>
             </Stack>
           </Stack>
-          <LoadState loading={series.loading && !series.data} error={series.error} dict={dict} />
+          <LoadState loaded={series} dict={dict} />
           {series.data ? (
             <Stack spacing={1.5}>
               <ChartLegend series={chart} />
@@ -297,16 +246,8 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
         }}
       >
         <Card component="section" aria-labelledby="planner-endpoints-title" sx={{ minWidth: 0 }}>
-          <CardContent sx={{ p: { xs: 2.5, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
-            <Typography variant="h6" component="h2" id="planner-endpoints-title">
-              {dict.plannerAdminEndpointsTitle}
-            </Typography>
-          </CardContent>
-          {endpoints.error || (endpoints.loading && !endpoints.data) ? (
-            <CardContent sx={{ pt: 0 }}>
-              <LoadState loading={endpoints.loading} error={endpoints.error} dict={dict} />
-            </CardContent>
-          ) : null}
+          <CardHeading id="planner-endpoints-title" title={dict.plannerAdminEndpointsTitle} />
+          <LoadState loaded={endpoints} dict={dict} sx={{ mx: { xs: 2.5, sm: 3 }, mb: 2.5 }} />
           {endpoints.data ? (
             <TableContainer
               role="region"
@@ -362,11 +303,7 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
                           align="right"
                           sx={{ fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}
                         >
-                          {e.p95_latency_ms === null
-                            ? "-"
-                            : fill(dict.plannerAdminMs, {
-                                value: formatNumber(e.p95_latency_ms, locale),
-                              })}
+                          {formatMs(e.p95_latency_ms, dict, locale)}
                         </TableCell>
                       </TableRow>
                     );
@@ -479,11 +416,7 @@ function ClientsCard({
             },
           }}
         />
-        {clients.error || (clients.loading && !clients.data) ? (
-          <Box sx={{ mt: 1.5 }}>
-            <LoadState loading={clients.loading} error={clients.error} dict={dict} />
-          </Box>
-        ) : null}
+        <LoadState loaded={clients} dict={dict} sx={{ mt: 1.5 }} />
       </CardContent>
       {clients.data ? (
         <TableContainer
@@ -621,7 +554,7 @@ function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRa
   const { apiJson, dict, locale } = ctx;
   const [group, setGroup] = React.useState<ErrorStatusGroup>("all");
   const errors = useApiLoad(
-    React.useCallback(() => fetchRecentErrors(apiJson, group, { range }), [apiJson, group, range]),
+    React.useCallback(() => fetchRecentErrors(apiJson, group, range), [apiJson, group, range]),
   );
   const codeLabels: Record<string, string> = dict.plannerAdminStatusCodeLabels;
 
@@ -648,11 +581,7 @@ function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRa
             ))}
           </ToggleButtonGroup>
         </Stack>
-        {errors.error || (errors.loading && !errors.data) ? (
-          <Box sx={{ mt: 1.5 }}>
-            <LoadState loading={errors.loading} error={errors.error} dict={dict} />
-          </Box>
-        ) : null}
+        <LoadState loaded={errors} dict={dict} sx={{ mt: 1.5 }} />
         {errors.data?.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
             {dict.plannerAdminErrorsEmpty}
@@ -703,7 +632,7 @@ function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRa
                     align="right"
                     sx={{ fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}
                   >
-                    {fill(dict.plannerAdminMs, { value: formatNumber(e.latency_ms, locale) })}
+                    {formatMs(e.latency_ms, dict, locale)}
                   </TableCell>
                   <TableCell>
                     <Button

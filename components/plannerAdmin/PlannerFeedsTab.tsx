@@ -22,52 +22,30 @@ import { PlannerAddFeedsDialog } from "@/components/plannerAdmin/PlannerAddFeeds
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import {
   CardHeading,
-  clickableRowSx,
-  openOnEnter,
   FeedStateChip,
-  feedState,
-  fill,
-  plannerErrorMessage,
   RentalStateChip,
-  rentalState,
+  saveFeed,
+  saveRental,
   scrollTableSx,
+  servedState,
 } from "@/components/plannerAdmin/shared";
-import {
-  plannerAdminPaths,
-  type PlannerFeed,
-  type PlannerRentalSource,
-} from "@/lib/api/plannerAdmin";
+import type { PlannerFeed, PlannerRentalSource } from "@/lib/api/plannerAdmin";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
-import { tableHeadRowSx } from "@/lib/ui/tableSx";
+import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
+import { fill } from "@/lib/i18n/fill";
 
 /** Whether a change has not reached the served graph yet. */
 function isPending(
   item: { updated_at: string; is_enabled: boolean; active_result: unknown },
   servedSince: string | null,
 ): boolean {
-  if (!servedSince) return item.is_enabled;
-  if (!item.active_result) return item.is_enabled;
+  if (!servedSince || !item.active_result) return item.is_enabled;
   return item.updated_at > servedSince;
-}
-
-/** Saves a change of a feed or source, then reloads the panel; a failure is reported. */
-async function patchAndReload(
-  ctx: PlannerAdminContext,
-  path: string,
-  body: Record<string, unknown>,
-) {
-  try {
-    await ctx.apiJson("PATCH", path, body);
-  } catch (e) {
-    ctx.notify(plannerErrorMessage(e, ctx.dict), "error");
-  }
-  await ctx.reload();
 }
 
 export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
   const { core, dict } = ctx;
   const [adding, setAdding] = React.useState<"gtfs" | "gbfs" | null>(null);
-  const patch = (path: string, body: Record<string, unknown>) => patchAndReload(ctx, path, body);
   const servedSince = core.status.active_build?.created_at ?? null;
   const pending =
     core.feeds.some((f) => isPending(f, servedSince)) ||
@@ -104,7 +82,6 @@ export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
           id="planner-gtfs-title"
           title={dict.plannerAdminGtfsTitle}
           hint={dict.plannerAdminGtfsHint}
-          dense
           action={
             <Button
               variant="contained"
@@ -145,7 +122,7 @@ export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
                     feed={feed}
                     ctx={ctx}
                     onOpen={() => ctx.openDrawer({ type: "feed", id: feed.id })}
-                    onPatch={(body) => patch(plannerAdminPaths.feed(feed.id), body)}
+                    onPatch={(body) => saveFeed(ctx, feed.id, body)}
                   />
                 ))}
               </TableBody>
@@ -159,7 +136,6 @@ export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
           id="planner-gbfs-title"
           title={dict.plannerAdminGbfsTitle}
           hint={dict.plannerAdminGbfsHint}
-          dense
           action={
             <Button
               variant="outlined"
@@ -199,7 +175,7 @@ export function PlannerFeedsTab({ ctx }: { ctx: PlannerAdminContext }) {
                     source={source}
                     ctx={ctx}
                     onOpen={() => ctx.openDrawer({ type: "rental", id: source.id })}
-                    onPatch={(body) => patch(plannerAdminPaths.rentalSource(source.id), body)}
+                    onPatch={(body) => saveRental(ctx, source.id, body)}
                   />
                 ))}
               </TableBody>
@@ -221,7 +197,7 @@ type RowProps = {
 
 function FeedRow({ feed, ctx, onOpen, onPatch }: RowProps & { feed: PlannerFeed }) {
   const { dict } = ctx;
-  const state = feedState(feed);
+  const state = servedState(feed);
   const partial =
     feed.include_realtime &&
     (state === "stale" || Boolean(feed.active_result?.realtime_skipped.length));
@@ -305,7 +281,7 @@ function RentalRow({ source, ctx, onOpen, onPatch }: RowProps & { source: Planne
         </Box>
       </TableCell>
       <TableCell>
-        <RentalStateChip state={rentalState(source)} dict={dict} />
+        <RentalStateChip state={servedState(source)} dict={dict} />
       </TableCell>
       <TableCell onClick={stop} onKeyDown={stop}>
         <Switch

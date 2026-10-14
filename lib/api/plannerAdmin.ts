@@ -1,3 +1,4 @@
+import type { ApiJson } from "@/lib/api/http";
 import { fetchAllPages, type PaginatedResponse } from "@/lib/api/types";
 
 /** Journey planner admin API (backend `docs/api/planner-admin.md`). Every route needs the Admin group. */
@@ -28,8 +29,6 @@ export const plannerAdminPaths = {
   statsTopClients: `${BASE}/stats/top-clients/`,
   statsUserAgents: `${BASE}/stats/user-agents/`,
 } as const;
-
-export type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
 export type PlannerOrganization = { id: number; name: string; region: string };
 
@@ -295,12 +294,13 @@ export const ERROR_STATUS_GROUPS = {
 } as const;
 export type ErrorStatusGroup = keyof typeof ERROR_STATUS_GROUPS | "all";
 
+const RECENT_ERRORS_PER_CODE = 50;
+
 /** The newest failed requests of a group, merged across the codes the log is filtered by. */
 export async function fetchRecentErrors(
   apiJson: ApiJson,
   group: ErrorStatusGroup,
-  filters: { range: TrafficRange; ip?: string },
-  perCode = 50,
+  range: TrafficRange,
 ): Promise<RequestLogEntry[]> {
   const codes =
     group === "all" ? Object.values(ERROR_STATUS_GROUPS).flat() : ERROR_STATUS_GROUPS[group];
@@ -309,14 +309,19 @@ export async function fetchRecentErrors(
       apiJson<PaginatedResponse<RequestLogEntry>>(
         "GET",
         plannerAdminPaths.requests +
-          rangeQuery(filters.range, { status, ip: filters.ip, page_size: perCode }),
+          rangeQuery(range, { status, page_size: RECENT_ERRORS_PER_CODE }),
       ),
     ),
   );
   return pages
     .flatMap((p) => p.results)
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    .slice(0, perCode * 2);
+    .slice(0, RECENT_ERRORS_PER_CODE * 2);
+}
+
+/** Endpoint URL names without the shared prefix: `planner-v1-plan` → `plan`. */
+export function endpointLabel(name: string): string {
+  return name.replace(/^planner-v1-/, "");
 }
 
 export async function fetchFeedCandidates(apiJson: ApiJson): Promise<FeedCandidate[]> {

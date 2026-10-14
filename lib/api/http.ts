@@ -14,18 +14,25 @@ export class ApiError extends Error {
   }
 }
 
-/** The `code` of a failed response's `{code, details}` body, if it has one. */
-export async function readErrorCode(res: Response): Promise<string | undefined> {
+/** An `ApiError` for a failed response, with the code of a `{code, details}` body if it has one. */
+export async function apiErrorFrom(
+  res: Response,
+  message = `HTTP ${res.status}`,
+): Promise<ApiError> {
+  let code: string | undefined;
   try {
     const body: unknown = await res.json();
     if (body && typeof body === "object" && "code" in body && typeof body.code === "string") {
-      return body.code;
+      code = body.code;
     }
   } catch {
     // Not JSON: no code.
   }
-  return undefined;
+  return new ApiError(res.status, message, code);
 }
+
+/** `useAuth().apiJson`: an authenticated JSON request. */
+export type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
 /** Domyślny limit czasu żądania (ms). Zapobiega wiszącemu UI przy awarii backendu. */
 export const DEFAULT_TIMEOUT_MS = 20_000;
@@ -66,7 +73,7 @@ export async function getJson<T>(path: string, opts?: { revalidate?: number }): 
     headers: { Accept: "application/json" },
     ...(useIsr ? { next: { revalidate: opts!.revalidate } } : { cache: "no-store" as const }),
   });
-  if (!res.ok) throw new ApiError(res.status, `GET ${path} failed: ${res.status}`);
+  if (!res.ok) throw await apiErrorFrom(res, `GET ${path} failed: ${res.status}`);
   return parseJsonOk<T>(res);
 }
 
@@ -80,7 +87,7 @@ export async function postJson<TResponse>(path: string, body: unknown): Promise<
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `HTTP ${res.status}`);
+    throw await apiErrorFrom(res);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -96,7 +103,7 @@ export async function putJson<TResponse>(path: string, body: unknown): Promise<T
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `HTTP ${res.status}`);
+    throw await apiErrorFrom(res);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -112,7 +119,7 @@ export async function patchJson<TResponse>(path: string, body: unknown): Promise
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `HTTP ${res.status}`);
+    throw await apiErrorFrom(res);
   }
   if (res.status === 204) return undefined as TResponse;
   return parseJsonOk<TResponse>(res);
@@ -124,6 +131,6 @@ export async function deleteVoid(path: string): Promise<void> {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `HTTP ${res.status}`);
+    throw await apiErrorFrom(res);
   }
 }

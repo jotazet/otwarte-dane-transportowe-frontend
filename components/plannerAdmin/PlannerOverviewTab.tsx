@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -10,7 +9,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { MdChevronRight, MdErrorOutline, MdInfoOutline, MdWarningAmber } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type {
   DrawerTarget,
   PlannerAdminContext,
@@ -20,10 +18,11 @@ import type {
 import type { PlannerAdminDict } from "@/components/plannerAdmin/plannerAdminDict";
 import { PlannerStatusCard } from "@/components/plannerAdmin/PlannerStatusCard";
 import { RequestsChart } from "@/components/plannerAdmin/RequestsChart";
-import { codeMessage, fill, plannerErrorMessage } from "@/components/plannerAdmin/shared";
-import { StatTiles } from "@/components/plannerAdmin/StatTiles";
+import { codeMessage, LoadState, twoColumnGridSx } from "@/components/plannerAdmin/shared";
+import { TrafficSummaryTiles } from "@/components/plannerAdmin/StatTiles";
 import { plannerAdminPaths, type StatsSummary, type StatsTimeseries } from "@/lib/api/plannerAdmin";
-import { formatNumber, formatPercent } from "@/lib/format";
+import { fill } from "@/lib/i18n/fill";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 
 type Severity = "error" | "warning" | "info";
 
@@ -241,30 +240,20 @@ const visuallyHidden = {
 
 function Traffic24hCard({ ctx }: { ctx: PlannerAdminContext }) {
   const { apiJson, dict, locale } = ctx;
-  const [data, setData] = React.useState<{ summary: StatsSummary; series: StatsTimeseries } | null>(
-    null,
+  const traffic = useApiLoad(
+    React.useCallback(async () => {
+      const [summary, series] = await Promise.all([
+        apiJson<StatsSummary>("GET", plannerAdminPaths.statsSummary),
+        apiJson<StatsTimeseries>(
+          "GET",
+          `${plannerAdminPaths.statsTimeseries}?interval=hour&split=none`,
+        ),
+      ]);
+      return { summary, series };
+    }, [apiJson]),
   );
-  const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    void (async () => {
-      try {
-        const [summary, series] = await Promise.all([
-          apiJson<StatsSummary>("GET", plannerAdminPaths.statsSummary),
-          apiJson<StatsTimeseries>(
-            "GET",
-            `${plannerAdminPaths.statsTimeseries}?interval=hour&split=none`,
-          ),
-        ]);
-        setData({ summary, series });
-      } catch (e) {
-        setError(plannerErrorMessage(e, dict));
-      }
-    })();
-  }, [apiJson, dict]);
-
-  const s = data?.summary;
-  const errors = s ? s.client_errors + s.rate_limited + s.server_errors : 0;
+  const data = traffic.data;
   return (
     <Card component="section" aria-labelledby="planner-traffic24-title">
       <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
@@ -283,34 +272,10 @@ function Traffic24hCard({ ctx }: { ctx: PlannerAdminContext }) {
             {dict.plannerAdminTrafficOpen}
           </Button>
         </Stack>
-        {error ? <Alert severity="error">{error}</Alert> : null}
-        {!data && !error ? <LoadingBlock /> : null}
-        {data && s ? (
+        <LoadState loaded={traffic} dict={dict} />
+        {data ? (
           <Stack spacing={2.5}>
-            <StatTiles
-              items={[
-                { label: dict.plannerAdminStatRequests, value: formatNumber(s.requests, locale) },
-                {
-                  label: dict.plannerAdminStatUniqueIps,
-                  value: formatNumber(s.unique_ips, locale),
-                },
-                {
-                  label: fill(dict.plannerAdminStatErrors, {
-                    share: formatPercent(s.requests ? errors / s.requests : 0, locale, 1),
-                  }),
-                  value: formatNumber(errors, locale),
-                },
-                {
-                  label: dict.plannerAdminStatP95,
-                  value:
-                    s.p95_latency_ms === null
-                      ? "-"
-                      : fill(dict.plannerAdminMs, {
-                          value: formatNumber(s.p95_latency_ms, locale),
-                        }),
-                },
-              ]}
-            />
+            <TrafficSummaryTiles summary={data.summary} dict={dict} locale={locale} />
             <RequestsChart
               buckets={data.series.buckets}
               series={[
@@ -334,14 +299,7 @@ function Traffic24hCard({ ctx }: { ctx: PlannerAdminContext }) {
 
 export function PlannerOverviewTab({ ctx }: { ctx: PlannerAdminContext }) {
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gap: 2,
-        alignItems: "start",
-        gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 1.85fr) minmax(0, 1fr)" },
-      }}
-    >
+    <Box sx={twoColumnGridSx}>
       <Stack spacing={2} sx={{ minWidth: 0 }}>
         <AttentionCard ctx={ctx} />
         <Traffic24hCard ctx={ctx} />

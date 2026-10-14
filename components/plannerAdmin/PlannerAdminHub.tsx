@@ -8,7 +8,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { AccessGate } from "@/components/AccessGate";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
@@ -22,10 +22,10 @@ import { PlannerFeedsTab } from "@/components/plannerAdmin/PlannerFeedsTab";
 import { PlannerIpDrawer } from "@/components/plannerAdmin/PlannerIpDrawer";
 import { PlannerOverviewTab } from "@/components/plannerAdmin/PlannerOverviewTab";
 import { PlannerTrafficTab } from "@/components/plannerAdmin/PlannerTrafficTab";
-import { fill, plannerErrorMessage } from "@/components/plannerAdmin/shared";
+import { plannerErrorMessage } from "@/components/plannerAdmin/shared";
+import type { ApiJson } from "@/lib/api/http";
 import {
   plannerAdminPaths,
-  type ApiJson,
   type BuildSchedule,
   type GraphBuild,
   type OsmDownload,
@@ -36,6 +36,7 @@ import {
 } from "@/lib/api/plannerAdmin";
 import { fetchAllPages, type PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { fill } from "@/lib/i18n/fill";
 
 export const PLANNER_ADMIN_TABS = ["overview", "feeds", "builds", "traffic", "access"] as const;
 export type PlannerAdminTab = (typeof PLANNER_ADMIN_TABS)[number];
@@ -62,6 +63,8 @@ export type DrawerTarget =
 export type PlannerAdminContext = {
   core: PlannerCore;
   reload: () => Promise<void>;
+  /** Puts a saved change into the panel's data without reloading it. */
+  updateCore: (update: (core: PlannerCore) => PlannerCore) => void;
   apiJson: ApiJson;
   dict: PlannerAdminDict;
   locale: string;
@@ -79,6 +82,17 @@ const BUILDS_PAGE_SIZE = 20;
 const OSM_PAGE_SIZE = 5;
 /** While a build or an OSM download runs, the panel refreshes itself this often. */
 const BUSY_REFRESH_MS = 20_000;
+
+/** What changes while a build or an OSM download runs; the rest of the core stays as it is. */
+async function loadJobs(apiJson: ApiJson) {
+  const get = <T,>(path: string) => apiJson<T>("GET", path);
+  const [status, builds, osm] = await Promise.all([
+    get<PlannerAdminStatus>(plannerAdminPaths.status),
+    get<PaginatedResponse<GraphBuild>>(`${plannerAdminPaths.builds}?page_size=${BUILDS_PAGE_SIZE}`),
+    get<PaginatedResponse<OsmDownload>>(`${plannerAdminPaths.osm}?page_size=${OSM_PAGE_SIZE}`),
+  ]);
+  return { status, builds: builds.results, osm: osm.results, loadedAt: new Date().toISOString() };
+}
 
 async function loadCore(apiJson: ApiJson): Promise<PlannerCore> {
   const get = <T,>(path: string) => apiJson<T>("GET", path);
@@ -129,8 +143,6 @@ export function PlannerAdminHub({ locale, dict }: { locale: string; dict: Planne
 
 function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdminDict }) {
   const { apiJson } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = parseTab(searchParams.get("tab"));
 
@@ -167,19 +179,35 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
   );
   React.useEffect(() => {
     if (!busy) return;
-    const timer = window.setInterval(() => void reload(), BUSY_REFRESH_MS);
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      void (async () => {
+        try {
+          const jobs = await loadJobs(apiJson);
+          setCore((c) => (c ? { ...c, ...jobs } : c));
+        } catch {
+          // The next tick tries again; the panel keeps the last data.
+        }
+      })();
+    }, BUSY_REFRESH_MS);
     return () => window.clearInterval(timer);
-  }, [busy, reload]);
+  }, [apiJson, busy]);
 
+  const updateCore = React.useCallback(
+    (update: (core: PlannerCore) => PlannerCore) => setCore((c) => (c ? update(c) : c)),
+    [],
+  );
+
+  // The native History API keeps useSearchParams in sync without a server round trip.
   const openTab = React.useCallback(
     (next: PlannerAdminTab) => {
       const params = new URLSearchParams(searchParams.toString());
       if (next === "overview") params.delete("tab");
       else params.set("tab", next);
       const q = params.toString();
-      router.push(q ? `${pathname}?${q}` : pathname, { scroll: false });
+      window.history.pushState(null, "", q ? `?${q}` : window.location.pathname);
     },
-    [pathname, router, searchParams],
+    [searchParams],
   );
 
   const notify = React.useCallback(
@@ -222,6 +250,7 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
   const ctx: PlannerAdminContext = {
     core,
     reload,
+    updateCore,
     apiJson,
     dict,
     locale,

@@ -23,7 +23,9 @@ The backend's journey planner ([backend ADR 0008–0010](https://github.com/jota
 ## Consequences
 
 - Field validation errors of the admin API keep DRF's English messages without codes, so the panel validates `feed_id`, `network`, IP networks and limits itself and shows a generic message for a `400`. If the admin views adopt the planner exception handler, the panel can map field codes instead.
-- Opening IP details sends five requests and "all errors" sends nine; both are admin-only and on demand. A `status_class` filter on `requests/` would cut the latter to one.
+- Opening IP details sends five requests and "all errors" sends nine; both are admin-only and on demand. A `status_class` filter on `requests/` would cut the latter to one and would also catch codes outside the fixed lists (405, 413, 422, 501), which "Recent errors" does not show today.
+- IP details load every ban to find one that covers the address. A `covers=<ip>` filter on `ip-bans/` (or the covering ban's id on `top-clients/`) would make that one small request.
+- The build schedule is stored as `HH:MM` UTC, so a build set for 03:00 Polish time in winter runs at 04:00 in summer. The panel shows both Polish times next to the UTC field; a schedule in `Europe/Warsaw` would need a backend change.
 - The add-feed dialog cannot show whether an organization publishes GTFS-RT: `feed-candidates/` does not say so.
 - The panel cannot warn that a feed's timetable is about to end, as the API exposes no service end date.
 

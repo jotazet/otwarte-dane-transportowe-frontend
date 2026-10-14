@@ -29,15 +29,12 @@ import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdmin
 import {
   BuildStatusChip,
   CardHeading,
-  clickableRowSx,
-  openOnEnter,
   codeMessage,
-  DefinitionRows,
   durationMinutes,
-  fill,
   plannerErrorMessage,
   scrollTableSx,
   StateChip,
+  twoColumnGridSx,
 } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
 import {
@@ -49,7 +46,9 @@ import {
 } from "@/lib/api/plannerAdmin";
 import { formatBytes, formatDateTime, formatTime } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
-import { tableHeadRowSx } from "@/lib/ui/tableSx";
+import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { fill } from "@/lib/i18n/fill";
 
 /** Only the served graph and the newest other one are kept, so only that one can come back. */
 export function restorableBuildId(builds: GraphBuild[]): number | null {
@@ -58,14 +57,7 @@ export function restorableBuildId(builds: GraphBuild[]): number | null {
 
 export function PlannerBuildsTab({ ctx }: { ctx: PlannerAdminContext }) {
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gap: 2,
-        alignItems: "start",
-        gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 1.85fr) minmax(0, 1fr)" },
-      }}
-    >
+    <Box sx={twoColumnGridSx}>
       <BuildHistoryCard ctx={ctx} />
       <Stack spacing={2} sx={{ minWidth: 0 }}>
         <ScheduleCard ctx={ctx} />
@@ -85,7 +77,6 @@ function BuildHistoryCard({ ctx }: { ctx: PlannerAdminContext }) {
         id="planner-builds-title"
         title={dict.plannerAdminBuildsTitle}
         hint={dict.plannerAdminBuildsHint}
-        dense
         action={
           <Button
             variant="contained"

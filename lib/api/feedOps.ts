@@ -1,3 +1,4 @@
+import type { ApiJson } from "@/lib/api/http";
 import { fetchAllPages, type FetchHealthFields } from "@/lib/api/types";
 
 export const feedOpsPaths = {
@@ -99,8 +100,6 @@ export function pauseFetchPath(
     ? feedOpsPaths.realtimePauseFetch(id)
     : feedOpsPaths.realtimeResumeFetch(id);
 }
-
-type ApiJson = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
 /** Loads all pages (for overview stats). */
 export async function fetchAllProxyFeeds(apiJson: ApiJson): Promise<ProxyFeedListItem[]> {

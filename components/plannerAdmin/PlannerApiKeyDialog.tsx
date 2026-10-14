@@ -16,7 +16,7 @@ import Typography from "@mui/material/Typography";
 import { MdCheck, MdContentCopy } from "react-icons/md";
 
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
-import { plannerErrorMessage } from "@/components/plannerAdmin/shared";
+import { isPositiveInt, plannerErrorMessage } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
 import {
   LIMIT_GROUPS,
@@ -25,6 +25,7 @@ import {
   type LimitGroup,
 } from "@/lib/api/plannerAdmin";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
+import { useCopyToClipboard } from "@/lib/ui/useCopyToClipboard";
 
 type Draft = { name: string; email: string; note: string; limits: Record<LimitGroup, string> };
 
@@ -50,19 +51,18 @@ export function PlannerApiKeyDialog({
   const { dict } = ctx;
   const [draft, setDraft] = React.useState<Draft>(EMPTY);
   const [created, setCreated] = React.useState<string | null>(null);
-  const [copied, setCopied] = React.useState(false);
+  const { copied, copy } = useCopyToClipboard();
   const [touched, setTouched] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [sending, setSending] = React.useState(false);
   const nameMissing = !draft.name.trim();
   const badLimit = LIMIT_GROUPS.some(
-    (g) => draft.limits[g].trim() && !/^[1-9]\d*$/.test(draft.limits[g].trim()),
+    (g) => draft.limits[g].trim() && !isPositiveInt(draft.limits[g]),
   );
 
   const reset = () => {
     setDraft(EMPTY);
     setCreated(null);
-    setCopied(false);
     setTouched(false);
     setError(null);
   };
@@ -96,16 +96,6 @@ export function PlannerApiKeyDialog({
       );
     } finally {
       setSending(false);
-    }
-  };
-
-  const copy = async () => {
-    if (!created) return;
-    try {
-      await navigator.clipboard.writeText(created);
-      setCopied(true);
-    } catch {
-      // Clipboard refused: the key stays visible and selectable.
     }
   };
 
@@ -149,7 +139,10 @@ export function PlannerApiKeyDialog({
                   {created}
                 </Box>
                 <Tooltip title={copied ? dict.plannerAdminCopied : dict.plannerAdminCopyKey}>
-                  <IconButton onClick={() => void copy()} aria-label={dict.plannerAdminCopyKey}>
+                  <IconButton
+                    onClick={() => void copy(created)}
+                    aria-label={dict.plannerAdminCopyKey}
+                  >
                     {copied ? <MdCheck aria-hidden /> : <MdContentCopy aria-hidden />}
                   </IconButton>
                 </Tooltip>
@@ -215,7 +208,7 @@ export function PlannerApiKeyDialog({
                         onChange={(e) =>
                           setDraft((d) => ({ ...d, limits: { ...d.limits, [g]: e.target.value } }))
                         }
-                        error={Boolean(value) && !/^[1-9]\d*$/.test(value)}
+                        error={Boolean(value) && !isPositiveInt(value)}
                         slotProps={{ htmlInput: { inputMode: "numeric" } }}
                       />
                     );

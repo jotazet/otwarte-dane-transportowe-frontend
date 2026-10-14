@@ -14,24 +14,26 @@ import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdmin
 import { DrawerSection, OtpLog, PlannerDrawer } from "@/components/plannerAdmin/PlannerDrawer";
 import {
   codeMessage,
-  DefinitionRows,
+  ErrorCodeAlert,
   FeedStateChip,
-  feedState,
-  fill,
   plannerErrorMessage,
   RentalStateChip,
-  rentalState,
+  saveFeed,
+  saveRental,
+  servedState,
 } from "@/components/plannerAdmin/shared";
 import {
   fetchFeedCandidates,
   plannerAdminPaths,
   type FailurePolicy,
-  type FeedCandidate,
   type PlannerFeed,
   type PlannerRentalSource,
 } from "@/lib/api/plannerAdmin";
 import { formatDateTime } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { fill } from "@/lib/i18n/fill";
 
 type Target = { type: "feed" | "rental"; id: number };
 
@@ -61,15 +63,6 @@ export function PlannerFeedDrawer({
       {source ? <RentalDetails ctx={ctx} source={source} onRemoved={onClose} /> : null}
     </PlannerDrawer>
   );
-}
-
-async function save(ctx: PlannerAdminContext, path: string, body: Record<string, unknown>) {
-  try {
-    await ctx.apiJson("PATCH", path, body);
-  } catch (e) {
-    ctx.notify(plannerErrorMessage(e, ctx.dict), "error");
-  }
-  await ctx.reload();
 }
 
 async function remove(
@@ -102,20 +95,13 @@ function FeedDetails({
 }) {
   const { dict, locale } = ctx;
   const result = feed.active_result;
-  const state = feedState(feed);
-  const [candidates, setCandidates] = React.useState<FeedCandidate[]>([]);
+  const state = servedState(feed);
+  // Without candidates the submission field offers only the current one.
+  const { apiJson } = ctx;
+  const loadCandidates = React.useCallback(() => fetchFeedCandidates(apiJson), [apiJson]);
+  const candidates = useApiLoad(loadCandidates).data ?? [];
   const updaters: Record<string, string> = dict.plannerAdminRealtimeUpdaterLabels;
   const endpoints: Record<string, string> = dict.plannerAdminRealtimeEndpointLabels;
-
-  React.useEffect(() => {
-    void (async () => {
-      try {
-        setCandidates(await fetchFeedCandidates(ctx.apiJson));
-      } catch {
-        // Without candidates the submission field offers only the current one.
-      }
-    })();
-  }, [ctx.apiJson]);
 
   const sameOrganization = candidates.filter((c) => c.organization.id === feed.organization.id);
   const submissions = sameOrganization.some((c) => c.id === feed.submission)
@@ -147,12 +133,11 @@ function FeedDetails({
           ) : null}
         </Box>
         {result?.error_code ? (
-          <Alert severity={state === "excluded" ? "error" : "warning"}>
-            {codeMessage(result.error_code, dict)}{" "}
-            <Box component="code" sx={{ fontFamily: MONOSPACE_FONT, fontSize: "0.75rem" }}>
-              {result.error_code}
-            </Box>
-          </Alert>
+          <ErrorCodeAlert
+            code={result.error_code}
+            dict={dict}
+            severity={state === "excluded" ? "error" : "warning"}
+          />
         ) : null}
         <OtpLog text={result?.log_excerpt ?? ""} label={dict.plannerAdminOtpLog} />
         <DefinitionRows
@@ -182,7 +167,7 @@ function FeedDetails({
           control={
             <Switch
               checked={feed.include_realtime}
-              onChange={(_, v) => void save(ctx, path, { include_realtime: v })}
+              onChange={(_, v) => void saveFeed(ctx, feed.id, { include_realtime: v })}
             />
           }
           label={dict.plannerAdminRealtimeToggle}
@@ -213,7 +198,7 @@ function FeedDetails({
           label={dict.plannerAdminFailurePolicy}
           value={feed.failure_policy}
           onChange={(e) =>
-            void save(ctx, path, { failure_policy: e.target.value as FailurePolicy })
+            void saveFeed(ctx, feed.id, { failure_policy: e.target.value as FailurePolicy })
           }
         >
           {(["keep_last_good", "exclude"] as const).map((p) => (
@@ -228,7 +213,7 @@ function FeedDetails({
           label={dict.plannerAdminSubmission}
           value={feed.submission}
           helperText={dict.plannerAdminSubmissionHint}
-          onChange={(e) => void save(ctx, path, { submission: Number(e.target.value) })}
+          onChange={(e) => void saveFeed(ctx, feed.id, { submission: Number(e.target.value) })}
         >
           {submissions.map((c) => (
             <MenuItem key={c.id} value={c.id}>
@@ -242,7 +227,7 @@ function FeedDetails({
           control={
             <Switch
               checked={feed.is_enabled}
-              onChange={(_, v) => void save(ctx, path, { is_enabled: v })}
+              onChange={(_, v) => void saveFeed(ctx, feed.id, { is_enabled: v })}
             />
           }
           label={dict.plannerAdminIncludeInBuild}
@@ -289,16 +274,9 @@ function RentalDetails({
     <>
       <DrawerSection title={dict.plannerAdminInServedGraph}>
         <Box>
-          <RentalStateChip state={rentalState(source)} dict={dict} />
+          <RentalStateChip state={servedState(source)} dict={dict} />
         </Box>
-        {result?.error_code ? (
-          <Alert severity="error">
-            {codeMessage(result.error_code, dict)}{" "}
-            <Box component="code" sx={{ fontFamily: MONOSPACE_FONT, fontSize: "0.75rem" }}>
-              {result.error_code}
-            </Box>
-          </Alert>
-        ) : null}
+        {result?.error_code ? <ErrorCodeAlert code={result.error_code} dict={dict} /> : null}
         <DefinitionRows
           rows={[
             {
@@ -319,7 +297,7 @@ function RentalDetails({
           control={
             <Switch
               checked={source.is_enabled}
-              onChange={(_, v) => void save(ctx, path, { is_enabled: v })}
+              onChange={(_, v) => void saveRental(ctx, source.id, { is_enabled: v })}
             />
           }
           label={dict.plannerAdminIncludeInBuild}

@@ -16,9 +16,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { MdSearch } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
-import { fill, plannerErrorMessage } from "@/components/plannerAdmin/shared";
+import { LoadState, plannerErrorMessage } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
 import {
   fetchFeedCandidates,
@@ -29,6 +28,8 @@ import {
   type PlannerOrganization,
 } from "@/lib/api/plannerAdmin";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
+import { fill } from "@/lib/i18n/fill";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 
 type Candidate = { id: number; name: string; organization: PlannerOrganization; included: boolean };
 type Selection = Record<number, { plannerId: string; realtime: boolean }>;
@@ -44,39 +45,32 @@ export function PlannerAddFeedsDialog({
 }) {
   const { apiJson, dict } = ctx;
   const gtfs = kind === "gtfs";
-  const [candidates, setCandidates] = React.useState<Candidate[] | null>(null);
-  const [loadError, setLoadError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const [hideIncluded, setHideIncluded] = React.useState(false);
   const [selected, setSelected] = React.useState<Selection>({});
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (!kind) return;
-    void (async () => {
-      setCandidates(null);
-      setLoadError(null);
-      setSelected({});
-      setQuery("");
-      setSubmitError(null);
-      try {
-        const list =
-          kind === "gtfs"
-            ? (await fetchFeedCandidates(apiJson)).map((c) => ({
-                ...c,
-                included: c.planner_feed !== null,
-              }))
-            : (await fetchRentalCandidates(apiJson)).map((c) => ({
-                ...c,
-                included: c.rental_source !== null,
-              }));
-        setCandidates(list);
-      } catch (e) {
-        setLoadError(plannerErrorMessage(e, dict));
+  const loaded = useApiLoad(
+    React.useCallback(async (): Promise<Candidate[] | null> => {
+      if (kind === "gtfs") {
+        const list = await fetchFeedCandidates(apiJson);
+        return list.map((c) => ({ ...c, included: c.planner_feed !== null }));
       }
-    })();
-  }, [apiJson, dict, kind]);
+      if (kind === "gbfs") {
+        const list = await fetchRentalCandidates(apiJson);
+        return list.map((c) => ({ ...c, included: c.rental_source !== null }));
+      }
+      return null;
+    }, [apiJson, kind]),
+  );
+  const candidates = loaded.data;
+
+  const reset = () => {
+    setSelected({});
+    setQuery("");
+    setSubmitError(null);
+  };
 
   const existing = React.useMemo(
     () =>
@@ -167,7 +161,14 @@ export function PlannerAddFeedsDialog({
   };
 
   return (
-    <Dialog open={kind !== null} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+    <Dialog
+      open={kind !== null}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      scroll="paper"
+      slotProps={{ transition: { onEnter: reset } }}
+    >
       <DialogTitle sx={{ pb: 1 }}>
         {gtfs ? dict.plannerAdminAddGtfsTitle : dict.plannerAdminAddGbfsTitle}
         <Typography variant="body2" color="text.secondary">
@@ -202,12 +203,7 @@ export function PlannerAddFeedsDialog({
         />
       </Stack>
       <DialogContent dividers sx={{ minHeight: 240, pt: 0 }}>
-        {loadError ? (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {loadError}
-          </Alert>
-        ) : null}
-        {!candidates && !loadError ? <LoadingBlock /> : null}
+        <LoadState loaded={loaded} dict={dict} sx={{ mt: 2 }} />
         {candidates && groups.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: "center" }}>
             {dict.plannerAdminAddEmpty}

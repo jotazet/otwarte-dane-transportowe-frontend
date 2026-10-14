@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
@@ -13,16 +12,15 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { MdHistory } from "react-icons/md";
 
-import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import { restorableBuildId } from "@/components/plannerAdmin/PlannerBuildsTab";
 import { DrawerSection, OtpLog, PlannerDrawer } from "@/components/plannerAdmin/PlannerDrawer";
 import {
   BuildStatusChip,
   codeMessage,
-  DefinitionRows,
+  ErrorCodeAlert,
   FeedStateChip,
-  fill,
+  LoadState,
   plannerErrorMessage,
   RentalStateChip,
   StateChip,
@@ -30,6 +28,9 @@ import {
 import { plannerAdminPaths, type GraphBuildDetail } from "@/lib/api/plannerAdmin";
 import { formatDateTime, formatTime } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { fill } from "@/lib/i18n/fill";
+import { useApiLoad } from "@/lib/ui/useApiLoad";
 
 export function PlannerBuildDrawer({
   ctx,
@@ -41,21 +42,21 @@ export function PlannerBuildDrawer({
   onClose: () => void;
 }) {
   const { apiJson, dict, locale } = ctx;
-  const [build, setBuild] = React.useState<GraphBuildDetail | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (buildId === null) return;
-    void (async () => {
-      setBuild(null);
-      setError(null);
-      try {
-        setBuild(await apiJson<GraphBuildDetail>("GET", plannerAdminPaths.build(buildId)));
-      } catch (e) {
-        setError(plannerErrorMessage(e, dict));
-      }
-    })();
-  }, [apiJson, buildId, dict, ctx.core.loadedAt]);
+  // A queued or running build changes with every refresh of the panel; a finished one does not.
+  const listed = ctx.core.builds.find((b) => b.id === buildId);
+  const busy = listed?.status === "queued" || listed?.status === "running";
+  const detail = useApiLoad(
+    React.useCallback(
+      async () =>
+        buildId === null
+          ? null
+          : apiJson<GraphBuildDetail>("GET", plannerAdminPaths.build(buildId)),
+      [apiJson, buildId],
+    ),
+    busy ? ctx.core.loadedAt : listed?.status,
+  );
+  // Until the newly opened build arrives, `detail` still holds the previous one.
+  const build = detail.data?.id === buildId ? detail.data : null;
 
   const restorable = build !== null && build.id === restorableBuildId(ctx.core.builds);
 
@@ -94,8 +95,7 @@ export function PlannerBuildDrawer({
       subtitle={subtitle}
       closeLabel={dict.close}
     >
-      {error ? <Alert severity="error">{error}</Alert> : null}
-      {!build && !error ? <LoadingBlock /> : null}
+      <LoadState loaded={{ ...detail, data: build }} dict={dict} />
       {build ? (
         <>
           <DrawerSection>
@@ -105,14 +105,7 @@ export function PlannerBuildDrawer({
                 <StateChip tone="neutral" label={dict.plannerAdminServed} />
               ) : null}
             </Stack>
-            {build.error_code ? (
-              <Alert severity="error">
-                {codeMessage(build.error_code, dict)}{" "}
-                <Box component="code" sx={{ fontFamily: MONOSPACE_FONT, fontSize: "0.75rem" }}>
-                  {build.error_code}
-                </Box>
-              </Alert>
-            ) : null}
+            {build.error_code ? <ErrorCodeAlert code={build.error_code} dict={dict} /> : null}
             <OtpLog text={build.log_excerpt} label={dict.plannerAdminOtpLog} />
             {build.status === "queued" ? (
               <Typography variant="body2" color="text.secondary">

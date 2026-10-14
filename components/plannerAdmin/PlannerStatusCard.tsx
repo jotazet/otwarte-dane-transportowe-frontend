@@ -9,9 +9,11 @@ import Typography from "@mui/material/Typography";
 import { MdRefresh } from "react-icons/md";
 
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
-import { DefinitionRows, feedState, fill, rentalState } from "@/components/plannerAdmin/shared";
+import { servedState, StatusPanel } from "@/components/plannerAdmin/shared";
 import { nextScheduledBuild } from "@/lib/api/plannerAdmin";
 import { formatDateTime, formatNumber, formatTime } from "@/lib/format";
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { fill } from "@/lib/i18n/fill";
 
 type State = "ok" | "maintenance" | "unhealthy" | "noGraph";
 
@@ -32,7 +34,7 @@ export function PlannerStatusCard({ ctx }: { ctx: PlannerAdminContext }) {
       : status.otp_healthy
         ? "ok"
         : "unhealthy";
-  const states = core.feeds.map(feedState);
+  const states = core.feeds.map((f) => servedState(f));
   const next = nextScheduledBuild(schedule);
   const active = status.active_build;
   const running = status.running_build;
@@ -53,38 +55,13 @@ export function PlannerStatusCard({ ctx }: { ctx: PlannerAdminContext }) {
           </Typography>
         </Stack>
 
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{
-            alignItems: "flex-start",
-            mt: 2,
-            p: 1.5,
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 1,
-          }}
-        >
-          <Box
-            aria-hidden
-            sx={{
-              width: 10,
-              height: 10,
-              mt: 0.75,
-              borderRadius: "50%",
-              flexShrink: 0,
-              bgcolor: DOT_COLOR[state],
-            }}
+        <Box sx={{ mt: 2 }}>
+          <StatusPanel
+            color={DOT_COLOR[state]}
+            title={dict.plannerAdminStateLabels[state]}
+            body={dict.plannerAdminStateBodies[state]}
           />
-          <Box>
-            <Typography variant="subtitle1" component="p" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-              {dict.plannerAdminStateLabels[state]}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {dict.plannerAdminStateBodies[state]}
-            </Typography>
-          </Box>
-        </Stack>
+        </Box>
 
         <Box sx={{ mt: 2 }}>
           <DefinitionRows
@@ -110,7 +87,7 @@ export function PlannerStatusCard({ ctx }: { ctx: PlannerAdminContext }) {
               {
                 label: dict.plannerAdminStatusRentals,
                 value: fill(dict.plannerAdminStatusRentalsValue, {
-                  included: core.rentals.filter((r) => rentalState(r) === "included").length,
+                  included: core.rentals.filter((r) => servedState(r) === "included").length,
                   total: core.rentals.length,
                 }),
               },
