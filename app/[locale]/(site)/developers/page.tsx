@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { MdCode, MdOpenInNew } from "react-icons/md";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
@@ -14,8 +13,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { loadOrError } from "@/lib/api/loadOr404";
-import { fetchPlannerCoverage, fetchPlannerStatus } from "@/lib/api/planner";
+import { fetchPlannerStatus } from "@/lib/api/planner";
 import { apiBaseUrl } from "@/lib/config";
+import { resolvePageLocale } from "@/lib/i18n/resolvePageLocale";
 import { developersRoot } from "@/lib/nav/breadcrumbTrails";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -36,17 +36,9 @@ export async function generateMetadata({
 }
 
 export default async function DevelopersPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: rawLocale } = await params;
-  if (!locales.includes(rawLocale as Locale)) notFound();
-  const locale = rawLocale as Locale;
-  const dict = await getDictionary(locale);
+  const { locale, dict } = await resolvePageLocale(params);
   const baseUrl = apiBaseUrl();
-
   const { data: status } = await loadOrError(fetchPlannerStatus());
-  // Counting trips needs the routing engine, which only answers while the planner is available.
-  const { data: coverage } = status?.available
-    ? await loadOrError(fetchPlannerCoverage(status))
-    : { data: null };
 
   return (
     <AppPage
@@ -99,7 +91,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           </Stack>
         </Grid>
         <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-          <PlannerStatusCard status={status} coverage={coverage} locale={locale} dict={dict} />
+          <PlannerStatusCard status={status} locale={locale} dict={dict} />
         </Grid>
       </Grid>
       {status ? (

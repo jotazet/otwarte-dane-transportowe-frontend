@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,6 +18,7 @@ import { MdCheck, MdContentCopy, MdSend } from "react-icons/md";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { fetchWithTimeout } from "@/lib/api/http";
 import { codeBlockSx } from "@/lib/ui/codeSx";
+import { useCopyToClipboard } from "@/lib/ui/useCopyToClipboard";
 
 type ExampleKey = keyof Dictionary["developersExampleLabels"];
 
@@ -37,7 +38,9 @@ const LANGUAGES = [
 type Language = (typeof LANGUAGES)[number]["value"];
 
 type Result =
-  { kind: "response"; status: number; ok: boolean; ms: number; body: string } | { kind: "failed" };
+  | { kind: "loading" }
+  | { kind: "response"; status: number; ms: number; body: string }
+  | { kind: "failed" };
 
 type QuickStartDict = Pick<
   Dictionary,
@@ -59,9 +62,13 @@ type QuickStartDict = Pick<
   | "developersCopyResponse"
 >;
 
-function snippet(baseUrl: string, example: (typeof EXAMPLES)[number], language: Language) {
+function exampleUrl(baseUrl: string, example: (typeof EXAMPLES)[number]) {
   const query = new URLSearchParams(example.params).toString();
-  const url = `${baseUrl}${example.path}${query ? `?${query}` : ""}`;
+  return `${baseUrl}${example.path}${query ? `?${query}` : ""}`;
+}
+
+function snippet(baseUrl: string, example: (typeof EXAMPLES)[number], language: Language) {
+  const url = exampleUrl(baseUrl, example);
   if (language === "curl") return `curl "${url}"`;
   if (language === "js")
     return `const res = await fetch("${url}");\nconst data = await res.json();`;
@@ -82,29 +89,11 @@ function CopyButton({
   label: string;
   copiedLabel: string;
 }) {
-  const [copied, setCopied] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setCopied(false), 1200);
-    } catch {
-      // The browser refused clipboard access; the text stays selectable.
-    }
-  }
+  const { copied, copy } = useCopyToClipboard();
 
   return (
     <Tooltip title={copied ? copiedLabel : label}>
-      <IconButton type="button" size="small" onClick={copy} aria-label={label}>
+      <IconButton type="button" size="small" onClick={() => void copy(text)} aria-label={label}>
         {copied ? <MdCheck size={18} aria-hidden /> : <MdContentCopy size={18} aria-hidden />}
       </IconButton>
     </Tooltip>
@@ -120,26 +109,22 @@ export function DeveloperQuickStart({
 }) {
   const [example, setExample] = useState(EXAMPLES[0]);
   const [language, setLanguage] = useState<Language>("curl");
-  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   // Ignores a response that arrives after the visitor picked another request.
   const requestIdRef = useRef(0);
 
   const code = snippet(apiBaseUrl, example, language);
-  const query = new URLSearchParams(example.params).toString();
-  const url = `${apiBaseUrl}${example.path}${query ? `?${query}` : ""}`;
+  const url = exampleUrl(apiBaseUrl, example);
 
   function pickExample(next: (typeof EXAMPLES)[number]) {
     requestIdRef.current += 1;
     setExample(next);
     setResult(null);
-    setLoading(false);
   }
 
   async function send() {
     const requestId = ++requestIdRef.current;
-    setLoading(true);
-    setResult(null);
+    setResult({ kind: "loading" });
     const started = performance.now();
     let next: Result;
     try {
@@ -154,7 +139,6 @@ export function DeveloperQuickStart({
       next = {
         kind: "response",
         status: res.status,
-        ok: res.ok,
         ms: Math.round(performance.now() - started),
         body,
       };
@@ -163,7 +147,6 @@ export function DeveloperQuickStart({
     }
     if (requestId !== requestIdRef.current) return;
     setResult(next);
-    setLoading(false);
   }
 
   return (
@@ -263,7 +246,7 @@ export function DeveloperQuickStart({
               variant="contained"
               startIcon={<MdSend aria-hidden />}
               onClick={send}
-              loading={loading}
+              loading={result?.kind === "loading"}
               sx={{ flexShrink: 0 }}
             >
               {dict.developersSendRequest}
@@ -294,7 +277,10 @@ export function DeveloperQuickStart({
                 <>
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: 600, color: result.ok ? "success.main" : "error.main" }}
+                    sx={{
+                      fontWeight: 600,
+                      color: result.status < 400 ? "success.main" : "error.main",
+                    }}
                   >
                     {result.status}
                   </Typography>
@@ -325,7 +311,7 @@ export function DeveloperQuickStart({
                 },
               }}
             >
-              {loading ? (
+              {result?.kind === "loading" ? (
                 <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
                   {dict.developersResponseLoading}
                 </Typography>
@@ -333,7 +319,7 @@ export function DeveloperQuickStart({
                 <Alert severity="error" sx={{ m: 2 }}>
                   {dict.developersResponseFailed}
                 </Alert>
-              ) : result ? (
+              ) : result?.kind === "response" ? (
                 <Box component="pre" sx={{ m: 0, p: 2, font: "inherit" }}>
                   <code>{result.body}</code>
                 </Box>

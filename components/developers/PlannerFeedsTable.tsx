@@ -43,8 +43,9 @@ export function PlannerFeedsTable({
   dict: FeedsTableDict;
 }) {
   const p = paths(locale);
+  const collator = new Intl.Collator(locale);
   const sorted = [...feeds].sort((a, b) =>
-    a.organization.name.localeCompare(b.organization.name, locale),
+    collator.compare(a.organization.name, b.organization.name),
   );
 
   return (

@@ -6,6 +6,12 @@ const PLANNER_REVALIDATE_S = 60;
 /** `vehicles/coverage/` counts at most this many operators per request. */
 const COVERAGE_MAX_AGENCIES = 20;
 
+/**
+ * Requests per minute without a key: the backend's `PlannerSettings` defaults. The public API
+ * does not publish the limits, so a change in the admin panel must be repeated here.
+ */
+export const PLANNER_ANONYMOUS_LIMITS = { plan: 20, realtime: 120, lookup: 150 } as const;
+
 export type PlannerUnavailableReason = "disabled" | "maintenance" | "no_graph";
 
 export type PlannerStatusFeed = {

@@ -1,14 +1,16 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import LinearProgress from "@mui/material/LinearProgress";
+import Skeleton from "@mui/material/Skeleton";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import type { Dictionary } from "@/i18n/getDictionary";
-import type { PlannerCoverage, PlannerStatus } from "@/lib/api/planner";
+import { loadOrError } from "@/lib/api/loadOr404";
+import { fetchPlannerCoverage, type PlannerStatus } from "@/lib/api/planner";
 import { formatDateTime, formatNumber, formatPercent } from "@/lib/format";
 
 type StatusState = keyof Dictionary["developersStatusStateLabels"];
@@ -41,12 +43,10 @@ type StatusCardDict = Pick<
 /** `status` is null when the backend did not answer. */
 export function PlannerStatusCard({
   status,
-  coverage,
   locale,
   dict,
 }: {
   status: PlannerStatus | null;
-  coverage: PlannerCoverage | null;
   locale: string;
   dict: StatusCardDict;
 }) {
@@ -166,48 +166,57 @@ export function PlannerStatusCard({
           </Box>
         ) : null}
 
+        {/* Counting trips needs the routing engine, which only answers while the planner is
+            available; it is slow, so the rest of the page does not wait for it. */}
         {status?.available ? (
           <Box sx={{ mt: 2.5 }}>
-            <Stack
-              direction="row"
-              sx={{ justifyContent: "space-between", alignItems: "baseline", gap: 1 }}
-            >
-              <Typography variant="body2" color="text.secondary" id="planner-coverage-label">
-                {dict.developersCoverageLabel}
-              </Typography>
-              {coverage ? (
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {formatPercent(coverage.tripsWithPosition / coverage.tripsUnderWay, locale)}
-                </Typography>
-              ) : null}
-            </Stack>
-            {coverage ? (
-              <>
-                <LinearProgress
-                  variant="determinate"
-                  value={(coverage.tripsWithPosition / coverage.tripsUnderWay) * 100}
-                  aria-labelledby="planner-coverage-label"
-                  sx={{ mt: 1, height: 6, borderRadius: 1 }}
-                />
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  component="p"
-                  sx={{ mt: 0.75 }}
-                >
-                  {dict.developersCoverageCount
-                    .replace("{withPosition}", formatNumber(coverage.tripsWithPosition, locale))
-                    .replace("{underWay}", formatNumber(coverage.tripsUnderWay, locale))}
-                </Typography>
-              </>
-            ) : (
-              <Typography variant="body2" sx={{ mt: 0.5 }}>
-                {dict.developersCoverageUnavailable}
-              </Typography>
-            )}
+            <Typography variant="body2" color="text.secondary" id="planner-coverage-label">
+              {dict.developersCoverageLabel}
+            </Typography>
+            <Suspense fallback={<Skeleton variant="rounded" height={6} sx={{ mt: 1 }} />}>
+              <CoverageSummary status={status} locale={locale} dict={dict} />
+            </Suspense>
           </Box>
         ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+async function CoverageSummary({
+  status,
+  locale,
+  dict,
+}: {
+  status: PlannerStatus;
+  locale: string;
+  dict: StatusCardDict;
+}) {
+  const { data: coverage } = await loadOrError(fetchPlannerCoverage(status));
+  if (!coverage) {
+    return (
+      <Typography variant="body2" sx={{ mt: 0.5 }}>
+        {dict.developersCoverageUnavailable}
+      </Typography>
+    );
+  }
+  const ratio = coverage.tripsWithPosition / coverage.tripsUnderWay;
+  return (
+    <>
+      <Typography variant="body2" sx={{ fontWeight: 600, mt: 0.5 }}>
+        {formatPercent(ratio, locale)}
+      </Typography>
+      <LinearProgress
+        variant="determinate"
+        value={ratio * 100}
+        aria-labelledby="planner-coverage-label"
+        sx={{ mt: 1, height: 6, borderRadius: 1 }}
+      />
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.75 }}>
+        {dict.developersCoverageCount
+          .replace("{withPosition}", formatNumber(coverage.tripsWithPosition, locale))
+          .replace("{underWay}", formatNumber(coverage.tripsUnderWay, locale))}
+      </Typography>
+    </>
   );
 }

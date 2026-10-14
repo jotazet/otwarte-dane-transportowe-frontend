@@ -6,18 +6,9 @@ import Typography from "@mui/material/Typography";
 import { MdCheckCircle, MdPublic, MdVpnKey } from "react-icons/md";
 
 import type { Dictionary } from "@/i18n/getDictionary";
+import { PLANNER_ANONYMOUS_LIMITS } from "@/lib/api/planner";
 import { formatNumber } from "@/lib/format";
 import { renderRichText } from "@/lib/richText";
-
-/**
- * Requests per minute without a key: the backend's `PlannerSettings` defaults. The public API
- * does not publish the limits, so a change in the admin panel must be repeated here.
- */
-const ANONYMOUS_LIMITS: Record<keyof Dictionary["developersLimitLabels"], number> = {
-  plan: 20,
-  realtime: 120,
-  lookup: 150,
-};
 
 type AccessCardDict = Pick<
   Dictionary,
@@ -52,7 +43,10 @@ export function DeveloperAccessCard({ locale, dict }: { locale: string; dict: Ac
       body: dict.developersBrowserBody,
     },
   ];
-  const limits = Object.entries(ANONYMOUS_LIMITS) as [keyof typeof ANONYMOUS_LIMITS, number][];
+  const limits = Object.entries(PLANNER_ANONYMOUS_LIMITS) as [
+    keyof typeof PLANNER_ANONYMOUS_LIMITS,
+    number,
+  ][];
 
   return (
     <Card>

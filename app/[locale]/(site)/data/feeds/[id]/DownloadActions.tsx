@@ -4,8 +4,9 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useEffect, useRef, useState } from "react";
 import { MdCheck, MdContentCopy, MdFileDownload } from "react-icons/md";
+
+import { useCopyToClipboard } from "@/lib/ui/useCopyToClipboard";
 
 export function DownloadActions({
   url,
@@ -14,25 +15,7 @@ export function DownloadActions({
   url: string;
   labels: { downloadFile: string; copyLink: string; openLinkError: string };
 }) {
-  const [copied, setCopied] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setCopied(false), 1200);
-    } catch {
-      // ignore
-    }
-  }
+  const { copied, copy } = useCopyToClipboard();
 
   if (!url || url === "-") return <Typography component="span">-</Typography>;
 
@@ -54,7 +37,7 @@ export function DownloadActions({
       <Tooltip title={labels.copyLink}>
         <IconButton
           type="button"
-          onClick={copy}
+          onClick={() => void copy(url)}
           color="primary"
           size="small"
           aria-label={labels.copyLink}
