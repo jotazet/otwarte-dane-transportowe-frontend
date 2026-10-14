@@ -229,10 +229,11 @@ function AttentionCard({ ctx }: { ctx: PlannerAdminContext }) {
   );
 }
 
+// Pixel strings: in sx a bare 1 means 100%, which made this label as wide as the page.
 const visuallyHidden = {
   position: "absolute",
-  width: 1,
-  height: 1,
+  width: "1px",
+  height: "1px",
   overflow: "hidden",
   clip: "rect(0 0 0 0)",
   whiteSpace: "nowrap",
