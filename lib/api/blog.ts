@@ -8,7 +8,8 @@ export type BlogPostListItem = {
   /** `null` albo string: zwykle pełny `http(s)://…/internal-media/blog/images/...` (zob. `lib/blogImage.ts`). */
   image?: string | null;
   author_username?: string | null;
-  author_id?: number;
+  /** Author's user id. */
+  author?: number;
   updated_at?: string | null;
   date?: string | null;
   tags?: string[];
@@ -17,7 +18,6 @@ export type BlogPostListItem = {
 
 export type BlogPost = BlogPostListItem & {
   your_reaction?: string | null;
-  author_id?: number;
 };
 
 export const BLOG_LIST_PAGE_SIZE = 12;
