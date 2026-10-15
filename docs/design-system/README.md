@@ -20,7 +20,7 @@
 ## Rules
 
 - **Calm, readable, dense where it helps.** Catalogue and review tables favour information density; public pages must also work on phones.
-- **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`).
+- **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`); **chip** labels sit 1 px lower (`paddingTop: 2`), so Roboto looks centred in Chromium and Firefox.
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
 - A **service state** (planner, public API) uses `components/StatusPanel.tsx`: a colour dot centred on the title line, the title, and a one-line explanation.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark.
