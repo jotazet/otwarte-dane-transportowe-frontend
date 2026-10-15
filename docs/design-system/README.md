@@ -24,6 +24,7 @@
 - **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`); **chip** labels sit 1 px lower (`paddingTop: 2`), so Roboto looks centred in Chromium and Firefox.
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
 - A **service state** (planner, public API) uses `components/StatusPanel.tsx`: a colour dot centred on the title line, the title, and a one-line explanation.
+- **Polish typesetting:** a one-letter word (a, i, o, u, w, z) never ends a line. `getDictionary` replaces the space after it with a no-break space for the whole Polish dictionary (`i18n/typography.ts`), so `pl.ts` keeps plain spaces.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark: every palette `main` reaches 4.5:1 as text on the scheme's backgrounds and `contrastText` reaches 4.5:1 on `main` and `dark`.
 - Long lists of organizations get a search box above the table (`TableSearchField`): it matches names and regions without diacritics (`lib/search.ts`) and announces the row count to screen readers.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
