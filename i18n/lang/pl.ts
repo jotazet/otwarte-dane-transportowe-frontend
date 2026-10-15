@@ -101,6 +101,7 @@ export const dictPl = {
   publicOrganization: "Publiczna",
   original: "Oryginalny",
   interval: "Interwał",
+  feedDownloadTimes: "Godziny pobierania (UTC)",
   sourceUpdateInterval: "Aktualizacja źródeł",
   sourceUpdateIntervalRange: "Aktualizacja źródeł: podaj liczbę całkowitą od 5 do 120 w sekundach.",
   actions: "Akcje",
@@ -277,7 +278,6 @@ export const dictPl = {
   blogPostFormHint:
     "Tytuł do 24 znaków, maksymalnie 5 tagów po 16 znaków. Treść w formacie Markdown.",
   blogTagsHint: "Tagi oddzielone przecinkami.",
-  blogImageUrl: "Adres URL obrazu (opcjonalnie)",
   postContent: "Treść wpisu",
   blogMarkdownHint: "Obsługiwany format Markdown (nagłówki, listy, linki, kod itd.).",
   staticSubmissionId: "ID zgłoszenia statycznego",
@@ -304,6 +304,7 @@ export const dictPl = {
   loginInvalid: "Nieprawidłowy login lub hasło.",
   loginFailed: "Nie udało się zalogować.",
   blogImageFile: "Prześlij obraz",
+  blogRemoveImage: "Usuń obecny obraz",
   viewFeedCatalog: "Katalog feedów",
   viewCasesCatalog: "Katalog spraw",
   homeWelcome: "Witaj",

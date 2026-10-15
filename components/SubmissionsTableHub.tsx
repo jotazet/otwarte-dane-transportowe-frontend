@@ -150,6 +150,22 @@ export function SubmissionsTableHub({
     setError(null);
     try {
       const q = buildListQuery({ transport_organization: filterOrgId });
+      if (listContext === "queue") {
+        // The combined endpoint lists only the caller's own submissions; the
+        // per-type lists give Helpers and Admins everyone's.
+        const get = <T,>(path: string) => apiJson<T>("GET", path);
+        const staticRows = await fetchAllPages<FeedSubmissionListItem>(
+          get,
+          `${submissionsPaths.feedList}${q}`,
+        );
+        const realtimeRows = await fetchAllPages<RealtimeSubmissionListItem>(
+          get,
+          `${submissionsPaths.realtimeList}${q}`,
+        );
+        setFeeds(staticRows);
+        setRts(realtimeRows);
+        return;
+      }
       const data = await apiJson<CombinedSubmissionsBundle>(
         "GET",
         `${submissionsPaths.combined}${q}`,
@@ -162,7 +178,7 @@ export function SubmissionsTableHub({
       setFeeds([]);
       setRts([]);
     }
-  }, [apiJson, auth.status, filterOrgId, dict]);
+  }, [apiJson, auth.status, filterOrgId, listContext, dict]);
 
   React.useEffect(() => {
     void (async () => {

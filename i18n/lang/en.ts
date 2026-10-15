@@ -101,6 +101,7 @@ export const dictEn: Dictionary = {
   publicOrganization: "Public",
   original: "Original",
   interval: "Interval",
+  feedDownloadTimes: "Download times (UTC)",
   sourceUpdateInterval: "Source update interval",
   sourceUpdateIntervalRange:
     "Source update interval: enter a whole number from 5 to 120 in seconds.",
@@ -274,7 +275,6 @@ export const dictEn: Dictionary = {
   blogPostFormHint:
     "Title up to 24 characters, up to 5 tags of 16 characters each. Body in Markdown.",
   blogTagsHint: "Comma-separated tags.",
-  blogImageUrl: "Cover image URL (optional)",
   postContent: "Post body",
   blogMarkdownHint: "Markdown supported (headings, lists, links, code, etc.).",
   staticSubmissionId: "Static submission ID",
@@ -301,6 +301,7 @@ export const dictEn: Dictionary = {
   loginInvalid: "Invalid username or password.",
   loginFailed: "Could not sign in.",
   blogImageFile: "Upload image",
+  blogRemoveImage: "Remove current image",
   viewFeedCatalog: "Feed catalog",
   viewCasesCatalog: "Cases catalog",
   homeWelcome: "Welcome",
