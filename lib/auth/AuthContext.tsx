@@ -45,9 +45,12 @@ function secureCookieSuffix() {
   return typeof location !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
 }
 
-function setAuthCookieFlag() {
+/** The flag lives as long as the refresh token, so proxy.ts stops trusting a dead session. */
+function setAuthCookieFlag(refresh: string) {
   if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${secureCookieSuffix()}`;
+  const exp = decodeJwt(refresh)?.exp;
+  const maxAge = typeof exp === "number" ? Math.max(0, exp - Math.floor(Date.now() / 1000)) : 0;
+  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax${secureCookieSuffix()}`;
 }
 
 function clearAuthCookieFlag() {
@@ -121,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const applyTokens = React.useCallback((tokens: Tokens, loginUsername?: string | null) => {
     writeStoredTokens(tokens);
-    setAuthCookieFlag();
+    setAuthCookieFlag(tokens.refresh);
     const user = userFromAccess(tokens.access, loginUsername);
     setState({
       status: "authenticated",
@@ -137,52 +140,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState({ status: "anonymous", user: null, tokens: null });
   }, []);
 
-  const refreshAccess = React.useCallback(async (): Promise<Tokens | null> => {
-    const stored = readStoredTokens();
-    if (!stored?.refresh) return null;
-    try {
-      const { access } = await postJson<{ access: string }>("/api/auth/token/refresh/", {
-        refresh: stored.refresh,
+  const refreshInFlight = React.useRef<Promise<Tokens | null> | null>(null);
+
+  const refreshAccess = React.useCallback((): Promise<Tokens | null> => {
+    // Requests that find the access token expired at the same time share one
+    // refresh: a second refresh with the same, by then blacklisted, token
+    // would fail and log the user out.
+    if (!refreshInFlight.current) {
+      refreshInFlight.current = (async () => {
+        const stored = readStoredTokens();
+        if (!stored?.refresh) return null;
+        try {
+          // The backend rotates refresh tokens and blacklists the old one, so
+          // the new one must replace it or the next refresh fails.
+          const res = await postJson<{ access: string; refresh?: string }>(
+            "/api/auth/token/refresh/",
+            { refresh: stored.refresh },
+          );
+          const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
+          applyTokens(next);
+          return next;
+        } catch {
+          clearAuth();
+          return null;
+        }
+      })().finally(() => {
+        refreshInFlight.current = null;
       });
-      const next = { access, refresh: stored.refresh };
-      applyTokens(next);
-      return next;
-    } catch {
-      clearAuth();
-      return null;
     }
+    return refreshInFlight.current;
   }, [applyTokens, clearAuth]);
 
   React.useLayoutEffect(() => {
-    let cancelled = false;
-
-    (async () => {
+    void (async () => {
       const t = readStoredTokens();
       if (!t?.refresh) {
-        if (!cancelled) setState({ status: "anonymous", user: null, tokens: null });
+        setState({ status: "anonymous", user: null, tokens: null });
         return;
       }
       if (t.access && !isJwtExpired(t.access)) {
-        if (!cancelled) applyTokens(t);
+        applyTokens(t);
         return;
       }
-      try {
-        const { access } = await postJson<{ access: string }>("/api/auth/token/refresh/", {
-          refresh: t.refresh,
-        });
-        const next = { access, refresh: t.refresh };
-        writeStoredTokens(next);
-        if (!cancelled) applyTokens(next);
-      } catch {
-        writeStoredTokens(null);
-        if (!cancelled) clearAuth();
-      }
+      // Through the shared refresh: Strict Mode runs this effect twice in
+      // development, and components may already be calling the API.
+      await refreshAccess();
     })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [applyTokens, clearAuth]);
+  }, [applyTokens, refreshAccess]);
 
   const login = React.useCallback(
     async (creds: { username: string; password: string }) => {

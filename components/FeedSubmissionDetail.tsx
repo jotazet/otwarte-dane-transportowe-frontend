@@ -194,11 +194,9 @@ export function FeedSubmissionDetail({
   const sourcePerms = perms.feedSource(sourceCtx);
 
   const canEditMeta =
-    (isOwner && (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta)) ||
-    (isDjangoAdmin &&
-      (sourcePerms.canEditFullSource ||
-        sourcePerms.canAdminSourceOnStage2Plus ||
-        sourcePerms.canEditLimitedMeta));
+    sourcePerms.canEditFullSource ||
+    sourcePerms.canEditLimitedMeta ||
+    sourcePerms.canAdminSourceOnStage2Plus;
 
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =

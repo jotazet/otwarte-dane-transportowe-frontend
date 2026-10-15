@@ -23,6 +23,7 @@ export type FeedDetail = {
   license?: string;
   is_original?: boolean | null;
   download_url?: string | null;
+  /** UTC times of day ("HH:MM:SS"); null when ODT does not proxy the feed. */
   download_time_1?: string | null;
   download_time_2?: string | null;
   endpoints?: FeedEndpoint[];

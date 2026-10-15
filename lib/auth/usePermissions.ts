@@ -6,8 +6,8 @@ import {
   canBlogEditPost,
   canDeleteFeedSubmission,
   canEditFeedSourceFields,
+  canEditFullSource,
   canHelperReviewOnly,
-  canProviderEditFullSource,
   canProviderEditLimitedMeta,
   hasBlogManageAccess,
   hasDataProviderAccess,
@@ -58,7 +58,7 @@ export function usePermissions() {
       return {
         canEditSource: canEditFeedSourceFields(full),
         canEditLimitedMeta: canProviderEditLimitedMeta(full),
-        canEditFullSource: canProviderEditFullSource(full),
+        canEditFullSource: canEditFullSource(full),
         canAdminSourceOnStage2Plus: canAdminEditSourceOnPublishedStages(full),
         canHelperReviewOnly: canHelperReviewOnly(full),
         canDelete: user ? canDeleteFeedSubmission(user) : false,
