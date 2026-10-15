@@ -28,6 +28,7 @@ export function paths(locale: string) {
     queueFeed: (id: number) => `${base}/data/queue/feed/${id}`,
     queueRealtime: (id: number) => `${base}/data/queue/realtime/${id}`,
     feedOps: `${base}/data/feed-ops`,
+    plannerAdmin: `${base}/data/planner`,
     info: `${base}/info`,
     developers: `${base}/developers`,
     users: `${base}/users`,

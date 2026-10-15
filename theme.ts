@@ -2,6 +2,18 @@ import { createTheme } from "@mui/material/styles";
 
 import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
 
+/** Categorical chart series, in a fixed order; checked for colour-blind separation in both schemes. */
+type ChartPalette = { series1: string; series2: string; series3: string; series4: string };
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    chart: ChartPalette;
+  }
+  interface PaletteOptions {
+    chart?: ChartPalette;
+  }
+}
+
 function paletteScheme(isLight: boolean) {
   return {
     palette: {
@@ -19,6 +31,12 @@ function paletteScheme(isLight: boolean) {
       text: {
         primary: isLight ? "#202124" : "#E8EAED",
         secondary: isLight ? "#5F6368" : "#9AA0A6",
+      },
+      chart: {
+        series1: isLight ? "#2A78D6" : "#3987E5",
+        series2: isLight ? "#EDA100" : "#C98500",
+        series3: isLight ? "#4A3AA7" : "#9085E9",
+        series4: isLight ? "#E34948" : "#E66767",
       },
     },
   };
