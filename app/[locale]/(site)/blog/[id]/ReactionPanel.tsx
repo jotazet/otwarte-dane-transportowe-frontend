@@ -7,17 +7,18 @@ import Stack from "@mui/material/Stack";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+import type { Dictionary } from "@/i18n/getDictionary";
 import { fetchMyReactions, reactToPost } from "@/lib/api/blog";
-import { blogReactionOrder, reactionMdIcons } from "@/lib/reactionIcons";
+import { blogReactionOrder, reactionCountLabel, reactionMdIcons } from "@/lib/reactionIcons";
 
 export function ReactionPanel({
   postId,
   initialSummary,
-  label,
+  dict,
 }: {
   postId: number;
   initialSummary: Record<string, number> | null | undefined;
-  label: string;
+  dict: Pick<Dictionary, "reactions" | "blogReactionLabels" | "blogReactionCountLabel">;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -69,7 +70,7 @@ export function ReactionPanel({
       <Divider sx={{ mb: 2 }} />
       <Stack
         component="section"
-        aria-label={label}
+        aria-label={dict.reactions}
         direction="row"
         spacing={1.5}
         useFlexGap
@@ -85,6 +86,8 @@ export function ReactionPanel({
               type="button"
               disabled={disabled}
               onClick={() => setReaction(selected ? null : reaction)}
+              aria-pressed={selected}
+              aria-label={reactionCountLabel(dict, reaction, count)}
               variant={selected ? "contained" : "outlined"}
               color="primary"
               size="medium"

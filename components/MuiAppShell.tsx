@@ -14,6 +14,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Skeleton from "@mui/material/Skeleton";
 import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -223,14 +224,16 @@ function MuiAppShellInner({
           lightModeLabel={dict.lightMode}
           size="small"
         />
-        <IconButton
-          aria-label={dict.close}
-          onClick={() => setMobileOpen(false)}
-          edge="end"
-          size="small"
-        >
-          <MdClose size={22} />
-        </IconButton>
+        <Tooltip title={dict.close}>
+          <IconButton
+            aria-label={dict.close}
+            onClick={() => setMobileOpen(false)}
+            edge="end"
+            size="small"
+          >
+            <MdClose size={22} aria-hidden />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
       <List sx={{ py: 1.5, px: 1, flex: 1 }} component="nav" aria-label={dict.menu}>
         <ListItemButton
@@ -278,10 +281,10 @@ function MuiAppShellInner({
             {auth.status === "loading" ? (
               <ListItemButton disabled sx={drawerItemSx()}>
                 <ListItemIcon sx={{ minWidth: 40 }}>
-                  <Skeleton variant="circular" width={22} height={22} animation="wave" />
+                  <Skeleton variant="circular" width={22} height={22} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={<Skeleton width="60%" animation="wave" />}
+                  primary={<Skeleton width="60%" />}
                   slotProps={{ primary: { sx: { fontWeight: 500 } } }}
                 />
               </ListItemButton>
@@ -370,25 +373,27 @@ function MuiAppShellInner({
                 columnGap: { md: 2 },
               }}
             >
-              <IconButton
-                ref={hamburgerRef}
-                color="inherit"
-                aria-label={dict.menu}
-                aria-haspopup="true"
-                aria-expanded={mobileOpen}
-                edge="start"
-                onClick={() => setMobileOpen(true)}
-                size="large"
-                sx={{
-                  display: { xs: "inline-flex", md: "none" },
-                  alignSelf: "center",
-                  color: "text.primary",
-                  borderRadius: 2,
-                  "&:hover": { bgcolor: "action.hover" },
-                }}
-              >
-                <MdMenu size={24} aria-hidden />
-              </IconButton>
+              <Tooltip title={dict.menu}>
+                <IconButton
+                  ref={hamburgerRef}
+                  color="inherit"
+                  aria-label={dict.menu}
+                  aria-haspopup="true"
+                  aria-expanded={mobileOpen}
+                  edge="start"
+                  onClick={() => setMobileOpen(true)}
+                  size="large"
+                  sx={{
+                    display: { xs: "inline-flex", md: "none" },
+                    alignSelf: "center",
+                    color: "text.primary",
+                    borderRadius: 2,
+                    "&:hover": { bgcolor: "action.hover" },
+                  }}
+                >
+                  <MdMenu size={24} aria-hidden />
+                </IconButton>
+              </Tooltip>
 
               <Box
                 ref={logoRef}
@@ -485,17 +490,16 @@ function MuiAppShellInner({
                     }}
                   >
                     {auth.status === "loading" ? (
-                      <Skeleton
-                        variant="circular"
-                        width={32}
-                        height={32}
-                        animation="wave"
-                        aria-hidden
-                      />
+                      <Skeleton variant="circular" width={32} height={32} aria-hidden />
                     ) : (
                       <AuthButton
                         locale={locale}
-                        labels={{ login: dict.login, account: dict.account, logout: dict.logout }}
+                        labels={{
+                          login: dict.login,
+                          account: dict.account,
+                          accountMenuLabel: dict.accountMenuLabel,
+                          logout: dict.logout,
+                        }}
                         roleLabels={dict}
                       />
                     )}

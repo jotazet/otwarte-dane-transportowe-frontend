@@ -5,11 +5,10 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdLanguage } from "react-icons/md";
 
-import type { Locale } from "@/i18n/locales";
+import { locales, type Locale } from "@/i18n/locales";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   pl: "Polski",
@@ -43,6 +42,8 @@ export function LocaleSwitcher({
     onClick: (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget),
   };
 
+  // Plain links on purpose: a client-side navigation keeps the root layout, so `<html lang>`
+  // would stay on the previous locale.
   const menu = (
     <Menu
       anchorEl={anchorEl}
@@ -60,38 +61,19 @@ export function LocaleSwitcher({
         },
       }}
     >
-      <MenuItem
-        component={Link}
-        href={hrefForLocale(pathname, "pl")}
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "pl"}
-      >
-        Polski
-      </MenuItem>
-      <MenuItem
-        component={Link}
-        href={hrefForLocale(pathname, "en")}
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "en"}
-      >
-        English
-      </MenuItem>
-      <MenuItem
-        component={Link}
-        href={hrefForLocale(pathname, "de")}
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "de"}
-      >
-        Deutsch
-      </MenuItem>
-      <MenuItem
-        component={Link}
-        href={hrefForLocale(pathname, "bg")}
-        onClick={() => setAnchorEl(null)}
-        selected={locale === "bg"}
-      >
-        Български
-      </MenuItem>
+      {locales.map((target) => (
+        <MenuItem
+          key={target}
+          component="a"
+          href={hrefForLocale(pathname, target)}
+          hrefLang={target}
+          lang={target}
+          onClick={() => setAnchorEl(null)}
+          selected={locale === target}
+        >
+          {LOCALE_LABELS[target]}
+        </MenuItem>
+      ))}
     </Menu>
   );
 

@@ -19,7 +19,7 @@ export function MarkdownEditor({
   disabled,
   helperText,
 }: {
-  id?: string;
+  id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -48,16 +48,21 @@ export function MarkdownEditor({
         }}
       >
         <MDEditor
-          id={id}
           value={value}
           onChange={(next) => onChange(next ?? "")}
           preview="live"
           height={360}
           visibleDragbar={false}
-          textareaProps={{ disabled, placeholder: label }}
+          // md-editor puts its own `id` on the wrapper div; the textarea needs it for the label.
+          textareaProps={{
+            id,
+            disabled,
+            placeholder: label,
+            "aria-describedby": helperText ? `${id}-helper` : undefined,
+          }}
         />
       </Box>
-      {helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
+      {helperText ? <FormHelperText id={`${id}-helper`}>{helperText}</FormHelperText> : null}
     </Box>
   );
 }

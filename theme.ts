@@ -2,11 +2,34 @@ import { createTheme } from "@mui/material/styles";
 
 import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
 
+// Every `main` reaches 4.5:1 as text on both backgrounds of its scheme, and `contrastText`
+// reaches 4.5:1 on `main` and `dark` (filled chips, contained buttons and their hover).
 function paletteScheme(isLight: boolean) {
+  const contrastText = isLight ? "#FFFFFF" : "#202124";
   return {
     palette: {
+      // 0.2 is MUI's default. Dark text sits on dark-scheme fills, so their hover shade
+      // (`dark`) must stay light.
+      tonalOffset: isLight ? 0.2 : { light: 0.2, dark: 0.1 },
       primary: {
-        main: "#1A73E8",
+        main: isLight ? "#1967D2" : "#8AB4F8",
+        contrastText,
+      },
+      success: {
+        main: isLight ? "#2E7D32" : "#66BB6A",
+        contrastText,
+      },
+      warning: {
+        main: isLight ? "#B35000" : "#FFA726",
+        contrastText,
+      },
+      error: {
+        main: isLight ? "#D32F2F" : "#F28B82",
+        contrastText,
+      },
+      info: {
+        main: isLight ? "#0071B2" : "#29B6F6",
+        contrastText,
       },
       secondary: {
         main: isLight ? "#174EA6" : "#8AB4F8",
@@ -35,6 +58,27 @@ const sharedTypography = {
 } as const;
 
 const sharedComponents = {
+  MuiButtonBase: {
+    styleOverrides: {
+      // Without the ripple MUI shows no keyboard focus at all (nav links, TableSortLabel).
+      // The outline is inset so overflow containers such as the desktop nav don't clip it.
+      root: ({
+        ownerState,
+        theme,
+      }: {
+        ownerState: { disableRipple?: boolean };
+        theme: ReturnType<typeof createTheme>;
+      }) =>
+        ownerState.disableRipple
+          ? {
+              "&.Mui-focusVisible": {
+                outline: `2px solid ${theme.vars?.palette.primary.main ?? theme.palette.primary.main}`,
+                outlineOffset: "-2px",
+              },
+            }
+          : null,
+    },
+  },
   MuiDialog: {
     defaultProps: {
       disableScrollLock: true,
@@ -45,27 +89,24 @@ const sharedComponents = {
       disableScrollLock: true,
     },
   },
+  MuiSkeleton: {
+    defaultProps: {
+      animation: false,
+    },
+  },
   MuiPopover: {
     defaultProps: {
       disableScrollLock: true,
       disablePortal: true,
-      transitionDuration: 0,
-    },
-    styleOverrides: {
-      paper: {
-        transition: "none",
-      },
     },
   },
   MuiMenu: {
     defaultProps: {
       disableScrollLock: true,
       disablePortal: true,
-      transitionDuration: 0,
     },
     styleOverrides: {
       paper: ({ theme }: { theme: ReturnType<typeof createTheme> }) => ({
-        transition: "none",
         borderRadius: 12,
         border: `1px solid ${theme.vars?.palette.divider ?? theme.palette.divider}`,
         maxHeight: 320,
@@ -91,7 +132,6 @@ const sharedComponents = {
       MenuProps: {
         disablePortal: false,
         disableScrollLock: true,
-        transitionDuration: 0,
         anchorOrigin: { vertical: "bottom", horizontal: "left" },
         transformOrigin: { vertical: "top", horizontal: "left" },
         slotProps: {
@@ -145,15 +185,25 @@ const sharedComponents = {
       },
     },
   },
-  // Wyłączenie animacji przejść (spójne, natychmiastowe UI).
-  MuiGrow: { defaultProps: { timeout: 0 } },
-  MuiFade: { defaultProps: { timeout: 0 } },
-  MuiZoom: { defaultProps: { timeout: 0 } },
-  MuiSlide: { defaultProps: { timeout: 0 } },
-  MuiCollapse: { defaultProps: { timeout: 0 } },
 } as const;
 
-/** Google-style blue aligned with Flutter `AppTheme` (`#1A73E8`). */
+// No motion: components take their timeouts from these durations (Grow, Popover and Menu
+// from getAutoHeightDuration), and every CSS transition MUI generates becomes `none`.
+const noMotion = {
+  duration: {
+    shortest: 0,
+    shorter: 0,
+    short: 0,
+    standard: 0,
+    complex: 0,
+    enteringScreen: 0,
+    leavingScreen: 0,
+  },
+  getAutoHeightDuration: () => 0,
+  create: () => "none",
+};
+
+/** Google-style blues: Flutter `AppTheme`'s `#1A73E8` adjusted per scheme to meet WCAG AA. */
 export const appTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: '[data-color-mode="%s"]',
@@ -166,5 +216,6 @@ export const appTheme = createTheme({
     borderRadius: 12,
   },
   typography: sharedTypography,
+  transitions: noMotion,
   components: sharedComponents,
 });
