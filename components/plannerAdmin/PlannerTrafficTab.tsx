@@ -101,6 +101,15 @@ function chartSeries(data: StatsTimeseries, dict: PlannerAdminDict): ChartSeries
   return series;
 }
 
+/** Endpoints and clients side by side: a fixed height, whatever the rows; the table scrolls. */
+const pairedCardSx = {
+  minWidth: 0,
+  height: 480,
+  display: "flex",
+  flexDirection: "column",
+} as const;
+const pairedTableSx = { flex: 1, minHeight: 0, borderTop: 1, borderColor: "divider" } as const;
+
 export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
   const { apiJson, dict, locale } = ctx;
   const [range, setRange] = React.useState<TrafficRange>("24h");
@@ -241,11 +250,10 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
         sx={{
           display: "grid",
           gap: 2,
-          alignItems: "start",
           gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(2, minmax(0, 1fr))" },
         }}
       >
-        <Card component="section" aria-labelledby="planner-endpoints-title" sx={{ minWidth: 0 }}>
+        <Card component="section" aria-labelledby="planner-endpoints-title" sx={pairedCardSx}>
           <CardHeading id="planner-endpoints-title" title={dict.plannerAdminEndpointsTitle} />
           <LoadState loaded={endpoints} dict={dict} sx={{ mx: { xs: 2.5, sm: 3 }, mb: 2.5 }} />
           {endpoints.data ? (
@@ -253,7 +261,7 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
               role="region"
               aria-labelledby="planner-endpoints-title"
               tabIndex={0}
-              sx={{ maxHeight: 300, borderTop: 1, borderColor: "divider" }}
+              sx={pairedTableSx}
             >
               <Table stickyHeader size="small">
                 <TableHead>
@@ -362,7 +370,7 @@ function ClientsCard({
       : null;
 
   return (
-    <Card component="section" aria-labelledby="planner-clients-title" sx={{ minWidth: 0 }}>
+    <Card component="section" aria-labelledby="planner-clients-title" sx={pairedCardSx}>
       <CardContent sx={{ p: { xs: 2.5, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
         <Stack
           direction="row"
@@ -426,7 +434,7 @@ function ClientsCard({
           role="region"
           aria-labelledby="planner-clients-title"
           tabIndex={0}
-          sx={{ maxHeight: 300, borderTop: 1, borderColor: "divider" }}
+          sx={pairedTableSx}
         >
           <Table stickyHeader size="small">
             <TableHead>
