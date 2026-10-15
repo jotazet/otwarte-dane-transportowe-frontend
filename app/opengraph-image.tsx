@@ -8,8 +8,8 @@ export const alt = dictPl.appName;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Satori cannot read the MUI theme: primary.main from theme.ts.
-const PRIMARY = "#1A73E8";
+// Satori cannot read the MUI theme: primary.main of the light scheme in theme.ts.
+const PRIMARY = "#1967D2";
 
 // Paths of components/OdtLogo.tsx.
 const LOGO_PATHS = [

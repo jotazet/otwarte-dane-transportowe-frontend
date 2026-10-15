@@ -5,10 +5,10 @@ What search engines and AI tools get from the public pages, and the rules for ne
 ## Metadata
 
 - Every public page exports `generateMetadata` built with `buildPageMetadata` (`lib/seo/metadata.ts`): title, description, canonical URL, language versions with `x-default` (Polish), Open Graph and a large Twitter card. Detail pages describe the organization itself (name, formats, latest case status, region), never the site in general.
-- The site layout (`app/[locale]/(site)/layout.tsx`) sets the title template and defaults in the page's language; the root layout only has the Polish fallback.
+- The root layout (`app/layout.tsx`) builds the title template and defaults in the request's language (`x-odt-locale` from `proxy.ts`), so they cover the home page too.
 - Blog posts are written in Polish only. Every locale's copy points its canonical URL at `/pl/blog/{id}` and declares no language versions, and the sitemap lists each post once.
 - A path without a locale redirects permanently (308) to Polish.
-- A page fetches its data once for both `generateMetadata` and the page, through `React.cache`.
+- Organization and feed pages fetch their data once for both `generateMetadata` and the page: the fetchers in `lib/api` are wrapped in `React.cache`.
 
 ## Structured data
 
