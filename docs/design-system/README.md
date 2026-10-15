@@ -22,6 +22,7 @@
 - **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`).
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark.
+- Long lists of organizations get a search box above the table (`TableSearchField`): it matches names and regions without diacritics (`lib/search.ts`) and announces the row count to screen readers.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
 
 ## Using `ui-ux-pro-max`

@@ -115,6 +115,8 @@ export const dictBg: Dictionary = {
   license: "Лиценз",
   search: "Търсене",
   searchOrganizationRegion: "Търси по организация или регион",
+  organizationCount: "Брой организации: {count}",
+  organizationSearchEmpty: "Не са намерени организации. Променете думата за търсене или филтрите.",
   all: "Всички",
   filterRegion: "Регион",
   filterStatus: "Статус",

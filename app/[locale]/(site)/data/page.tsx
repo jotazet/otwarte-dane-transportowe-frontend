@@ -63,6 +63,9 @@ export default async function DataPage({ params }: { params: Promise<{ locale: s
             all: dict.all,
             actions: dict.actions,
             edit: dict.edit,
+            searchOrganizationRegion: dict.searchOrganizationRegion,
+            organizationCount: dict.organizationCount,
+            organizationSearchEmpty: dict.organizationSearchEmpty,
           }}
         />
       )}

@@ -113,6 +113,8 @@ export const dictPl = {
   license: "Licencja",
   search: "Szukaj",
   searchOrganizationRegion: "Szukaj po organizacji lub regionie",
+  organizationCount: "Liczba organizacji: {count}",
+  organizationSearchEmpty: "Nie znaleziono organizacji. Zmień wyszukiwaną frazę lub filtry.",
   all: "Wszystkie",
   filterRegion: "Region",
   filterStatus: "Status",
