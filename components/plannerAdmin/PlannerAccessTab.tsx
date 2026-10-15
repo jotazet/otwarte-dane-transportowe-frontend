@@ -28,9 +28,9 @@ import {
   plannerErrorMessage,
   scrollTableSx,
   StateChip,
-  StatusPanel,
   twoColumnGridSx,
 } from "@/components/plannerAdmin/shared";
+import { StatusPanel } from "@/components/StatusPanel";
 import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
   isBanActive,

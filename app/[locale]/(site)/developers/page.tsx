@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { MdCode, MdOpenInNew } from "react-icons/md";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 
 import { DeveloperAccessCard } from "@/components/developers/DeveloperAccessCard";
 import { DeveloperQuickStart } from "@/components/developers/DeveloperQuickStart";
@@ -17,7 +15,7 @@ import { fetchPlannerStatus } from "@/lib/api/planner";
 import { apiBaseUrl } from "@/lib/config";
 import { resolvePageLocale } from "@/lib/i18n/resolvePageLocale";
 import { developersRoot } from "@/lib/nav/breadcrumbTrails";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildPageMetadata, siteUrl } from "@/lib/seo/metadata";
 
 export async function generateMetadata({
   params,
@@ -39,6 +37,17 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
   const { locale, dict } = await resolvePageLocale(params);
   const baseUrl = apiBaseUrl();
   const { data: status } = await loadOrError(fetchPlannerStatus());
+  // Tells search engines and AI tools that this page documents a free web API.
+  const apiJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebAPI",
+    name: dict.metaDevelopersTitle,
+    description: dict.developersSubtitle,
+    url: siteUrl("/developers", locale),
+    documentation: `${baseUrl}/api/planner/v1/docs/`,
+    isAccessibleForFree: true,
+    provider: { "@type": "Organization", name: dict.appName, url: siteUrl("", locale) },
+  };
 
   return (
     <AppPage
@@ -47,6 +56,11 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
       breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={developersRoot(locale, dict)}
     >
+      <script
+        type="application/ld+json"
+        // Built from the dictionary and config only; "<" is escaped as the Next.js JSON-LD guide advises.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(apiJsonLd).replace(/</g, "\\u003c") }}
+      />
       <PageHeader
         title={dict.developersTitle}
         subtitle={dict.developersSubtitle}
@@ -63,37 +77,29 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           </Button>
         }
       />
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-          <Stack spacing={2}>
-            <DeveloperQuickStart
-              apiBaseUrl={baseUrl}
-              dict={{
-                developersQuickStartTitle: dict.developersQuickStartTitle,
-                developersApiBaseUrl: dict.developersApiBaseUrl,
-                developersCopyApiBaseUrl: dict.developersCopyApiBaseUrl,
-                developersRequest: dict.developersRequest,
-                developersExampleLabels: dict.developersExampleLabels,
-                developersCodeLanguage: dict.developersCodeLanguage,
-                developersCopyCode: dict.developersCopyCode,
-                developersCopied: dict.developersCopied,
-                developersSendRequest: dict.developersSendRequest,
-                developersSendRequestHint: dict.developersSendRequestHint,
-                developersResponse: dict.developersResponse,
-                developersResponseEmpty: dict.developersResponseEmpty,
-                developersResponseLoading: dict.developersResponseLoading,
-                developersResponseTime: dict.developersResponseTime,
-                developersResponseFailed: dict.developersResponseFailed,
-                developersCopyResponse: dict.developersCopyResponse,
-              }}
-            />
-            <DeveloperAccessCard locale={locale} dict={dict} />
-          </Stack>
-        </Grid>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-          <PlannerStatusCard status={status} locale={locale} dict={dict} />
-        </Grid>
-      </Grid>
+      <DeveloperQuickStart
+        apiBaseUrl={baseUrl}
+        dict={{
+          developersQuickStartTitle: dict.developersQuickStartTitle,
+          developersApiBaseUrl: dict.developersApiBaseUrl,
+          developersCopyApiBaseUrl: dict.developersCopyApiBaseUrl,
+          developersRequest: dict.developersRequest,
+          developersExampleLabels: dict.developersExampleLabels,
+          developersCodeLanguage: dict.developersCodeLanguage,
+          developersCopyCode: dict.developersCopyCode,
+          developersCopied: dict.developersCopied,
+          developersSendRequest: dict.developersSendRequest,
+          developersSendRequestHint: dict.developersSendRequestHint,
+          developersResponse: dict.developersResponse,
+          developersResponseEmpty: dict.developersResponseEmpty,
+          developersResponseLoading: dict.developersResponseLoading,
+          developersResponseTime: dict.developersResponseTime,
+          developersResponseFailed: dict.developersResponseFailed,
+          developersCopyResponse: dict.developersCopyResponse,
+        }}
+      />
+      <DeveloperAccessCard locale={locale} dict={dict} />
+      <PlannerStatusCard status={status} locale={locale} dict={dict} />
       {status ? (
         <PlannerFeedsTable
           feeds={status.feeds}

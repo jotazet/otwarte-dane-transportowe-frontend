@@ -20,6 +20,8 @@ export const dictPl = {
   casesIntro: "Statusy spraw i historia działań podjętych w celu uzyskania dostępu do danych.",
   dataIntro:
     "Feedy GTFS, NeTEx, GTFS-RT i GBFS - statyczne i na żywo - od operatorów w całej Polsce.",
+  developersIntro:
+    "Otwarte API: katalog feedów i planer podróży, z przykładami zapytań i dokumentacją.",
   publicEndpoint: "Publiczny endpoint",
   requiresLogin: "Wymaga logowania",
   blogTitle: "Blog",
@@ -481,10 +483,10 @@ export const dictPl = {
     "Aktualności, przemyślenia i komunikaty o transporcie publicznym, GTFS, NeTEx i otwartych danych transportowych w Polsce.",
   metaDevelopersTitle: "API otwartych danych transportowych – katalog feedów i planer podróży",
   metaDevelopersDescription:
-    "Publiczne API ODT: katalog feedów GTFS, NeTEx, GTFS-RT, SIRI i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów. Bez rejestracji i bez klucza.",
+    "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów GTFS, GTFS-RT i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów.",
   developersTitle: "Dla deweloperów",
   developersSubtitle:
-    "Otwarte API z danymi transportu publicznego w Polsce: katalog feedów i planer podróży. Bez rejestracji i bez klucza.",
+    "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów z rozkładami jazdy GTFS i danymi na żywo GTFS-RT, GBFS oraz planer podróży z wyznaczaniem tras, odjazdami z przystanków i pozycjami pojazdów. Przykłady zapytań w curl, JavaScript i Pythonie.",
   developersOpenDocs: "Otwórz dokumentację API",
   developersQuickStartTitle: "Szybki start",
   developersApiBaseUrl: "Adres API",
@@ -511,7 +513,7 @@ export const dictPl = {
   developersAccessTitle: "Dostęp i limity",
   developersNoSignUpTitle: "Bez rejestracji",
   developersNoSignUpBody:
-    "Każdy endpoint działa bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
+    "Każdy endpoint może działać bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
   developersApiKeyTitle: "Klucz API",
   developersApiKeyBody:
     "Wyższe limity są dostępne z kluczem API. Aby go otrzymać, napisz na adres <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Klucz przesyłaj w nagłówku X-API-Key i nie umieszczaj go w kodzie strony WWW.",
