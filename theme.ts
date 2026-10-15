@@ -203,6 +203,13 @@ const sharedComponents = {
       },
     },
   },
+  MuiChip: {
+    styleOverrides: {
+      // Roboto leaves chip text about 1 px above the middle (1.5 px in Firefox, which reads
+      // the font's typo metrics); 2 px on top moves it down by 1 px.
+      label: { paddingTop: 2 },
+    },
+  },
 } as const;
 
 // No motion: components take their timeouts from these durations (Grow, Popover and Menu

@@ -152,38 +152,6 @@ export function ErrorCodeAlert({
   );
 }
 
-/** A state in words with a coloured dot, as on the developers page status card. */
-export function StatusPanel({
-  color,
-  title,
-  body,
-}: {
-  color: string;
-  title: string;
-  body: string;
-}) {
-  return (
-    <Stack
-      direction="row"
-      spacing={1.5}
-      sx={{ alignItems: "flex-start", p: 1.5, border: 1, borderColor: "divider", borderRadius: 1 }}
-    >
-      <Box
-        aria-hidden
-        sx={{ width: 10, height: 10, mt: 0.75, borderRadius: "50%", flexShrink: 0, bgcolor: color }}
-      />
-      <Box>
-        <Typography variant="subtitle1" component="p" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {body}
-        </Typography>
-      </Box>
-    </Stack>
-  );
-}
-
 /** While nothing has loaded: a spinner, or the error. Renders nothing once data is there. */
 export function LoadState({
   loaded,

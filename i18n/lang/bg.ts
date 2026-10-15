@@ -22,6 +22,8 @@ export const dictBg: Dictionary = {
   casesIntro: "Статуси на казусите и история на действията, предприети за достъп до данните.",
   dataIntro:
     "GTFS, NeTEx, GTFS-RT и GBFS фийдове - статични и в реално време - от оператори в цяла Полша.",
+  developersIntro:
+    "Отворен API: каталог с фийдове и планер на пътувания, с примерни заявки и документация.",
   publicEndpoint: "Публичен ендпойнт",
   requiresLogin: "Изисква вход",
   blogTitle: "Блог",
@@ -128,6 +130,8 @@ export const dictBg: Dictionary = {
   license: "Лиценз",
   search: "Търсене",
   searchOrganizationRegion: "Търси по организация или регион",
+  organizationCount: "Брой организации: {count}",
+  organizationSearchEmpty: "Не са намерени организации. Променете думата за търсене или филтрите.",
   all: "Всички",
   filterRegion: "Регион",
   filterStatus: "Статус",
@@ -465,28 +469,32 @@ export const dictBg: Dictionary = {
   metaDataTitle: "Каталог GTFS Полша – статични фийдове и фийдове в реално време",
   metaDataDescription:
     "Каталог на GTFS, NeTEx, GTFS-RT и GBFS фийдове от полски транспортни оператори. Копирай линкове към фийдовете или използвай API на отворените транспортни данни.",
-  metaFeedDetailTitle: "{organization} – статични фийдове и фийдове в реално време",
-  metaFeedDetailDescription:
-    "Статични фийдове и фийдове в реално време на {organization}: типове данни, лицензи и линкове към фийдовете.",
   metaInfoTitle: "Отворени транспортни данни – GTFS, NeTEx, правно основание",
   metaInfoDescription:
     "Стандартите GTFS, NeTEx, GTFS-RT и SIRI в Полша. Правно основание за отворените транспортни данни, сътрудничество и контакт с проекта ODT.",
   metaCasesTitle: "Статуси на набавянето на транспортни данни в Полша",
   metaCasesDescription:
     "Проверявай статусите на набавянето на отворени GTFS и NeTEx данни за транспортните организации в Полша - публични и частни.",
-  metaCaseOrganizationTitle: "{organization} – статус на набавянето на данни",
-  metaCaseOrganizationDescription:
-    "Статус на набавянето на транспортни данни от {organization}: история на казуса и доставчици на данни.",
+  metaFeedDetailTitle: "{name} – фийдове {formats}",
+  metaFeedDetailDescription:
+    "Фийдове {formats} на {name}: линкове за изтегляне и информация за обновяването. Отворени данни за обществения транспорт в Полша.",
+  metaOrganizationTitle: "{name} – статус на набавянето на данни",
+  metaOrganizationDescription:
+    "{name}: история на действията на ODT за достъп до транспортните данни на организацията.",
+  metaLatestStatus: "Най-актуален статус: {status}.",
+  metaRegion: "Регион: {region}.",
+  metaDatasetDescription:
+    "Фийд {name} на {organization} ({formats}) в каталога на ODT: линкове за изтегляне и информация за обновяването.",
   metaBlogTitle: "Блог за обществения транспорт и отворените данни",
   metaBlogDescription:
     "Новини, размисли и съобщения за обществения транспорт, GTFS, NeTEx и отворените транспортни данни в Полша.",
   metaDevelopersTitle:
     "API за отворени транспортни данни – каталог с фийдове и планер на пътувания",
   metaDevelopersDescription:
-    "Публичният API на ODT: каталог с фийдове GTFS, NeTEx, GTFS-RT, SIRI и GBFS и планер на пътувания със заминавания и позиции на превозните средства. Без регистрация и без ключ.",
+    "Отворен и безплатен API с данни за обществения транспорт в Полша: каталог с фийдове GTFS, GTFS-RT и GBFS и планер на пътувания със заминавания и позиции на превозните средства.",
   developersTitle: "За разработчици",
   developersSubtitle:
-    "Отворен API с данни за обществения транспорт в Полша: каталог с фийдове и планер на пътувания. Без регистрация и без ключ.",
+    "Отворен и безплатен API с данни за обществения транспорт в Полша: каталог с фийдове с разписания GTFS и данни в реално време GTFS-RT и GBFS, както и планер на пътувания с търсене на маршрути, заминавания от спирките и позиции на превозните средства. Примерни заявки на curl, JavaScript и Python.",
   developersOpenDocs: "Отвори документацията на API",
   developersQuickStartTitle: "Бърз старт",
   developersApiBaseUrl: "Адрес на API",
@@ -513,7 +521,7 @@ export const dictBg: Dictionary = {
   developersAccessTitle: "Достъп и лимити",
   developersNoSignUpTitle: "Без регистрация",
   developersNoSignUpBody:
-    "Всеки ендпойнт работи без ключ. Лимитите на заявките се броят на минута, отделно за всеки IP адрес.",
+    "Всеки ендпойнт може да работи без ключ. Лимитите на заявките се броят на минута, отделно за всеки IP адрес.",
   developersApiKeyTitle: "API ключ",
   developersApiKeyBody:
     "С API ключ лимитите са по-високи. За да получите ключ, пишете на <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Изпращайте ключа в заглавката X-API-Key и никога не го поставяйте в кода на уебсайт.",

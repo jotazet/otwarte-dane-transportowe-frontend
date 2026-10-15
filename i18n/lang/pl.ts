@@ -20,6 +20,8 @@ export const dictPl = {
   casesIntro: "Statusy spraw i historia działań podjętych w celu uzyskania dostępu do danych.",
   dataIntro:
     "Feedy GTFS, NeTEx, GTFS-RT i GBFS - statyczne i na żywo - od operatorów w całej Polsce.",
+  developersIntro:
+    "Otwarte API: katalog feedów i planer podróży, z przykładami zapytań i dokumentacją.",
   publicEndpoint: "Publiczny endpoint",
   requiresLogin: "Wymaga logowania",
   blogTitle: "Blog",
@@ -126,6 +128,8 @@ export const dictPl = {
   license: "Licencja",
   search: "Szukaj",
   searchOrganizationRegion: "Szukaj po organizacji lub regionie",
+  organizationCount: "Liczba organizacji: {count}",
+  organizationSearchEmpty: "Nie znaleziono organizacji. Zmień wyszukiwaną frazę lub filtry.",
   all: "Wszystkie",
   filterRegion: "Region",
   filterStatus: "Status",
@@ -464,27 +468,31 @@ export const dictPl = {
   metaDataTitle: "Katalog GTFS Polska – feedy statyczne i realtime",
   metaDataDescription:
     "Katalog feedów GTFS, NeTEx, GTFS-RT i GBFS od polskich operatorów transportu. Skopiuj linki do feedów lub korzystaj z API otwartych danych transportowych.",
-  metaFeedDetailTitle: "{organization} – feedy statyczne i realtime",
-  metaFeedDetailDescription:
-    "Feedy statyczne i realtime organizacji {organization}: typy danych, licencje i linki do feedów.",
   metaInfoTitle: "Otwarte dane transportowe – GTFS, NeTEx, podstawa prawna",
   metaInfoDescription:
     "Standardy GTFS, NeTEx, GTFS-RT i SIRI w Polsce. Podstawa prawna otwartych danych transportowych, współpraca i kontakt z projektem ODT.",
   metaCasesTitle: "Statusy pozyskiwania danych transportowych w Polsce",
   metaCasesDescription:
     "Sprawdzaj statusy pozyskiwania otwartych danych GTFS i NeTEx dla organizacji transportowych w Polsce - publicznych i prywatnych.",
-  metaCaseOrganizationTitle: "{organization} – status pozyskiwania danych",
-  metaCaseOrganizationDescription:
-    "Status pozyskiwania danych transportowych od organizacji {organization}: historia sprawy i dostawcy danych.",
+  metaFeedDetailTitle: "{name} – feedy {formats}",
+  metaFeedDetailDescription:
+    "Feedy {formats} organizacji {name}: linki do pobrania i informacje o aktualizacji. Otwarte dane transportu publicznego w Polsce.",
+  metaOrganizationTitle: "{name} – status pozyskiwania danych",
+  metaOrganizationDescription:
+    "{name}: historia działań ODT w sprawie dostępu do danych transportowych tej organizacji.",
+  metaLatestStatus: "Najnowszy status: {status}.",
+  metaRegion: "Region: {region}.",
+  metaDatasetDescription:
+    "Feed {name} organizacji {organization} ({formats}) w katalogu ODT: linki do pobrania i informacje o aktualizacji.",
   metaBlogTitle: "Blog o transporcie publicznym i otwartych danych",
   metaBlogDescription:
     "Aktualności, przemyślenia i komunikaty o transporcie publicznym, GTFS, NeTEx i otwartych danych transportowych w Polsce.",
   metaDevelopersTitle: "API otwartych danych transportowych – katalog feedów i planer podróży",
   metaDevelopersDescription:
-    "Publiczne API ODT: katalog feedów GTFS, NeTEx, GTFS-RT, SIRI i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów. Bez rejestracji i bez klucza.",
+    "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów GTFS, GTFS-RT i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów.",
   developersTitle: "Dla deweloperów",
   developersSubtitle:
-    "Otwarte API z danymi transportu publicznego w Polsce: katalog feedów i planer podróży. Bez rejestracji i bez klucza.",
+    "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów z rozkładami jazdy GTFS i danymi na żywo GTFS-RT, GBFS oraz planer podróży z wyznaczaniem tras, odjazdami z przystanków i pozycjami pojazdów. Przykłady zapytań w curl, JavaScript i Pythonie.",
   developersOpenDocs: "Otwórz dokumentację API",
   developersQuickStartTitle: "Szybki start",
   developersApiBaseUrl: "Adres API",
@@ -511,7 +519,7 @@ export const dictPl = {
   developersAccessTitle: "Dostęp i limity",
   developersNoSignUpTitle: "Bez rejestracji",
   developersNoSignUpBody:
-    "Każdy endpoint działa bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
+    "Każdy endpoint może działać bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
   developersApiKeyTitle: "Klucz API",
   developersApiKeyBody:
     "Wyższe limity są dostępne z kluczem API. Aby go otrzymać, napisz na adres <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Klucz przesyłaj w nagłówku X-API-Key i nie umieszczaj go w kodzie strony WWW.",

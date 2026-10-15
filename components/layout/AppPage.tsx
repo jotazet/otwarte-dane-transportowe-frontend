@@ -5,8 +5,10 @@ import Stack from "@mui/material/Stack";
 
 import { AppBreadcrumbs, type BreadcrumbItem } from "@/components/layout/AppBreadcrumbs";
 import { PageSection } from "@/components/PageSection";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { resolveBackHref } from "@/lib/nav/breadcrumbTrails";
 import { paths } from "@/lib/nav/routes";
+import { breadcrumbLd } from "@/lib/seo/structuredData";
 
 export function AppPage({
   children,
@@ -28,6 +30,7 @@ export function AppPage({
 
   return (
     <PageSection maxWidth={maxWidth}>
+      <JsonLd data={breadcrumbLd(breadcrumbs ?? [])} />
       {breadcrumbs?.length ? (
         <AppBreadcrumbs
           items={breadcrumbs}

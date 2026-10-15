@@ -9,7 +9,8 @@ import Typography from "@mui/material/Typography";
 import { MdRefresh } from "react-icons/md";
 
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
-import { servedState, StatusPanel } from "@/components/plannerAdmin/shared";
+import { servedState } from "@/components/plannerAdmin/shared";
+import { StatusPanel } from "@/components/StatusPanel";
 import { nextScheduledBuild } from "@/lib/api/plannerAdmin";
 import { formatDateTime, formatNumber, formatTime } from "@/lib/format";
 import { DefinitionRows } from "@/components/layout/DefinitionRows";

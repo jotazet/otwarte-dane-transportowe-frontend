@@ -9,6 +9,7 @@ This repository documents only the website itself. Everything shared with the ba
 | [design-system/](design-system/README.md) | tokens, theme rules and how to use `ui-ux-pro-max` with MUI |
 | [architecture/decisions/](architecture/decisions/) | UI decisions (ADRs) |
 | [deployment.md](deployment.md) | production with Docker Compose |
+| [seo.md](seo.md) | metadata, structured data, llms.txt and what crawlers see |
 
 ## What goes where
 

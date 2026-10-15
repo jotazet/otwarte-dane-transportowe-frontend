@@ -1,4 +1,4 @@
-# 0003. Build the developers page from the planner's public status and a live request
+# 0005. Build the developers page from the planner's public status and a live request
 
 - **Status:** Accepted
 - **Date:** 2026-10-13

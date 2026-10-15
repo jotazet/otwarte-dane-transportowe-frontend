@@ -1,17 +1,6 @@
-import type { Dictionary } from "@/i18n/getDictionary";
-import type { Locale } from "@/i18n/locales";
-import { siteUrl } from "@/lib/seo/metadata";
-
-export function WebSiteJsonLd({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: dict.appName,
-    description: dict.metaSiteDescription,
-    url: siteUrl("", locale),
-    inLanguage: locale,
-  };
-
+/** Structured data for search engines and AI tools; `data` comes from `lib/seo/structuredData`. */
+export function JsonLd({ data }: { data: object | null }) {
+  if (!data) return null;
   return (
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }} />
   );
@@ -26,10 +15,10 @@ const JSONLD_ESCAPE: Record<string, string> = {
 };
 
 /**
- * Escapuje znaki, które mogłyby zamknąć/rozbić kontekst `<script>` (XSS przez JSON-LD):
- * `<`, `>`, `&` oraz separatory linii U+2028/U+2029.
+ * Escapes the characters that could close or break the `<script>` (XSS through JSON-LD):
+ * `<`, `>`, `&` and the line separators U+2028 and U+2029.
  */
-function safeJsonLd(data: unknown): string {
+export function safeJsonLd(data: unknown): string {
   const pattern = new RegExp(
     `[<>&${String.fromCharCode(0x2028)}${String.fromCharCode(0x2029)}]`,
     "g",
