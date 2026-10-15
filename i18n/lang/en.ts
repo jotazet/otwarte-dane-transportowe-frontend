@@ -431,7 +431,7 @@ export const dictEn: Dictionary = {
     "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",
   metaDevelopersTitle: "Open transport data API – feed catalogue and journey planner",
   metaDevelopersDescription:
-    "ODT's public API: a catalogue of GTFS, NeTEx, GTFS-RT, SIRI and GBFS feeds and a journey planner with departures and vehicle positions. Example requests and API documentation.",
+    "A free, open API with public transport data for Poland: a catalogue of GTFS, GTFS-RT and GBFS feeds and a journey planner with departures and vehicle positions.",
   developersTitle: "For developers",
   developersSubtitle:
     "A free, open API with public transport data for Poland: a catalogue of feeds with GTFS timetables and live GTFS-RT and GBFS data, and a journey planner with routing, stop departures and vehicle positions. Example requests in curl, JavaScript and Python.",

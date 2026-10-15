@@ -434,7 +434,7 @@ export const dictPl = {
     "Aktualności, przemyślenia i komunikaty o transporcie publicznym, GTFS, NeTEx i otwartych danych transportowych w Polsce.",
   metaDevelopersTitle: "API otwartych danych transportowych – katalog feedów i planer podróży",
   metaDevelopersDescription:
-    "Publiczne API ODT: katalog feedów GTFS, NeTEx, GTFS-RT, SIRI i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów. Przykłady zapytań i dokumentacja API.",
+    "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów GTFS, GTFS-RT i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów.",
   developersTitle: "Dla deweloperów",
   developersSubtitle:
     "Otwarte darmowe API z danymi transportu publicznego w Polsce: katalog feedów z rozkładami jazdy GTFS i danymi na żywo GTFS-RT, GBFS oraz planer podróży z wyznaczaniem tras, odjazdami z przystanków i pozycjami pojazdów. Przykłady zapytań w curl, JavaScript i Pythonie.",
