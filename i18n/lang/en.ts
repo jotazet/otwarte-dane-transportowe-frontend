@@ -434,7 +434,7 @@ export const dictEn: Dictionary = {
     "ODT's public API: a catalogue of GTFS, NeTEx, GTFS-RT, SIRI and GBFS feeds and a journey planner with departures and vehicle positions. Example requests and API documentation.",
   developersTitle: "For developers",
   developersSubtitle:
-    "An open API with public transport data for Poland: a catalogue of timetable feeds (GTFS, NeTEx) and live data (GTFS-RT, SIRI, GBFS), and a journey planner with routing, stop departures and vehicle positions. Example requests in curl, JavaScript and Python.",
+    "A free, open API with public transport data for Poland: a catalogue of feeds with GTFS timetables and live GTFS-RT and GBFS data, and a journey planner with routing, stop departures and vehicle positions. Example requests in curl, JavaScript and Python.",
   developersOpenDocs: "Open API documentation",
   developersQuickStartTitle: "Quick start",
   developersApiBaseUrl: "API base URL",
