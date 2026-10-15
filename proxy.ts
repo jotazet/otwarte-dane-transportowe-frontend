@@ -14,6 +14,7 @@ export function proxy(req: NextRequest) {
     pathname.startsWith("/api") ||
     pathname.startsWith("/favicon") ||
     pathname.startsWith("/internal-media") ||
+    pathname.startsWith("/opengraph-image") ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();
@@ -35,7 +36,9 @@ export function proxy(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = `/pl${pathname === "/" ? "" : pathname}`;
     url.search = search;
-    return NextResponse.redirect(url);
+    // Permanent: a path without a locale always lands on Polish, so search engines can
+    // move its signals to the target.
+    return NextResponse.redirect(url, 308);
   }
 
   const requestHeaders = new Headers(req.headers);

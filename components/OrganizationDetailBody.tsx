@@ -73,7 +73,9 @@ export function OrganizationDetailBody({
         />
       ) : providers.length ? (
         <Stack spacing={1.5}>
-          <Typography variant="h6">{dict.providers}</Typography>
+          <Typography variant="h6" component="h2">
+            {dict.providers}
+          </Typography>
           <TableCard>
             <Table size="small" sx={{ minWidth: 720 }}>
               <TableHead>
@@ -100,7 +102,7 @@ export function OrganizationDetailBody({
       {(canManage || statuses.length > 0) && (
         <Stack spacing={1.5}>
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-            <Typography variant="h6" sx={{ flex: 1 }}>
+            <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
               {dict.caseStatuses}
             </Typography>
             {canManage ? (

@@ -423,6 +423,16 @@ export const dictEn: Dictionary = {
   metaCasesTitle: "Transport data acquisition statuses in Poland",
   metaCasesDescription:
     "Check open GTFS and NeTEx data acquisition statuses for transport organizations in Poland - public and private.",
+  metaFeedDetailTitle: "{name} – {formats} feeds",
+  metaFeedDetailDescription:
+    "{formats} feeds from {name}: download links and update information. Open public transport data from Poland.",
+  metaOrganizationTitle: "{name} – data acquisition status",
+  metaOrganizationDescription:
+    "History of ODT's steps to get access to transport data from {name}.",
+  metaLatestStatus: "Latest status: {status}.",
+  metaRegion: "Region: {region}.",
+  metaDatasetDescription:
+    "Feed {name} from {organization} ({formats}) in the ODT catalog: download links and update information.",
   metaBlogTitle: "Blog on public transport and open data",
   metaBlogDescription:
     "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",

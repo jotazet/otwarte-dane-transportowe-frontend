@@ -23,7 +23,7 @@ export function SectionCard({
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Box sx={{ color: "primary.main", display: "flex", "& svg": { fontSize: 32 } }}>{icon}</Box>
-        <Typography variant="h6" sx={{ mt: 2.5 }}>
+        <Typography variant="h6" component="h2" sx={{ mt: 2.5 }}>
           {title}
         </Typography>
         <Typography

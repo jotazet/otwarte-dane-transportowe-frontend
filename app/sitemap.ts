@@ -85,9 +85,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...STATIC_PATHS.flatMap((path) =>
       localizedEntries(path, path === "/blog" ? postDates[0] : undefined),
     ),
-    ...posts.flatMap((post) =>
-      localizedEntries(`/blog/${post.id}`, parseDate(post.updated_at ?? post.date)),
-    ),
+    // Posts are written in Polish only and every locale's copy points canonical at /pl.
+    ...posts.map((post) => {
+      const lastModified = parseDate(post.updated_at ?? post.date);
+      return {
+        url: pageUrl(DEFAULT_LOCALE, `/blog/${post.id}`),
+        ...(lastModified ? { lastModified } : {}),
+      };
+    }),
     ...organizations.flatMap((org) => localizedEntries(`/cases/organizations/${org.id}`)),
     ...feedOrganizations.flatMap((org) => localizedEntries(`/data/feeds/${org.id}`)),
   ];

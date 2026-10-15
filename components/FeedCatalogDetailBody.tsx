@@ -38,10 +38,12 @@ export function FeedCatalogDetailBody({
     <Stack spacing={3}>
       {groups.length ? (
         <Stack spacing={3}>
-          <Typography variant="h6">{dict.feedGroups}</Typography>
+          <Typography variant="h6" component="h2">
+            {dict.feedGroups}
+          </Typography>
           {groups.map((group, groupIndex) => (
             <Stack key={`${group.name}-${groupIndex}`} spacing={1.5}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700 }}>
                 {group.name}
               </Typography>
               <TableCard>

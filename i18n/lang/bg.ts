@@ -427,6 +427,16 @@ export const dictBg: Dictionary = {
   metaCasesTitle: "Статуси на набавянето на транспортни данни в Полша",
   metaCasesDescription:
     "Проверявай статусите на набавянето на отворени GTFS и NeTEx данни за транспортните организации в Полша - публични и частни.",
+  metaFeedDetailTitle: "{name} – фийдове {formats}",
+  metaFeedDetailDescription:
+    "Фийдове {formats} на {name}: линкове за изтегляне и информация за обновяването. Отворени данни за обществения транспорт в Полша.",
+  metaOrganizationTitle: "{name} – статус на набавянето на данни",
+  metaOrganizationDescription:
+    "История на действията на ODT за достъп до транспортните данни на {name}.",
+  metaLatestStatus: "Най-актуален статус: {status}.",
+  metaRegion: "Регион: {region}.",
+  metaDatasetDescription:
+    "Фийд {name} на {organization} ({formats}) в каталога на ODT: линкове за изтегляне и информация за обновяването.",
   metaBlogTitle: "Блог за обществения транспорт и отворените данни",
   metaBlogDescription:
     "Новини, размисли и съобщения за обществения транспорт, GTFS, NeTEx и отворените транспортни данни в Полша.",

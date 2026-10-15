@@ -19,6 +19,8 @@ export type FeedEndpoint = {
 
 export type FeedDetail = {
   license?: string;
+  /** Realtime feeds only: gtfs_rt, siri or gbfs. */
+  protocol?: string | null;
   is_original?: boolean | null;
   download_url?: string | null;
   download_time_1?: string | null;
