@@ -23,6 +23,7 @@ import { usePathname } from "next/navigation";
 import {
   MdArticle,
   MdClose,
+  MdCode,
   MdDataset,
   MdHome,
   MdInfoOutline,
@@ -126,8 +127,20 @@ function MuiAppShellInner({
       { href: p.cases, label: dict.cases, icon: <MdRuleFolder size={22} aria-hidden /> },
       { href: p.data, label: dict.data, icon: <MdDataset size={22} aria-hidden /> },
       { href: p.info, label: dict.info, icon: <MdInfoOutline size={22} aria-hidden /> },
+      { href: p.developers, label: dict.developers, icon: <MdCode size={22} aria-hidden /> },
     ],
-    [dict.blog, dict.cases, dict.data, dict.info, p.blog, p.cases, p.data, p.info],
+    [
+      dict.blog,
+      dict.cases,
+      dict.data,
+      dict.info,
+      dict.developers,
+      p.blog,
+      p.cases,
+      p.data,
+      p.info,
+      p.developers,
+    ],
   );
 
   const activeHref = React.useMemo(() => {
@@ -415,6 +428,7 @@ function MuiAppShellInner({
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
                     variant="subtitle1"
+                    component="span"
                     color="primary"
                     sx={{
                       fontWeight: 600,

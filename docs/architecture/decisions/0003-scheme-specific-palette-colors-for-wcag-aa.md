@@ -1,6 +1,6 @@
 # 0003. Pick palette colors per color scheme to meet WCAG AA
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-12
 
 ## Context

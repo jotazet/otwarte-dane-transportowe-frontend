@@ -2,6 +2,18 @@ import { createTheme } from "@mui/material/styles";
 
 import { SELECT_MENU_MAX_HEIGHT } from "@/lib/ui/selectMenu";
 
+/** Categorical chart series, in a fixed order; checked for colour-blind separation in both schemes. */
+type ChartPalette = { series1: string; series2: string; series3: string; series4: string };
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    chart: ChartPalette;
+  }
+  interface PaletteOptions {
+    chart?: ChartPalette;
+  }
+}
+
 // Every `main` reaches 4.5:1 as text on both backgrounds of its scheme, and `contrastText`
 // reaches 4.5:1 on `main` and `dark` (filled chips, contained buttons and their hover).
 function paletteScheme(isLight: boolean) {
@@ -42,6 +54,12 @@ function paletteScheme(isLight: boolean) {
       text: {
         primary: isLight ? "#202124" : "#E8EAED",
         secondary: isLight ? "#5F6368" : "#9AA0A6",
+      },
+      chart: {
+        series1: isLight ? "#2A78D6" : "#3987E5",
+        series2: isLight ? "#EDA100" : "#C98500",
+        series3: isLight ? "#4A3AA7" : "#9085E9",
+        series4: isLight ? "#E34948" : "#E66767",
       },
     },
   };
@@ -183,6 +201,13 @@ const sharedComponents = {
         borderRadius: 24,
         fontWeight: 600,
       },
+    },
+  },
+  MuiChip: {
+    styleOverrides: {
+      // Roboto leaves chip text about 1 px above the middle (1.5 px in Firefox, which reads
+      // the font's typo metrics); 2 px on top moves it down by 1 px.
+      label: { paddingTop: 2 },
     },
   },
 } as const;

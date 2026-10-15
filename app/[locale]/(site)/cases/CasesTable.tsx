@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,17 +11,20 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useMemo, useState } from "react";
 import { MdEdit } from "react-icons/md";
 
 import { TableCard } from "@/components/TableCard";
 import { TableFilterSelect } from "@/components/TableFilterSelect";
+import { TableSearchField } from "@/components/TableSearchField";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasHelperAccess } from "@/lib/auth/permissions";
 import { caseStatusLabel } from "@/lib/cases/statusChoices";
 import { text } from "@/lib/format";
+import { matchesSearch } from "@/lib/search";
 import { useTableSort } from "@/lib/ui/useTableSort";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 import { TransportOrganizationListItem } from "@/lib/api/cases";
@@ -44,12 +48,16 @@ export function CasesTable({
     | "actions"
     | "edit"
     | "caseStatusLabels"
+    | "searchOrganizationRegion"
+    | "organizationCount"
+    | "organizationSearchEmpty"
   >;
 }) {
   const auth = useAuth();
   const canManage =
     auth.status === "authenticated" &&
     hasHelperAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin });
+  const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string | "">("");
   const [provider, setProvider] = useState<string | "">("");
   const { sortColumn, sortAscending, toggleSort } = useTableSort<SortColumn>("organization");
@@ -75,7 +83,11 @@ export function CasesTable({
     const filtered = organizations.filter((org) => {
       const matchesStatus = !status || latestStatus(org, dict) === status;
       const matchesProvider = !provider || providerNames(org).some((p) => p === provider);
-      return matchesStatus && matchesProvider;
+      return (
+        matchesStatus &&
+        matchesProvider &&
+        matchesSearch(query, [org.transport_organization, org.region])
+      );
     });
 
     const sorted = [...filtered].sort((a, b) => {
@@ -86,128 +98,147 @@ export function CasesTable({
     });
 
     return sorted;
-  }, [dict, organizations, provider, sortAscending, sortColumn, status]);
+  }, [dict, organizations, provider, query, sortAscending, sortColumn, status]);
 
   return (
-    <TableCard>
-      <Table size="small" sx={{ minWidth: 900 }}>
-        <TableHead>
-          <TableRow sx={tableHeadRowSx}>
-            <TableCell>
-              <TableSortLabel
-                active={sortColumn === "organization"}
-                direction={sortColumn === "organization" ? (sortAscending ? "asc" : "desc") : "asc"}
-                onClick={() => toggleSort("organization")}
-              >
-                {dict.organizations}
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortColumn === "region"}
-                direction={sortColumn === "region" ? (sortAscending ? "asc" : "desc") : "asc"}
-                onClick={() => toggleSort("region")}
-              >
-                {dict.region}
-              </TableSortLabel>
-            </TableCell>
-            <TableCell sx={{ minWidth: 200 }}>
-              <Box
-                component="span"
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.25,
-                }}
-              >
-                <Box
-                  component="span"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: "0.8125rem",
-                    letterSpacing: "0.02em",
-                  }}
-                >
-                  {dict.latestStatus}
-                </Box>
-                <TableFilterSelect
-                  value={status}
-                  onChange={setStatus}
-                  options={statuses}
-                  emptyLabel={dict.all}
-                  ariaLabel={dict.latestStatus}
-                />
-              </Box>
-            </TableCell>
-            <TableCell sx={{ minWidth: 200 }}>
-              <Box
-                component="span"
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.25,
-                }}
-              >
-                <Box
-                  component="span"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: "0.8125rem",
-                    letterSpacing: "0.02em",
-                  }}
-                >
-                  {dict.providers}
-                </Box>
-                <TableFilterSelect
-                  value={provider}
-                  onChange={setProvider}
-                  options={providers}
-                  emptyLabel={dict.all}
-                  ariaLabel={dict.providers}
-                />
-              </Box>
-            </TableCell>
-            {canManage ? <TableCell sx={{ width: 96 }}>{dict.actions}</TableCell> : null}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((org) => (
-            <TableRow key={org.id} hover sx={tableZebraRowSx}>
+    <Stack spacing={2}>
+      <TableSearchField
+        value={query}
+        onChange={setQuery}
+        label={dict.searchOrganizationRegion}
+        resultLabel={dict.organizationCount.replace("{count}", String(rows.length))}
+      />
+      <TableCard>
+        <Table size="small" sx={{ minWidth: 900 }}>
+          <TableHead>
+            <TableRow sx={tableHeadRowSx}>
               <TableCell>
-                <Link
-                  component={NextLink}
-                  href={`/${locale}/cases/organizations/${org.id}`}
-                  underline="hover"
-                  color="inherit"
-                  sx={{ fontWeight: 600 }}
+                <TableSortLabel
+                  active={sortColumn === "organization"}
+                  direction={
+                    sortColumn === "organization" ? (sortAscending ? "asc" : "desc") : "asc"
+                  }
+                  onClick={() => toggleSort("organization")}
                 >
-                  {text(org.transport_organization)}
-                </Link>
+                  {dict.organizations}
+                </TableSortLabel>
               </TableCell>
-              <TableCell>{text(org.region)}</TableCell>
-              <TableCell>{latestStatus(org, dict)}</TableCell>
-              <TableCell>{providerNames(org).join(", ")}</TableCell>
-              {canManage ? (
-                <TableCell>
-                  <Tooltip title={dict.edit}>
-                    <IconButton
-                      component={NextLink}
-                      href={`/${locale}/cases/organizations/${org.id}/edit`}
-                      prefetch={false}
-                      size="small"
-                      color="primary"
-                      aria-label={dict.edit}
-                    >
-                      <MdEdit size={20} aria-hidden />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              ) : null}
+              <TableCell>
+                <TableSortLabel
+                  active={sortColumn === "region"}
+                  direction={sortColumn === "region" ? (sortAscending ? "asc" : "desc") : "asc"}
+                  onClick={() => toggleSort("region")}
+                >
+                  {dict.region}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.25,
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "0.8125rem",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    {dict.latestStatus}
+                  </Box>
+                  <TableFilterSelect
+                    value={status}
+                    onChange={setStatus}
+                    options={statuses}
+                    emptyLabel={dict.all}
+                    ariaLabel={dict.latestStatus}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.25,
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "0.8125rem",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    {dict.providers}
+                  </Box>
+                  <TableFilterSelect
+                    value={provider}
+                    onChange={setProvider}
+                    options={providers}
+                    emptyLabel={dict.all}
+                    ariaLabel={dict.providers}
+                  />
+                </Box>
+              </TableCell>
+              {canManage ? <TableCell sx={{ width: 96 }}>{dict.actions}</TableCell> : null}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableCard>
+          </TableHead>
+          <TableBody>
+            {rows.map((org) => (
+              <TableRow key={org.id} hover sx={tableZebraRowSx}>
+                <TableCell>
+                  <Link
+                    component={NextLink}
+                    href={`/${locale}/cases/organizations/${org.id}`}
+                    underline="hover"
+                    color="inherit"
+                    sx={{ fontWeight: 600 }}
+                  >
+                    {text(org.transport_organization)}
+                  </Link>
+                </TableCell>
+                <TableCell>{text(org.region)}</TableCell>
+                <TableCell>{latestStatus(org, dict)}</TableCell>
+                <TableCell>{providerNames(org).join(", ")}</TableCell>
+                {canManage ? (
+                  <TableCell>
+                    <Tooltip title={dict.edit}>
+                      <IconButton
+                        component={NextLink}
+                        href={`/${locale}/cases/organizations/${org.id}/edit`}
+                        prefetch={false}
+                        size="small"
+                        color="primary"
+                        aria-label={dict.edit}
+                      >
+                        <MdEdit size={20} aria-hidden />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                ) : null}
+              </TableRow>
+            ))}
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={canManage ? 5 : 4}>
+                  <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                    {dict.organizationSearchEmpty}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : null}
+          </TableBody>
+        </Table>
+      </TableCard>
+    </Stack>
   );
 }
 

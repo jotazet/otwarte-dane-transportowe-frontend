@@ -16,6 +16,7 @@ const DISALLOW = [
   "/*/users",
   "/*/data/queue",
   "/*/data/feed-ops",
+  "/*/data/planner",
   "/*/data/my-submissions",
   "/*/data/submissions", // legacy → redirect na /data/queue
   "/*/data/submit", // legacy → redirect na /data/my-submissions

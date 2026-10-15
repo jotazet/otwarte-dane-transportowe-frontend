@@ -19,10 +19,12 @@ import {
   MdArticle,
   MdAssignment,
   MdCloudUpload,
+  MdCode,
   MdDataset,
   MdWbCloudy,
   MdManageAccounts,
   MdMonitorHeart,
+  MdRoute,
   MdRuleFolder,
   MdTrain,
 } from "react-icons/md";
@@ -115,6 +117,13 @@ function buildRoleCards(
   }
   if (hasAdminAccess(user)) {
     cards.push({
+      key: "planner-admin",
+      title: dict.plannerAdminTitle,
+      body: dict.plannerAdminHomeCardBody,
+      href: p.plannerAdmin,
+      icon: <MdRoute size={28} aria-hidden />,
+    });
+    cards.push({
       key: "users",
       title: dict.users,
       body: dict.usersDesc,
@@ -130,6 +139,7 @@ function OverviewCards({
   cards,
   dict,
   outlined,
+  perRowLg = 3,
 }: {
   cards: readonly {
     title: string;
@@ -140,11 +150,13 @@ function OverviewCards({
   }[];
   dict: Dictionary;
   outlined?: boolean;
+  /** Cards in a row on large screens. */
+  perRowLg?: 3 | 4;
 }) {
   return (
     <Grid container spacing={2} sx={{ mt: 1 }}>
       {cards.map((c) => (
-        <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={c.key ?? c.href}>
+        <Grid size={{ xs: 12, sm: 6, lg: 12 / perRowLg }} key={c.key ?? c.href}>
           <Card sx={{ height: "100%", ...(outlined ? { borderColor: "primary.light" } : {}) }}>
             <CardActionArea
               component={Link}
@@ -153,7 +165,7 @@ function OverviewCards({
             >
               <CardContent>
                 <Box sx={{ color: "primary.main" }}>{c.icon}</Box>
-                <Typography variant="h6" sx={{ mt: 2 }}>
+                <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
                   {c.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1, lineHeight: 1.6 }}>
@@ -180,7 +192,16 @@ function OverviewCards({
   );
 }
 
-export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function HomePageView({
+  locale,
+  dict,
+  signedIn,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+  /** The sign-in cookie is set: show a placeholder, not the visitor's hero, until auth loads. */
+  signedIn: boolean;
+}) {
   const auth = useAuth();
   const p = paths(locale);
 
@@ -205,6 +226,13 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
       body: dict.casesIntro,
       href: p.cases,
       icon: <MdRuleFolder size={28} aria-hidden />,
+    },
+    {
+      key: "developers",
+      title: dict.developers,
+      body: dict.developersIntro,
+      href: p.developers,
+      icon: <MdCode size={28} aria-hidden />,
     },
   ] as const;
 
@@ -247,7 +275,9 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
       >
         <Container maxWidth="lg" sx={{ py: { xs: 5, sm: 7 } }}>
           <Box sx={{ maxWidth: 720 }}>
-            {isLoading ? (
+            {/* Visitors and crawlers get the hero in the server HTML; only a signed-in user
+                waits for the greeting. */}
+            {isLoading && signedIn ? (
               <>
                 <Skeleton variant="text" width="55%" height={48} />
                 <Skeleton variant="text" width="80%" height={32} sx={{ mt: 2 }} />
@@ -263,6 +293,7 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
                 </Typography>
                 <Typography
                   variant="h6"
+                  component="p"
                   color="text.secondary"
                   sx={{ mt: 2, fontWeight: 500, lineHeight: 1.5 }}
                 >
@@ -325,7 +356,7 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
             <Typography variant="h5" component="h2" gutterBottom>
               {dict.sectionOverview}
             </Typography>
-            <OverviewCards cards={publicCards} dict={dict} />
+            <OverviewCards cards={publicCards} dict={dict} perRowLg={4} />
           </>
         )}
       </Container>

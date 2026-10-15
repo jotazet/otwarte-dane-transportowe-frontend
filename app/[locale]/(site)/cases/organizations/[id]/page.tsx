@@ -10,6 +10,7 @@ import { fetchTransportOrganization } from "@/lib/api/cases";
 import { loadOr404 } from "@/lib/api/loadOr404";
 import { parseNumericId } from "@/lib/nav/ids";
 import { casesOrganization } from "@/lib/nav/breadcrumbTrails";
+import { caseStatusLabel } from "@/lib/cases/statusChoices";
 import { text } from "@/lib/format";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -21,17 +22,31 @@ export async function generateMetadata({
   const { locale: rawLocale, id } = await params;
   if (!locales.includes(rawLocale as Locale)) return {};
   const locale = rawLocale as Locale;
-  const dict = await getDictionary(locale);
-
   const orgId = parseNumericId(id);
   if (orgId == null) return {};
+  const dict = await getDictionary(locale);
 
   try {
     const organization = await fetchTransportOrganization(orgId);
-    const orgLabel = text(organization.transport_organization);
+    const name = text(organization.transport_organization);
+    // The detail lists the whole history instead of latest_status; "none" says nothing.
+    const status = [...(organization.statuses ?? [])]
+      .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+      .find((entry) => entry.status && entry.status !== "none")?.status;
+    const region = organization.region?.trim();
+    // Whole sentences, each from the dictionary; the optional ones are left out when empty.
+    const description = [
+      dict.metaOrganizationDescription.replace("{name}", name),
+      status
+        ? dict.metaLatestStatus.replace("{status}", caseStatusLabel(status, dict.caseStatusLabels))
+        : null,
+      region ? dict.metaRegion.replace("{region}", region) : null,
+    ]
+      .filter(Boolean)
+      .join(" ");
     return buildPageMetadata(locale, dict, {
-      title: dict.metaCaseOrganizationTitle.replace("{organization}", orgLabel),
-      description: dict.metaCaseOrganizationDescription.replace("{organization}", orgLabel),
+      title: dict.metaOrganizationTitle.replace("{name}", name),
+      description,
       path: `/cases/organizations/${orgId}`,
     });
   } catch {

@@ -49,6 +49,10 @@ export function dataFeedOps(locale: string, dict: Dictionary): BreadcrumbItem[] 
   return [{ label: dict.feedOps }];
 }
 
+export function dataPlannerAdmin(locale: string, dict: Dictionary): BreadcrumbItem[] {
+  return [{ label: dict.plannerAdminTitle }];
+}
+
 export function dataSubmissionDetail(
   locale: string,
   dict: Dictionary,
@@ -189,6 +193,10 @@ export function userDetail(
 
 export function infoRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
   return [{ label: dict.info }];
+}
+
+export function developersRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
+  return [{ label: dict.developers }];
 }
 
 export function accountRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
