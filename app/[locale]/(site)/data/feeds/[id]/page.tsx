@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { FeedCatalogDetailBody, type FeedDetailGroup } from "@/components/FeedCatalogDetailBody";
@@ -10,6 +11,33 @@ import { loadOr404 } from "@/lib/api/loadOr404";
 import { parseNumericId } from "@/lib/nav/ids";
 import { dataFeedDetail } from "@/lib/nav/breadcrumbTrails";
 import { formatTimeOfDay, text } from "@/lib/format";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, id } = await params;
+  if (!locales.includes(rawLocale as Locale)) return {};
+  const locale = rawLocale as Locale;
+  const dict = await getDictionary(locale);
+
+  const orgId = parseNumericId(id);
+  if (orgId == null) return {};
+
+  try {
+    const organization = await fetchFeedCatalogOrganization(orgId);
+    const orgLabel = text(organization.transport_organization);
+    return buildPageMetadata(locale, dict, {
+      title: dict.metaFeedDetailTitle.replace("{organization}", orgLabel),
+      description: dict.metaFeedDetailDescription.replace("{organization}", orgLabel),
+      path: `/data/feeds/${orgId}`,
+    });
+  } catch {
+    return {};
+  }
+}
 
 export default async function FeedCatalogDetailPage({
   params,

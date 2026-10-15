@@ -20,7 +20,8 @@ export default async function SubmissionDetailPage({
   if (!parsed) notFound();
 
   const { listContext, kind: submissionKind, submissionId } = parsed;
-  const titlePrefix = submissionKind === "feed" ? dict.feedSubmissions : dict.realtimeSubmissions;
+  const titleTemplate =
+    submissionKind === "feed" ? dict.staticSubmissionTitle : dict.realtimeSubmissionTitle;
 
   return (
     <AppPage
@@ -30,7 +31,7 @@ export default async function SubmissionDetailPage({
       breadcrumbs={dataSubmissionDetail(locale, dict, listContext, submissionId)}
     >
       <PageHeader
-        title={`${titlePrefix} #${submissionId}`}
+        title={titleTemplate.replace("{id}", String(submissionId))}
         subtitle={dict.dataSubtitle}
         icon={<MdDataset size={28} aria-hidden />}
       />
