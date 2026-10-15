@@ -22,6 +22,8 @@ export const dictEn: Dictionary = {
   casesIntro: "Case statuses and a history of steps taken to get access to data.",
   dataIntro:
     "GTFS, NeTEx, GTFS-RT and GBFS feeds - static and live - from operators across Poland.",
+  developersIntro:
+    "An open API: the feed catalogue and the journey planner, with example requests and documentation.",
   publicEndpoint: "Public endpoint",
   requiresLogin: "Requires login",
   blogTitle: "Blog",

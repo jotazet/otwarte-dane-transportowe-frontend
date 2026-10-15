@@ -19,6 +19,7 @@ import {
   MdArticle,
   MdAssignment,
   MdCloudUpload,
+  MdCode,
   MdDataset,
   MdWbCloudy,
   MdManageAccounts,
@@ -138,6 +139,7 @@ function OverviewCards({
   cards,
   dict,
   outlined,
+  perRowLg = 3,
 }: {
   cards: readonly {
     title: string;
@@ -148,11 +150,13 @@ function OverviewCards({
   }[];
   dict: Dictionary;
   outlined?: boolean;
+  /** Cards in a row on large screens. */
+  perRowLg?: 3 | 4;
 }) {
   return (
     <Grid container spacing={2} sx={{ mt: 1 }}>
       {cards.map((c) => (
-        <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={c.key ?? c.href}>
+        <Grid size={{ xs: 12, sm: 6, lg: 12 / perRowLg }} key={c.key ?? c.href}>
           <Card sx={{ height: "100%", ...(outlined ? { borderColor: "primary.light" } : {}) }}>
             <CardActionArea
               component={Link}
@@ -213,6 +217,13 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
       body: dict.casesIntro,
       href: p.cases,
       icon: <MdRuleFolder size={28} aria-hidden />,
+    },
+    {
+      key: "developers",
+      title: dict.developers,
+      body: dict.developersIntro,
+      href: p.developers,
+      icon: <MdCode size={28} aria-hidden />,
     },
   ] as const;
 
@@ -333,7 +344,7 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
             <Typography variant="h5" component="h2" gutterBottom>
               {dict.sectionOverview}
             </Typography>
-            <OverviewCards cards={publicCards} dict={dict} />
+            <OverviewCards cards={publicCards} dict={dict} perRowLg={4} />
           </>
         )}
       </Container>

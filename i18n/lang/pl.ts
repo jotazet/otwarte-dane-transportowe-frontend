@@ -20,6 +20,8 @@ export const dictPl = {
   casesIntro: "Statusy spraw i historia działań podjętych w celu uzyskania dostępu do danych.",
   dataIntro:
     "Feedy GTFS, NeTEx, GTFS-RT i GBFS - statyczne i na żywo - od operatorów w całej Polsce.",
+  developersIntro:
+    "Otwarte API: katalog feedów i planer podróży, z przykładami zapytań i dokumentacją.",
   publicEndpoint: "Publiczny endpoint",
   requiresLogin: "Wymaga logowania",
   blogTitle: "Blog",

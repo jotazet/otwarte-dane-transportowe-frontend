@@ -22,6 +22,8 @@ export const dictBg: Dictionary = {
   casesIntro: "Статуси на казусите и история на действията, предприети за достъп до данните.",
   dataIntro:
     "GTFS, NeTEx, GTFS-RT и GBFS фийдове - статични и в реално време - от оператори в цяла Полша.",
+  developersIntro:
+    "Отворен API: каталог с фийдове и планер на пътувания, с примерни заявки и документация.",
   publicEndpoint: "Публичен ендпойнт",
   requiresLogin: "Изисква вход",
   blogTitle: "Блог",

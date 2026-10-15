@@ -23,6 +23,8 @@ export const dictDe: Dictionary = {
     "Fallstatus und Verlauf der Schritte, die unternommen wurden, um Zugang zu Daten zu erhalten.",
   dataIntro:
     "GTFS-, NeTEx-, GTFS-RT- und GBFS-Feeds - statisch und live - von Betreibern in ganz Polen.",
+  developersIntro:
+    "Eine offene API: Feed-Katalog und Reiseplaner, mit Beispielanfragen und Dokumentation.",
   publicEndpoint: "Öffentlicher Endpoint",
   requiresLogin: "Login erforderlich",
   blogTitle: "Blog",
