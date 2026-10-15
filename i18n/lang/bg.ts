@@ -434,10 +434,10 @@ export const dictBg: Dictionary = {
   metaDevelopersTitle:
     "API за отворени транспортни данни – каталог с фийдове и планер на пътувания",
   metaDevelopersDescription:
-    "Публичният API на ODT: каталог с фийдове GTFS, NeTEx, GTFS-RT, SIRI и GBFS и планер на пътувания със заминавания и позиции на превозните средства. Без регистрация и без ключ.",
+    "Публичният API на ODT: каталог с фийдове GTFS, NeTEx, GTFS-RT, SIRI и GBFS и планер на пътувания със заминавания и позиции на превозните средства. Примерни заявки и документация на API.",
   developersTitle: "За разработчици",
   developersSubtitle:
-    "Отворен API с данни за обществения транспорт в Полша: каталог с фийдове и планер на пътувания. Без регистрация и без ключ.",
+    "Отворен API с данни за обществения транспорт в Полша: каталог с фийдове за разписания (GTFS, NeTEx) и данни в реално време (GTFS-RT, SIRI, GBFS), както и планер на пътувания с търсене на маршрути, заминавания от спирките и позиции на превозните средства. Примерни заявки на curl, JavaScript и Python.",
   developersOpenDocs: "Отвори документацията на API",
   developersQuickStartTitle: "Бърз старт",
   developersApiBaseUrl: "Адрес на API",
@@ -464,7 +464,7 @@ export const dictBg: Dictionary = {
   developersAccessTitle: "Достъп и лимити",
   developersNoSignUpTitle: "Без регистрация",
   developersNoSignUpBody:
-    "Всеки ендпойнт работи без ключ. Лимитите на заявките се броят на минута, отделно за всеки IP адрес.",
+    "Всеки ендпойнт може да работи без ключ. Лимитите на заявките се броят на минута, отделно за всеки IP адрес.",
   developersApiKeyTitle: "API ключ",
   developersApiKeyBody:
     "С API ключ лимитите са по-високи. За да получите ключ, пишете на <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Изпращайте ключа в заглавката X-API-Key и никога не го поставяйте в кода на уебсайт.",

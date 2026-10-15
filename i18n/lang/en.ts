@@ -429,10 +429,10 @@ export const dictEn: Dictionary = {
     "News, thoughts and announcements about public transport, GTFS, NeTEx and open transport data in Poland.",
   metaDevelopersTitle: "Open transport data API – feed catalogue and journey planner",
   metaDevelopersDescription:
-    "ODT's public API: a catalogue of GTFS, NeTEx, GTFS-RT, SIRI and GBFS feeds and a journey planner with departures and vehicle positions. No sign-up or key needed.",
+    "ODT's public API: a catalogue of GTFS, NeTEx, GTFS-RT, SIRI and GBFS feeds and a journey planner with departures and vehicle positions. Example requests and API documentation.",
   developersTitle: "For developers",
   developersSubtitle:
-    "An open API with public transport data for Poland: the feed catalogue and the journey planner. No sign-up, no key.",
+    "An open API with public transport data for Poland: a catalogue of timetable feeds (GTFS, NeTEx) and live data (GTFS-RT, SIRI, GBFS), and a journey planner with routing, stop departures and vehicle positions. Example requests in curl, JavaScript and Python.",
   developersOpenDocs: "Open API documentation",
   developersQuickStartTitle: "Quick start",
   developersApiBaseUrl: "API base URL",
@@ -459,7 +459,7 @@ export const dictEn: Dictionary = {
   developersAccessTitle: "Access and limits",
   developersNoSignUpTitle: "No sign-up",
   developersNoSignUpBody:
-    "Every endpoint works without a key. Rate limits are counted per minute, separately for each IP address.",
+    "Every endpoint can work without a key. Rate limits are counted per minute, separately for each IP address.",
   developersApiKeyTitle: "API key",
   developersApiKeyBody:
     "An API key gives higher limits. To get one, write to <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Send the key in the X-API-Key header and never put it in a website's code.",

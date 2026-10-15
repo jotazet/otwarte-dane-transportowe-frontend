@@ -437,10 +437,10 @@ export const dictDe: Dictionary = {
     "Neuigkeiten, Gedanken und Mitteilungen über öffentlichen Verkehr, GTFS, NeTEx und offene Verkehrsdaten in Polen.",
   metaDevelopersTitle: "API für offene Verkehrsdaten – Feed-Katalog und Reiseplaner",
   metaDevelopersDescription:
-    "Die öffentliche API von ODT: ein Katalog von GTFS-, NeTEx-, GTFS-RT-, SIRI- und GBFS-Feeds und ein Reiseplaner mit Abfahrten und Fahrzeugpositionen. Ohne Registrierung und ohne Schlüssel.",
+    "Die öffentliche API von ODT: ein Katalog von GTFS-, NeTEx-, GTFS-RT-, SIRI- und GBFS-Feeds und ein Reiseplaner mit Abfahrten und Fahrzeugpositionen. Beispielanfragen und API-Dokumentation.",
   developersTitle: "Für Entwickler",
   developersSubtitle:
-    "Eine offene API mit Daten des öffentlichen Verkehrs in Polen: Feed-Katalog und Reiseplaner. Ohne Registrierung und ohne Schlüssel.",
+    "Eine offene API mit Daten des öffentlichen Verkehrs in Polen: ein Katalog von Fahrplan-Feeds (GTFS, NeTEx) und Echtzeitdaten (GTFS-RT, SIRI, GBFS) sowie ein Reiseplaner mit Routensuche, Abfahrten an Haltestellen und Fahrzeugpositionen. Beispielanfragen in curl, JavaScript und Python.",
   developersOpenDocs: "API-Dokumentation öffnen",
   developersQuickStartTitle: "Schnellstart",
   developersApiBaseUrl: "API-Adresse",
@@ -467,7 +467,7 @@ export const dictDe: Dictionary = {
   developersAccessTitle: "Zugang und Limits",
   developersNoSignUpTitle: "Ohne Registrierung",
   developersNoSignUpBody:
-    "Jeder Endpoint funktioniert ohne Schlüssel. Die Anfragelimits gelten pro Minute und für jede IP-Adresse einzeln.",
+    "Jeder Endpoint kann ohne Schlüssel funktionieren. Die Anfragelimits gelten pro Minute und für jede IP-Adresse einzeln.",
   developersApiKeyTitle: "API-Schlüssel",
   developersApiKeyBody:
     "Mit einem API-Schlüssel gelten höhere Limits. Schreiben Sie dafür an <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Senden Sie den Schlüssel im Header X-API-Key und binden Sie ihn nie in den Code einer Website ein.",

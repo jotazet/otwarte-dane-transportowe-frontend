@@ -432,10 +432,10 @@ export const dictPl = {
     "Aktualności, przemyślenia i komunikaty o transporcie publicznym, GTFS, NeTEx i otwartych danych transportowych w Polsce.",
   metaDevelopersTitle: "API otwartych danych transportowych – katalog feedów i planer podróży",
   metaDevelopersDescription:
-    "Publiczne API ODT: katalog feedów GTFS, NeTEx, GTFS-RT, SIRI i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów. Bez rejestracji i bez klucza.",
+    "Publiczne API ODT: katalog feedów GTFS, NeTEx, GTFS-RT, SIRI i GBFS oraz planer podróży z odjazdami i pozycjami pojazdów. Przykłady zapytań i dokumentacja API.",
   developersTitle: "Dla deweloperów",
   developersSubtitle:
-    "Otwarte API z danymi transportu publicznego w Polsce: katalog feedów i planer podróży. Bez rejestracji i bez klucza.",
+    "Otwarte API z danymi transportu publicznego w Polsce: katalog feedów z rozkładami jazdy (GTFS, NeTEx) i danymi na żywo (GTFS-RT, SIRI, GBFS) oraz planer podróży z wyznaczaniem tras, odjazdami z przystanków i pozycjami pojazdów. Przykłady zapytań w curl, JavaScript i Pythonie.",
   developersOpenDocs: "Otwórz dokumentację API",
   developersQuickStartTitle: "Szybki start",
   developersApiBaseUrl: "Adres API",
@@ -462,7 +462,7 @@ export const dictPl = {
   developersAccessTitle: "Dostęp i limity",
   developersNoSignUpTitle: "Bez rejestracji",
   developersNoSignUpBody:
-    "Każdy endpoint działa bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
+    "Każdy endpoint może działać bez klucza. Limity zapytań są liczone na minutę, osobno dla każdego adresu IP.",
   developersApiKeyTitle: "Klucz API",
   developersApiKeyBody:
     "Wyższe limity są dostępne z kluczem API. Aby go otrzymać, napisz na adres <a href='mailto:kontakt@odt.org.pl'>kontakt@odt.org.pl</a>. Klucz przesyłaj w nagłówku X-API-Key i nie umieszczaj go w kodzie strony WWW.",

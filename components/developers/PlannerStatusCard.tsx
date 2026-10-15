@@ -2,12 +2,15 @@ import { Suspense, type ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Skeleton from "@mui/material/Skeleton";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+import { DefinitionRows } from "@/components/layout/DefinitionRows";
+import { StatusPanel } from "@/components/StatusPanel";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { loadOrError } from "@/lib/api/loadOr404";
 import { fetchPlannerCoverage, type PlannerStatus } from "@/lib/api/planner";
@@ -104,80 +107,33 @@ export function PlannerStatusCard({
           </Typography>
         </Stack>
 
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{
-            alignItems: "flex-start",
-            mt: 2,
-            p: 1.5,
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 1,
-          }}
-        >
-          <Box
-            aria-hidden
-            sx={{
-              width: 10,
-              height: 10,
-              mt: 0.75,
-              borderRadius: "50%",
-              flexShrink: 0,
-              bgcolor: DOT_COLOR[state],
-            }}
-          />
-          <Box>
-            <Typography variant="subtitle1" component="p" sx={{ fontWeight: 600, lineHeight: 1.4 }}>
-              {dict.developersStatusStateLabels[state]}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {dict.developersStatusStateBodies[state]}
-            </Typography>
-          </Box>
-        </Stack>
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid size={{ xs: 12, md: rows.length ? 6 : 12 }}>
+            <StatusPanel
+              color={DOT_COLOR[state]}
+              title={dict.developersStatusStateLabels[state]}
+              body={dict.developersStatusStateBodies[state]}
+            />
 
-        {rows.length ? (
-          <Box
-            component="dl"
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) auto",
-              columnGap: 2,
-              rowGap: 1,
-              mt: 2,
-              mb: 0,
-            }}
-          >
-            {rows.map((row) => (
-              <Box key={row.label} sx={{ display: "contents" }}>
-                <Typography component="dt" variant="body2" color="text.secondary">
-                  {row.label}
+            {/* Counting trips needs the routing engine, which only answers while the planner is
+                available; it is slow, so the rest of the page does not wait for it. */}
+            {status?.available ? (
+              <Box sx={{ mt: 2.5 }}>
+                <Typography variant="body2" color="text.secondary" id="planner-coverage-label">
+                  {dict.developersCoverageLabel}
                 </Typography>
-                <Typography
-                  component="dd"
-                  variant="body2"
-                  sx={{ m: 0, textAlign: "right", fontWeight: 500, whiteSpace: "nowrap" }}
-                >
-                  {row.value}
-                </Typography>
+                <Suspense fallback={<Skeleton variant="rounded" height={6} sx={{ mt: 1 }} />}>
+                  <CoverageSummary status={status} locale={locale} dict={dict} />
+                </Suspense>
               </Box>
-            ))}
-          </Box>
-        ) : null}
-
-        {/* Counting trips needs the routing engine, which only answers while the planner is
-            available; it is slow, so the rest of the page does not wait for it. */}
-        {status?.available ? (
-          <Box sx={{ mt: 2.5 }}>
-            <Typography variant="body2" color="text.secondary" id="planner-coverage-label">
-              {dict.developersCoverageLabel}
-            </Typography>
-            <Suspense fallback={<Skeleton variant="rounded" height={6} sx={{ mt: 1 }} />}>
-              <CoverageSummary status={status} locale={locale} dict={dict} />
-            </Suspense>
-          </Box>
-        ) : null}
+            ) : null}
+          </Grid>
+          {rows.length ? (
+            <Grid size={{ xs: 12, md: 6 }}>
+              <DefinitionRows rows={rows} />
+            </Grid>
+          ) : null}
+        </Grid>
       </CardContent>
     </Card>
   );

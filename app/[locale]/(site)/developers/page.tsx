@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { MdCode, MdOpenInNew } from "react-icons/md";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 
 import { DeveloperAccessCard } from "@/components/developers/DeveloperAccessCard";
 import { DeveloperQuickStart } from "@/components/developers/DeveloperQuickStart";
@@ -63,37 +61,29 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
           </Button>
         }
       />
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-          <Stack spacing={2}>
-            <DeveloperQuickStart
-              apiBaseUrl={baseUrl}
-              dict={{
-                developersQuickStartTitle: dict.developersQuickStartTitle,
-                developersApiBaseUrl: dict.developersApiBaseUrl,
-                developersCopyApiBaseUrl: dict.developersCopyApiBaseUrl,
-                developersRequest: dict.developersRequest,
-                developersExampleLabels: dict.developersExampleLabels,
-                developersCodeLanguage: dict.developersCodeLanguage,
-                developersCopyCode: dict.developersCopyCode,
-                developersCopied: dict.developersCopied,
-                developersSendRequest: dict.developersSendRequest,
-                developersSendRequestHint: dict.developersSendRequestHint,
-                developersResponse: dict.developersResponse,
-                developersResponseEmpty: dict.developersResponseEmpty,
-                developersResponseLoading: dict.developersResponseLoading,
-                developersResponseTime: dict.developersResponseTime,
-                developersResponseFailed: dict.developersResponseFailed,
-                developersCopyResponse: dict.developersCopyResponse,
-              }}
-            />
-            <DeveloperAccessCard locale={locale} dict={dict} />
-          </Stack>
-        </Grid>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-          <PlannerStatusCard status={status} locale={locale} dict={dict} />
-        </Grid>
-      </Grid>
+      <DeveloperQuickStart
+        apiBaseUrl={baseUrl}
+        dict={{
+          developersQuickStartTitle: dict.developersQuickStartTitle,
+          developersApiBaseUrl: dict.developersApiBaseUrl,
+          developersCopyApiBaseUrl: dict.developersCopyApiBaseUrl,
+          developersRequest: dict.developersRequest,
+          developersExampleLabels: dict.developersExampleLabels,
+          developersCodeLanguage: dict.developersCodeLanguage,
+          developersCopyCode: dict.developersCopyCode,
+          developersCopied: dict.developersCopied,
+          developersSendRequest: dict.developersSendRequest,
+          developersSendRequestHint: dict.developersSendRequestHint,
+          developersResponse: dict.developersResponse,
+          developersResponseEmpty: dict.developersResponseEmpty,
+          developersResponseLoading: dict.developersResponseLoading,
+          developersResponseTime: dict.developersResponseTime,
+          developersResponseFailed: dict.developersResponseFailed,
+          developersCopyResponse: dict.developersCopyResponse,
+        }}
+      />
+      <DeveloperAccessCard locale={locale} dict={dict} />
+      <PlannerStatusCard status={status} locale={locale} dict={dict} />
       {status ? (
         <PlannerFeedsTable
           feeds={status.feeds}
