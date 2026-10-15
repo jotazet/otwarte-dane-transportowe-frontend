@@ -182,7 +182,7 @@ export function BlogPostCards({
                     gridRow: { sm: cover ? 2 : "auto" },
                   }}
                 >
-                  <BlogPostListReactionSummary summary={post.reactions_summary} />
+                  <BlogPostListReactionSummary summary={post.reactions_summary} dict={dict} />
                   {!!post.tags?.length ? (
                     <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: "wrap" }}>
                       {post.tags.map((tag) => (

@@ -39,7 +39,7 @@ export default async function StatusEditPage({
       breadcrumbs={casesStatusEdit(locale, dict, orgId, orgLabel)}
     >
       <PageHeader
-        title={`${dict.edit} ${dict.caseStatuses}: #${sid}`}
+        title={dict.caseStatusEditTitle.replace("{id}", String(sid))}
         subtitle={dict.caseStatusesDesc}
         icon={<MdRuleFolder size={28} aria-hidden />}
       />

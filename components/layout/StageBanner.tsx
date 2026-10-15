@@ -3,6 +3,8 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 
+import type { Dictionary } from "@/i18n/getDictionary";
+
 const STAGE_SEVERITY: Record<number, "info" | "warning" | "success"> = {
   1: "info",
   2: "warning",
@@ -18,6 +20,7 @@ export function StageBanner({
   rejectionReasons,
   rejectedLabel,
   fixHint,
+  dict,
 }: {
   stage: number;
   stageLabel: string;
@@ -27,6 +30,7 @@ export function StageBanner({
   rejectionReasons?: string[];
   rejectedLabel: string;
   fixHint?: string;
+  dict: Pick<Dictionary, "submissionStagePendingApprovalNote" | "submissionStagePublishedNote">;
 }) {
   if (isRejected) {
     const hasReasons = rejectionReasons !== undefined && rejectionReasons.length > 0;
@@ -46,11 +50,19 @@ export function StageBanner({
     );
   }
   const severity = STAGE_SEVERITY[stage] ?? "info";
+  const message =
+    stage === 3
+      ? dict.submissionStagePendingApprovalNote
+      : stage === 4
+        ? dict.submissionStagePublishedNote
+        : "{stage}";
+  // Split around the placeholder so the stage label can stay bold.
+  const [before, after] = message.split("{stage}");
   return (
     <Alert severity={severity}>
+      {before}
       <strong>{stageLabel}</strong>
-      {stage === 3 ? " - oczekuje na zatwierdzenie" : null}
-      {stage === 4 ? " - opublikowany w katalogu" : null}
+      {after}
     </Alert>
   );
 }

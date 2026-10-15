@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getJson } from "@/lib/api/http";
 import { fetchAllPages } from "@/lib/api/types";
 
@@ -58,9 +60,14 @@ export async function fetchTransportOrganizations(opts?: {
   );
 }
 
-export async function fetchTransportOrganization(id: number): Promise<TransportOrganizationDetail> {
-  return await getJson<TransportOrganizationDetail>(casesPaths.organization(id));
-}
+/**
+ * Wrapped in React `cache` so `generateMetadata` and the page share one request per
+ * render: the timeout signal in `fetchWithTimeout` opts out of Next's fetch memoization.
+ */
+export const fetchTransportOrganization = cache(
+  (id: number): Promise<TransportOrganizationDetail> =>
+    getJson<TransportOrganizationDetail>(casesPaths.organization(id)),
+);
 
 export async function fetchDataProviders(): Promise<DataProviderRecord[]> {
   return await fetchAllPages<DataProviderRecord>((p) => getJson(p), casesPaths.dataProviders);

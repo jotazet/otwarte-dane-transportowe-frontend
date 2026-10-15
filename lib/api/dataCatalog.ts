@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getJson } from "@/lib/api/http";
 import { fetchAllPages } from "@/lib/api/types";
 
@@ -21,6 +23,7 @@ export type FeedDetail = {
   license?: string;
   is_original?: boolean | null;
   download_url?: string | null;
+  /** UTC times of day ("HH:MM:SS"); null when ODT does not proxy the feed. */
   download_time_1?: string | null;
   download_time_2?: string | null;
   endpoints?: FeedEndpoint[];
@@ -49,8 +52,8 @@ export async function fetchFeedCatalog(opts?: {
   );
 }
 
-export async function fetchFeedCatalogOrganization(
-  id: number,
-): Promise<FeedCatalogOrganizationDetail> {
-  return await getJson<FeedCatalogOrganizationDetail>(`/api/data_manager/feeds/${id}/`);
-}
+/** Cached per render for the same reason as `fetchTransportOrganization` (lib/api/cases.ts). */
+export const fetchFeedCatalogOrganization = cache(
+  (id: number): Promise<FeedCatalogOrganizationDetail> =>
+    getJson<FeedCatalogOrganizationDetail>(`/api/data_manager/feeds/${id}/`),
+);

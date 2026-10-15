@@ -31,6 +31,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { text } from "@/lib/format";
 import { formatApiError } from "@/lib/formatApiError";
 import { paths, submissionDetailPath, type SubmissionListContext } from "@/lib/nav/routes";
+import { submissionStageLabel } from "@/lib/submissionStage";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 
 type UnifiedRow =
@@ -150,6 +151,22 @@ export function SubmissionsTableHub({
     setError(null);
     try {
       const q = buildListQuery({ transport_organization: filterOrgId });
+      if (listContext === "queue") {
+        // The combined endpoint lists only the caller's own submissions; the
+        // per-type lists give Helpers and Admins everyone's.
+        const get = <T,>(path: string) => apiJson<T>("GET", path);
+        const staticRows = await fetchAllPages<FeedSubmissionListItem>(
+          get,
+          `${submissionsPaths.feedList}${q}`,
+        );
+        const realtimeRows = await fetchAllPages<RealtimeSubmissionListItem>(
+          get,
+          `${submissionsPaths.realtimeList}${q}`,
+        );
+        setFeeds(staticRows);
+        setRts(realtimeRows);
+        return;
+      }
       const data = await apiJson<CombinedSubmissionsBundle>(
         "GET",
         `${submissionsPaths.combined}${q}`,
@@ -162,7 +179,7 @@ export function SubmissionsTableHub({
       setFeeds([]);
       setRts([]);
     }
-  }, [apiJson, auth.status, filterOrgId, dict]);
+  }, [apiJson, auth.status, filterOrgId, listContext, dict]);
 
   React.useEffect(() => {
     void (async () => {
@@ -240,7 +257,7 @@ export function SubmissionsTableHub({
       <Stack spacing={2} sx={listContext === "my" ? { mb: 3 } : undefined}>
         {config.showOrgFilterBanner && filterOrgId != null ? (
           <Typography variant="body2" color="text.secondary">
-            {dict.filteredByOrganization} #{filterOrgId}
+            {dict.filteredByOrganization.replace("{id}", String(filterOrgId))}
           </Typography>
         ) : null}
         {error ? <Alert severity="error">{error}</Alert> : null}
@@ -296,7 +313,9 @@ export function SubmissionsTableHub({
                   </TableCell>
                   <TableCell>{orgLabel(row)}</TableCell>
                   <TableCell>{row.typeLabel}</TableCell>
-                  <TableCell>{row.current_stage_label}</TableCell>
+                  <TableCell>
+                    {submissionStageLabel(row.kind, row.current_stage, row.is_rejected, dict)}
+                  </TableCell>
                   <TableCell>
                     <StatusChip row={row} dict={dict} listContext={listContext} />
                   </TableCell>

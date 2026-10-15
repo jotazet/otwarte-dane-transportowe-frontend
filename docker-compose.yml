@@ -9,4 +9,9 @@ services:
     container_name: odt-frontend
     restart: unless-stopped
     ports:
-      - "${FRONTEND_BIND:-0.0.0.0}:${FRONTEND_PORT:-3000}:3000"
+      - "${FRONTEND_BIND:-127.0.0.1}:${FRONTEND_PORT:-3000}:3000"
+    extra_hosts:
+      # Server-side rendering reaches the API through the reverse proxy on this host,
+      # not through the CDN, so the visitor's IP it forwards is kept. A .invalid name
+      # never resolves, so leaving API_HOSTNAME unset changes nothing.
+      - "${API_HOSTNAME:-unset.invalid}:host-gateway"

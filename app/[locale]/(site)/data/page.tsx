@@ -63,6 +63,8 @@ export default async function DataPage({ params }: { params: Promise<{ locale: s
             all: dict.all,
             actions: dict.actions,
             edit: dict.edit,
+            yes: dict.yes,
+            no: dict.no,
           }}
         />
       )}

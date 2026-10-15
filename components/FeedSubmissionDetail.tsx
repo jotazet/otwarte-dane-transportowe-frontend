@@ -41,6 +41,7 @@ import {
 import { downloadBlob } from "@/lib/download";
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
+import { submissionStageLabel } from "@/lib/submissionStage";
 
 type StaticEntry = FetchHealthFields & {
   id: number;
@@ -61,7 +62,6 @@ type FeedDetail = {
   name?: string;
   note?: string;
   current_stage: number;
-  current_stage_label: string;
   is_rejected: boolean;
   rejection_cause?: string | null;
   static_entry?: StaticEntry | null;
@@ -194,11 +194,9 @@ export function FeedSubmissionDetail({
   const sourcePerms = perms.feedSource(sourceCtx);
 
   const canEditMeta =
-    (isOwner && (sourcePerms.canEditFullSource || sourcePerms.canEditLimitedMeta)) ||
-    (isDjangoAdmin &&
-      (sourcePerms.canEditFullSource ||
-        sourcePerms.canAdminSourceOnStage2Plus ||
-        sourcePerms.canEditLimitedMeta));
+    sourcePerms.canEditFullSource ||
+    sourcePerms.canEditLimitedMeta ||
+    sourcePerms.canAdminSourceOnStage2Plus;
 
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =
@@ -318,11 +316,12 @@ export function FeedSubmissionDetail({
 
       <StageBanner
         stage={row.current_stage}
-        stageLabel={row.current_stage_label}
+        stageLabel={submissionStageLabel("static", row.current_stage, row.is_rejected, dict)}
         isRejected={row.is_rejected}
         rejectionCause={row.rejection_cause}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
+        dict={dict}
       />
 
       <Card>
@@ -377,7 +376,7 @@ export function FeedSubmissionDetail({
       ) : null}
 
       {canEditMeta ? (
-        <FormSection title={`${dict.name} / ${dict.note}`}>
+        <FormSection title={dict.submissionNameAndNoteSection}>
           <Stack spacing={2}>
             <TextField
               label={dict.name}
@@ -408,7 +407,7 @@ export function FeedSubmissionDetail({
           {showAdminSourceTab ? (
             <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
               <Tab label={dict.providerEditTab ?? dict.save} />
-              <Tab label={dict.adminSourceEditTab ?? "Edycja administracyjna"} />
+              <Tab label={dict.adminSourceEditTab} />
             </Tabs>
           ) : null}
 
@@ -494,7 +493,7 @@ export function FeedSubmissionDetail({
                   label={dict.authValue}
                   value={authValue}
                   onChange={(e) => setAuthValue(e.target.value)}
-                  helperText={`${dict.authValueNewOnly} - ${dict.authValueHint}`}
+                  helperText={dict.authValueEditHint}
                   autoComplete="new-password"
                   fullWidth
                   disabled={sourceFieldsDisabled || limitedOnly}
@@ -584,13 +583,8 @@ export function FeedSubmissionDetail({
       ) : null}
 
       {row.history?.length ? (
-        <FormSection title={dict.historyTitle ?? "Historia"}>
-          <HistoryTimeline
-            events={row.history}
-            title=""
-            emptyLabel={dict.emptyListBody}
-            locale={locale}
-          />
+        <FormSection title={dict.historyTitle}>
+          <HistoryTimeline events={row.history} locale={locale} dict={dict} />
         </FormSection>
       ) : null}
       {confirmDialog}

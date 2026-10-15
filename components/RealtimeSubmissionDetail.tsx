@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
+import { HistoryTimeline, type HistoryTimelineEvent } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
@@ -45,6 +46,7 @@ import {
 import { formatApiError } from "@/lib/formatApiError";
 import { text } from "@/lib/format";
 import { formatRejectionReasons } from "@/lib/rejectionReasons";
+import { submissionStageLabel } from "@/lib/submissionStage";
 
 type RtEndpoint = FetchHealthFields & {
   id?: number;
@@ -65,14 +67,13 @@ type RtDetail = {
   note?: string;
   license?: string;
   current_stage: number;
-  current_stage_label: string;
   is_rejected: boolean;
   rejection_cause?: string | null;
   rejection_reasons?: RejectionReason[] | null;
   endpoints?: RtEndpoint[];
   submitted_by?: number;
   submitted_by_username?: string | null;
-  history?: { event_type?: string; created_at?: string }[];
+  history?: HistoryTimelineEvent[];
 };
 
 type EndpointDraft = {
@@ -318,6 +319,7 @@ export function RealtimeSubmissionDetail({
     !sourcePerms.canEditFullSource &&
     !sourcePerms.canAdminSourceOnStage2Plus;
   const rejectionReasons = formatRejectionReasons(row.rejection_reasons ?? [], dict);
+  const stageLabel = submissionStageLabel("realtime", row.current_stage, row.is_rejected, dict);
 
   return (
     <Stack spacing={2}>
@@ -325,25 +327,28 @@ export function RealtimeSubmissionDetail({
 
       <StageBanner
         stage={row.current_stage}
-        stageLabel={row.current_stage_label}
+        stageLabel={stageLabel}
         isRejected={row.is_rejected}
         rejectionCause={row.rejection_cause}
         rejectionReasons={rejectionReasons}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
+        dict={dict}
       />
 
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            RT #{row.id} - {row.protocol}
+            {dict.realtimeSubmissionCardTitle
+              .replace("{id}", String(row.id))
+              .replace("{protocol}", row.protocol)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {dict.organizations}: {row.transport_organization} • {dict.staticSubmissionId}:{" "}
             {row.static_submission ?? "-"} • {dict.author}: {row.submitted_by_username ?? "-"}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
-            {dict.stage}: {row.current_stage_label}
+            {stageLabel}
           </Typography>
           {row.is_rejected ? (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
@@ -501,7 +506,7 @@ export function RealtimeSubmissionDetail({
                         prev.map((x, i) => (i === idx ? { ...x, auth_value: v } : x)),
                       );
                     }}
-                    helperText={dict.authValueNewOnly + " - " + dict.authValueHint}
+                    helperText={dict.authValueEditHint}
                     autoComplete="new-password"
                     disabled={fieldsLocked}
                     showPasswordLabel={dict.showPassword}
@@ -580,6 +585,12 @@ export function RealtimeSubmissionDetail({
               )}
             </Stack>
           ) : null}
+        </FormSection>
+      ) : null}
+
+      {row.history?.length ? (
+        <FormSection title={dict.historyTitle}>
+          <HistoryTimeline events={row.history} locale={locale} dict={dict} />
         </FormSection>
       ) : null}
       {confirmDialog}

@@ -35,7 +35,7 @@ export default async function StatusNewPage({
       breadcrumbs={casesStatusNew(locale, dict, orgId, orgLabel)}
     >
       <PageHeader
-        title={`${dict.addStatus}: ${orgLabel}`}
+        title={dict.caseStatusNewTitle.replace("{organization}", orgLabel)}
         subtitle={dict.caseStatusesDesc}
         icon={<MdRuleFolder size={28} aria-hidden />}
       />

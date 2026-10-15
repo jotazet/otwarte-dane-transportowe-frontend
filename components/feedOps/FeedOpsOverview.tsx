@@ -40,7 +40,6 @@ function StatCard({
     <Card
       sx={{
         height: "100%",
-        transition: "border-color 0.15s",
         "&:hover": onClick ? { borderColor: "primary.main" } : undefined,
       }}
     >
