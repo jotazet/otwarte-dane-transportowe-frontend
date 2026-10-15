@@ -43,7 +43,7 @@ export default async function BlogEditPage({
         locale={locale}
         dict={dict}
         postId={postId}
-        authorId={post.author_id}
+        authorId={post.author}
         initialTitle={post.title}
         initialContent={post.content}
         initialTags={post.tags}

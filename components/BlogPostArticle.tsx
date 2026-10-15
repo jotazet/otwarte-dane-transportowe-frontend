@@ -45,12 +45,7 @@ export function BlogPostArticle({
   const cover = blogCoverImageSrc(post.image);
   const auth = useAuth();
   const router = useRouter();
-  const canManage =
-    auth.status === "authenticated" &&
-    (canBlogEditPost(auth.user, post.author_id) ||
-      (auth.user.username &&
-        text(post.author_username) === auth.user.username &&
-        auth.user.roles.has("Blogger")));
+  const canManage = auth.status === "authenticated" && canBlogEditPost(auth.user, post.author);
   const [delOpen, setDelOpen] = React.useState(false);
   const [delPending, setDelPending] = React.useState(false);
   const [delError, setDelError] = React.useState<string | null>(null);
