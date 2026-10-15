@@ -432,7 +432,7 @@ export const dictBg: Dictionary = {
     "Фийдове {formats} на {name}: линкове за изтегляне и информация за обновяването. Отворени данни за обществения транспорт в Полша.",
   metaOrganizationTitle: "{name} – статус на набавянето на данни",
   metaOrganizationDescription:
-    "История на действията на ODT за достъп до транспортните данни на {name}.",
+    "{name}: история на действията на ODT за достъп до транспортните данни на организацията.",
   metaLatestStatus: "Най-актуален статус: {status}.",
   metaRegion: "Регион: {region}.",
   metaDatasetDescription:

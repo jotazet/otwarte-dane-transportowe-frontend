@@ -431,7 +431,7 @@ export const dictPl = {
     "Feedy {formats} organizacji {name}: linki do pobrania i informacje o aktualizacji. Otwarte dane transportu publicznego w Polsce.",
   metaOrganizationTitle: "{name} – status pozyskiwania danych",
   metaOrganizationDescription:
-    "Historia działań ODT w sprawie dostępu do danych transportowych organizacji {name}.",
+    "{name}: historia działań ODT w sprawie dostępu do danych transportowych tej organizacji.",
   metaLatestStatus: "Najnowszy status: {status}.",
   metaRegion: "Region: {region}.",
   metaDatasetDescription:

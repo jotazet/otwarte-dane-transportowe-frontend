@@ -33,7 +33,10 @@ export async function generateMetadata({
   try {
     const organization = await loadOrganization(orgId);
     const name = text(organization.transport_organization);
-    const status = organization.latest_status?.status;
+    // The detail lists the whole history instead of latest_status; "none" says nothing.
+    const status = [...(organization.statuses ?? [])]
+      .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+      .find((entry) => entry.status && entry.status !== "none")?.status;
     const region = organization.region?.trim();
     // Whole sentences, each from the dictionary; the optional ones are left out when empty.
     const description = [

@@ -40,6 +40,14 @@ function buildAlternates(
   };
 }
 
+/**
+ * The preview drawn by app/opengraph-image.tsx. Set on every page: a page's `openGraph`
+ * replaces the parent's, file-based image included.
+ */
+function previewImage(dict: Dictionary) {
+  return { url: "/opengraph-image", width: 1200, height: 630, alt: dict.appName };
+}
+
 export type PageMetaOptions = {
   title: string;
   description: string;
@@ -74,11 +82,13 @@ export function buildPageMetadata(
       title,
       description,
       url,
+      images: [previewImage(dict)],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [previewImage(dict)],
     },
   };
 }
@@ -103,11 +113,13 @@ export function buildSiteFallbackMetadata(dict: Dictionary, locale: Locale): Met
       locale: OG_LOCALES[locale],
       title,
       description,
+      images: [previewImage(dict)],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [previewImage(dict)],
     },
   };
 }

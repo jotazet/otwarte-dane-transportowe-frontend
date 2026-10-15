@@ -410,6 +410,7 @@ function MuiAppShellInner({
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
                     variant="subtitle1"
+                    component="span"
                     color="primary"
                     sx={{
                       fontWeight: 600,

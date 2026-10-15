@@ -436,7 +436,7 @@ export const dictDe: Dictionary = {
     "Feeds ({formats}) von {name}: Download-Links und Angaben zur Aktualisierung. Offene Daten des öffentlichen Verkehrs in Polen.",
   metaOrganizationTitle: "{name} – Status der Datenbeschaffung",
   metaOrganizationDescription:
-    "Verlauf der Schritte von ODT, um Zugang zu den Verkehrsdaten von {name} zu erhalten.",
+    "{name}: Verlauf der Schritte von ODT, um Zugang zu den Verkehrsdaten dieser Organisation zu erhalten.",
   metaLatestStatus: "Neuester Status: {status}.",
   metaRegion: "Region: {region}.",
   metaDatasetDescription:

@@ -428,7 +428,7 @@ export const dictEn: Dictionary = {
     "{formats} feeds from {name}: download links and update information. Open public transport data from Poland.",
   metaOrganizationTitle: "{name} – data acquisition status",
   metaOrganizationDescription:
-    "History of ODT's steps to get access to transport data from {name}.",
+    "{name}: the history of ODT's steps to get access to this organization's transport data.",
   metaLatestStatus: "Latest status: {status}.",
   metaRegion: "Region: {region}.",
   metaDatasetDescription:
