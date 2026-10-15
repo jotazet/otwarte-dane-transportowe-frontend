@@ -26,7 +26,7 @@ export default async function UserDetailPage({
       breadcrumbs={userDetail(locale, dict, userId, `#${userId}`)}
     >
       <PageHeader
-        title={`${dict.users} #${userId}`}
+        title={dict.userDetailTitle.replace("{id}", String(userId))}
         subtitle={dict.usersDesc}
         icon={<MdPerson size={28} aria-hidden />}
       />

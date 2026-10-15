@@ -35,7 +35,7 @@ export default async function BlogEditPage({
       breadcrumbs={blogEdit(locale, dict, postId, title)}
     >
       <PageHeader
-        title={`${dict.edit}: ${title}`}
+        title={dict.blogPostEditTitle.replace("{title}", title)}
         subtitle={dict.blogSubtitle}
         icon={<MdArticle size={28} />}
       />

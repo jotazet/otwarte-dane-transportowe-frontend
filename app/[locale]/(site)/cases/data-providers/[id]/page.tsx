@@ -34,7 +34,7 @@ export default async function DataProviderEditPage({
       breadcrumbs={casesProviderDetail(locale, dict, providerId, label)}
     >
       <PageHeader
-        title={`${dict.edit}: ${label}`}
+        title={dict.dataProviderEditTitle.replace("{name}", label)}
         subtitle={dict.providersDesc}
         icon={<MdBusiness size={28} aria-hidden />}
       />
