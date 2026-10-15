@@ -3,18 +3,8 @@
 import { usePathname } from "next/navigation";
 
 import { StatusScreen } from "@/components/layout/StatusScreen";
-import { dictBg } from "@/i18n/lang/bg";
-import { dictDe } from "@/i18n/lang/de";
-import { dictEn } from "@/i18n/lang/en";
-import { dictPl } from "@/i18n/lang/pl";
+import { dictionaryFor } from "@/i18n/getDictionary";
 import { locales, type Locale } from "@/i18n/locales";
-
-function dictFor(locale: Locale) {
-  if (locale === "en") return dictEn;
-  if (locale === "de") return dictDe;
-  if (locale === "bg") return dictBg;
-  return dictPl;
-}
 
 export default function SiteError({
   reset,
@@ -25,7 +15,7 @@ export default function SiteError({
   const pathname = usePathname() || "/pl";
   const seg = pathname.split("/")[1];
   const locale = (locales.includes(seg as Locale) ? seg : "pl") as Locale;
-  const dict = dictFor(locale);
+  const dict = dictionaryFor(locale);
 
   return (
     <StatusScreen

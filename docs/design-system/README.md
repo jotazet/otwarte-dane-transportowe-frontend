@@ -21,6 +21,7 @@
 - **Calm, readable, dense where it helps.** Catalogue and review tables favour information density; public pages must also work on phones.
 - **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`).
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
+- **Polish typesetting:** a one-letter word (a, i, o, u, w, z) never ends a line. `getDictionary` replaces the space after it with a no-break space for the whole Polish dictionary (`i18n/typography.ts`), so `pl.ts` keeps plain spaces.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
 
