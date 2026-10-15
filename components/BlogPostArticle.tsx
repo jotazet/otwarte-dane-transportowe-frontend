@@ -160,11 +160,7 @@ export function BlogPostArticle({
           <MarkdownContent content={text(post.content)} />
         </Box>
 
-        <ReactionPanel
-          postId={postId}
-          initialSummary={post.reactions_summary}
-          label={dict.reactions}
-        />
+        <ReactionPanel postId={postId} initialSummary={post.reactions_summary} dict={dict} />
 
         <Dialog open={delOpen} onClose={() => !delPending && setDelOpen(false)}>
           <DialogTitle>{dict.confirmDeletePost}</DialogTitle>

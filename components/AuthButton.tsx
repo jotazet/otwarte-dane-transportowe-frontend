@@ -36,7 +36,7 @@ export function AuthButton({
   roleLabels,
 }: {
   locale: string;
-  labels: { login: string; account: string; logout: string };
+  labels: { login: string; account: string; accountMenuLabel: string; logout: string };
   roleLabels?: Partial<DictionaryShape>;
 }) {
   const pathname = usePathname();
@@ -47,14 +47,7 @@ export function AuthButton({
 
   if (auth.status === "loading") {
     return (
-      <Skeleton
-        variant="circular"
-        width={32}
-        height={32}
-        animation="wave"
-        sx={{ flexShrink: 0 }}
-        aria-hidden
-      />
+      <Skeleton variant="circular" width={32} height={32} sx={{ flexShrink: 0 }} aria-hidden />
     );
   }
 
@@ -90,14 +83,15 @@ export function AuthButton({
     .slice(0, 2)
     .map((s) => s[0]!.toUpperCase())
     .join("");
+  const accountLabel = labels.accountMenuLabel.replace("{name}", displayName);
 
   return (
     <>
-      <Tooltip title={displayName}>
+      <Tooltip title={accountLabel}>
         <IconButton
           size="small"
           onClick={(e) => setAnchorEl(e.currentTarget)}
-          aria-label={labels.account}
+          aria-label={accountLabel}
           aria-haspopup="true"
           aria-expanded={open}
           sx={{ flexShrink: 0 }}

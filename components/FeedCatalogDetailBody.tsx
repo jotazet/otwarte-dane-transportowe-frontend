@@ -67,7 +67,7 @@ export function FeedCatalogDetailBody({
                         <TableRow key={idx} hover>
                           <TableCell sx={{ fontWeight: 600 }}>{row.type}</TableCell>
                           <TableCell>
-                            <OriginalCell value={row.original} />
+                            <OriginalCell value={row.original} dict={dict} />
                           </TableCell>
                           <TableCell>{row.interval}</TableCell>
                           {showDownloadTimes ? (
@@ -80,6 +80,7 @@ export function FeedCatalogDetailBody({
                               labels={{
                                 downloadFile: dict.downloadFile,
                                 copyLink: dict.copyLink,
+                                linkCopied: dict.linkCopied,
                                 openLinkError: dict.openLinkError,
                               }}
                             />

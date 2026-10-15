@@ -14,6 +14,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 import { MdAdd, MdDelete } from "react-icons/md";
@@ -500,19 +501,17 @@ export function DataSubmitForm({
                   minRows={2}
                 />
 
-                <Stack spacing={0.5}>
-                  <Typography variant="subtitle2">{dict.staticSource}</Typography>
-                  <SourceModeToggle
-                    value={staticSource}
-                    onChange={(v) => {
-                      setStaticSource(v);
-                      setError(null);
-                    }}
-                    urlLabel={dict.staticSourceUrl}
-                    fileLabel={dict.staticSourceFile}
-                    disabled={pending}
-                  />
-                </Stack>
+                <SourceModeToggle
+                  label={dict.staticSource}
+                  value={staticSource}
+                  onChange={(v) => {
+                    setStaticSource(v);
+                    setError(null);
+                  }}
+                  urlLabel={dict.staticSourceUrl}
+                  fileLabel={dict.staticSourceFile}
+                  disabled={pending}
+                />
 
                 {staticSource === "url" ? (
                   <TextField
@@ -811,14 +810,22 @@ export function DataSubmitForm({
                         }}
                         sx={{ minWidth: 160 }}
                       />
-                      <IconButton
-                        aria-label={dict.delete}
-                        color="error"
-                        disabled={pending || rtEndpoints.length <= 1}
-                        onClick={() => setRtEndpoints((rows) => rows.filter((_, i) => i !== idx))}
-                      >
-                        <MdDelete />
-                      </IconButton>
+                      {/* The span lets the tooltip work on a disabled button; describeChild keeps
+                          the name on the button instead of an aria-label on the span. */}
+                      <Tooltip title={dict.delete} describeChild>
+                        <Box component="span" sx={{ display: "inline-flex" }}>
+                          <IconButton
+                            aria-label={dict.delete}
+                            color="error"
+                            disabled={pending || rtEndpoints.length <= 1}
+                            onClick={() =>
+                              setRtEndpoints((rows) => rows.filter((_, i) => i !== idx))
+                            }
+                          >
+                            <MdDelete aria-hidden />
+                          </IconButton>
+                        </Box>
+                      </Tooltip>
                     </Stack>
                     <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                       <InlineSelect
@@ -899,7 +906,7 @@ export function DataSubmitForm({
                 <Button
                   type="button"
                   variant="outlined"
-                  startIcon={<MdAdd />}
+                  startIcon={<MdAdd aria-hidden />}
                   disabled={pending}
                   onClick={() =>
                     setRtEndpoints((rows) => [

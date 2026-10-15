@@ -7,12 +7,13 @@
 | Token | Value |
 | --- | --- |
 | Color schemes | light and dark, as CSS variables, switched with `data-color-mode` on `<html>` (`ColorModeToggle`, stored under `odt-color-mode`) |
-| Primary | `#1A73E8` |
+| Primary | `#1967D2` (light), `#8AB4F8` (dark) |
+| Status | success, warning, error, info per scheme, see [ADR 0003](../architecture/decisions/0003-scheme-specific-palette-colors-for-wcag-aa.md) |
 | Secondary | `#174EA6` (light), `#8AB4F8` (dark) |
 | Text | `#202124` / `#5F6368` (light), `#E8EAED` / `#9AA0A6` (dark) |
-| Font | Roboto via `next/font` (`--font-roboto`), headings weight 500 |
+| Font | Roboto via `next/font` (`--font-roboto`) as a variable font, so every weight from 100 to 900 is available; headings weight 500 |
 | Radius | 12 by default; cards 16; buttons 24 |
-| Motion | transitions disabled in the theme (`timeout: 0`) |
+| Motion | none: `transitions` in the theme sets every duration to 0 and every CSS transition MUI generates to `none`, and the Skeleton animation is off; don't set timeouts per component |
 
 `app/globals.css` repeats the page background per color scheme so the first paint matches the theme; keep the two in sync.
 
@@ -21,7 +22,7 @@
 - **Calm, readable, dense where it helps.** Catalogue and review tables favour information density; public pages must also work on phones.
 - **Cards** have a divider border and no shadow; **buttons** keep sentence case (`textTransform: none`).
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
-- Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark.
+- Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark: every palette `main` reaches 4.5:1 as text on the scheme's backgrounds and `contrastText` reaches 4.5:1 on `main` and `dark`.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
 
 ## Using `ui-ux-pro-max`

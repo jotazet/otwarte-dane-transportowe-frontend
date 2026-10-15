@@ -4,6 +4,7 @@ import * as React from "react";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
 import { MdOutlineSortByAlpha } from "react-icons/md";
 
 import { selectMenuPaperSx } from "@/lib/ui/selectMenu";
@@ -27,6 +28,7 @@ export function TableFilterSelect({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const currentLabel = value === "" ? emptyLabel : value;
+  const buttonLabel = `${ariaLabel}: ${currentLabel}`;
 
   function pick(next: string) {
     onChange(next);
@@ -35,32 +37,34 @@ export function TableFilterSelect({
 
   return (
     <>
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          setAnchorEl(e.currentTarget);
-        }}
-        aria-label={`${ariaLabel}: ${currentLabel}`}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : "false"}
-        sx={{
-          p: 0.25,
-          ml: 0.125,
-          flexShrink: 0,
-          color: value ? "primary.main" : "text.secondary",
-          "&:hover": {
-            bgcolor: "action.hover",
-          },
-        }}
-      >
-        <MdOutlineSortByAlpha
-          size={18}
-          aria-hidden
-          color="currentColor"
-          style={{ display: "block", opacity: open ? 1 : 0.85 }}
-        />
-      </IconButton>
+      <Tooltip title={buttonLabel}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            setAnchorEl(e.currentTarget);
+          }}
+          aria-label={buttonLabel}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : "false"}
+          sx={{
+            p: 0.25,
+            ml: 0.125,
+            flexShrink: 0,
+            color: value ? "primary.main" : "text.secondary",
+            "&:hover": {
+              bgcolor: "action.hover",
+            },
+          }}
+        >
+          <MdOutlineSortByAlpha
+            size={18}
+            aria-hidden
+            color="currentColor"
+            style={{ display: "block", opacity: open ? 1 : 0.85 }}
+          />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}
