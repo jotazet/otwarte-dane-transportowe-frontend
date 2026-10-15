@@ -23,6 +23,7 @@ import {
   MdWbCloudy,
   MdManageAccounts,
   MdMonitorHeart,
+  MdRoute,
   MdRuleFolder,
   MdTrain,
 } from "react-icons/md";
@@ -114,6 +115,13 @@ function buildRoleCards(
     });
   }
   if (hasAdminAccess(user)) {
+    cards.push({
+      key: "planner-admin",
+      title: dict.plannerAdminTitle,
+      body: dict.plannerAdminHomeCardBody,
+      href: p.plannerAdmin,
+      icon: <MdRoute size={28} aria-hidden />,
+    });
     cards.push({
       key: "users",
       title: dict.users,

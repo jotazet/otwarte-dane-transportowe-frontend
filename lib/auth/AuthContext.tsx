@@ -2,7 +2,14 @@
 
 import * as React from "react";
 
-import { ApiError, fetchWithTimeout, postJson, UPLOAD_TIMEOUT_MS } from "@/lib/api/http";
+import {
+  ApiError,
+  apiErrorFrom,
+  fetchWithTimeout,
+  postJson,
+  UPLOAD_TIMEOUT_MS,
+  type ApiJson,
+} from "@/lib/api/http";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
@@ -32,7 +39,7 @@ type AuthContextValue = AuthState & {
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => void;
   getAccessToken: () => string | null;
-  apiJson: <T>(method: string, path: string, body?: unknown) => Promise<T>;
+  apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
   apiBlob: (path: string) => Promise<Blob>;
 };
@@ -235,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access));
       }
       if (!res.ok) {
-        throw new ApiError(res.status, `HTTP ${res.status}`);
+        throw await apiErrorFrom(res);
       }
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
@@ -267,7 +274,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
-        throw new ApiError(res.status, `HTTP ${res.status}`);
+        throw await apiErrorFrom(res);
       }
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
@@ -295,7 +302,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
-        throw new ApiError(res.status, `HTTP ${res.status}`);
+        throw await apiErrorFrom(res);
       }
       return res.blob();
     },

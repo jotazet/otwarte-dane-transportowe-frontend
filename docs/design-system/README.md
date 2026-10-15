@@ -14,6 +14,7 @@
 | Font | Roboto via `next/font` (`--font-roboto`) as a variable font, so every weight from 100 to 900 is available; headings weight 500 |
 | Radius | 12 by default; cards 16; buttons 24 |
 | Motion | none: `transitions` in the theme sets every duration to 0 and every CSS transition MUI generates to `none`, and the Skeleton animation is off; don't set timeouts per component |
+| Chart series | `palette.chart.series1`–`series4`: blue, amber, violet, red, in this fixed order; light `#2A78D6` `#EDA100` `#4A3AA7` `#E34948`, dark `#3987E5` `#C98500` `#9085E9` `#E66767`. Checked for colour-blind separation of neighbours in both schemes; amber is under 3:1 on white, so charts that use it also have a legend and a table view |
 
 `app/globals.css` repeats the page background per color scheme so the first paint matches the theme; keep the two in sync.
 

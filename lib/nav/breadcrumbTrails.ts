@@ -49,6 +49,10 @@ export function dataFeedOps(locale: string, dict: Dictionary): BreadcrumbItem[] 
   return [{ label: dict.feedOps }];
 }
 
+export function dataPlannerAdmin(locale: string, dict: Dictionary): BreadcrumbItem[] {
+  return [{ label: dict.plannerAdminTitle }];
+}
+
 export function dataSubmissionDetail(
   locale: string,
   dict: Dictionary,
