@@ -46,3 +46,16 @@ export function formatTimeOfDay(value?: string | null): string | null {
   const m = /^(\d{2}):(\d{2})/.exec(value ?? "");
   return m ? `${m[1]}:${m[2]}` : null;
 }
+
+/** A count with the locale's thousands separator ("12 345"). */
+export function formatNumber(value: number, locale = "pl") {
+  return new Intl.NumberFormat(LOCALE_MAP[locale] ?? locale).format(value);
+}
+
+/** A ratio (0–1) as a whole percentage in the locale's format ("97%"). */
+export function formatPercent(ratio: number, locale = "pl") {
+  return new Intl.NumberFormat(LOCALE_MAP[locale] ?? locale, {
+    style: "percent",
+    maximumFractionDigits: 0,
+  }).format(ratio);
+}

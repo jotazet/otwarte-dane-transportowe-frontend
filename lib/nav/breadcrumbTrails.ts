@@ -191,6 +191,10 @@ export function infoRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
   return [{ label: dict.info }];
 }
 
+export function developersRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
+  return [{ label: dict.developers }];
+}
+
 export function accountRoot(locale: string, dict: Dictionary): BreadcrumbItem[] {
   return [{ label: dict.accountSettings }];
 }

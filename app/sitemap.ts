@@ -30,7 +30,7 @@ const API_OPTS = { revalidate: 3600 } as const;
 const MAX_PER_COLLECTION = 5_000;
 
 /** Trasy statyczne (bez prefiksu języka). `/cases/organizations` nie ma listingu — jest nim `/cases`. */
-const STATIC_PATHS = ["", "/blog", "/cases", "/data", "/info"] as const;
+const STATIC_PATHS = ["", "/blog", "/cases", "/data", "/info", "/developers"] as const;
 
 function pageUrl(locale: Locale, path: string): string {
   return `${SITE_URL}/${locale}${path}`;
