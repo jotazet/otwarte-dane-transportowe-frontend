@@ -454,7 +454,6 @@ function MuiAppShellInner({
                       key={item.href}
                       component={NextLink}
                       href={item.href}
-                      prefetch
                       variant="text"
                       color="inherit"
                       disableRipple

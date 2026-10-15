@@ -15,7 +15,8 @@ Fill in `.env`:
 - `NEXT_PUBLIC_API_BASE_URL` – public API URL, e.g. `https://v2.api.odt.org.pl`
 - `NEXT_PUBLIC_SITE_URL` – public site URL, e.g. `https://v2.odt.org.pl`
 - `FRONTEND_PORT` – host port (default `3000`)
-- `FRONTEND_BIND` – `127.0.0.1` when the reverse proxy runs on the same host (recommended), or `0.0.0.0` for testing from the LAN
+- `FRONTEND_BIND` – host address of the port (default `127.0.0.1`, for a reverse proxy on the same host). The container trusts `X-Forwarded-For`, so use `0.0.0.0` only for testing from the LAN.
+- `API_HOSTNAME` – the host of `NEXT_PUBLIC_API_BASE_URL`, e.g. `api.odt.org.pl`, when the API's reverse proxy runs on this machine: server-side rendering then reaches it directly, not through the CDN (see [section 4](#4-reverse-proxy--tls)). Leave unset otherwise.
 
 ## 2. Build and start
 
@@ -31,13 +32,26 @@ API_HOST=$(grep '^NEXT_PUBLIC_API_BASE_URL=' .env | cut -d= -f2- | sed 's#^https
 docker exec odt-frontend sh -c "grep -rlo '$API_HOST' .next/ | wc -l"   # more than 0
 # the landing page returns 200 (use your FRONTEND_PORT):
 curl -i http://localhost:3000/pl
+# with API_HOSTNAME: the API host resolves to this machine and answers (prints its address, then OK):
+API_HOSTNAME=$(grep '^API_HOSTNAME=' .env | cut -d= -f2-)
+docker exec odt-frontend sh -c "grep ' $API_HOSTNAME\$' /etc/hosts; wget -q -O /dev/null 'https://$API_HOSTNAME/api/blog/posts/?page_size=1' && echo OK"
 ```
 
 Don't check for the absence of `http://localhost:8000`: it is always in the bundle as the fallback after `||` in `lib/config.ts` and `next.config.ts`, even when the API URL was inlined correctly.
 
 ## 4. Reverse proxy + TLS
 
-Put a reverse proxy (nginx/Caddy) in front of the container that routes the site's domain to `127.0.0.1:${FRONTEND_PORT}` and forwards the `X-Forwarded-Proto: https` header.
+Put a reverse proxy (nginx/Caddy) in front of the container that routes the site's domain to `127.0.0.1:${FRONTEND_PORT}` and forwards the `X-Forwarded-Proto: https` header and the visitor's IP in `X-Forwarded-For` (the rightmost entry is used). With Caddy:
+
+```caddy
+example.org {
+    reverse_proxy 127.0.0.1:3000 {
+        header_up X-Forwarded-For {client_ip}
+    }
+}
+```
+
+Server-side rendering forwards that IP to the API, so the backend rate-limits each visitor separately. With `API_HOSTNAME` these calls reach the API's reverse proxy on this machine instead of the CDN, which would replace the IP; that proxy must accept `X-Forwarded-For` from the Docker networks. Its configuration and the deployment order are in [section 13 of the backend's `docs/deployment.md`](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/deployment.md#client-ip-cdn-and-the-frontend); background in [ADR 0011](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/architecture/decisions/0011-client-ip-behind-cloudflare-and-ssr.md).
 
 ## 5. Updates
 
