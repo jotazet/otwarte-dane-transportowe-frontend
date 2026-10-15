@@ -21,6 +21,8 @@ export type FeedEndpoint = {
 
 export type FeedDetail = {
   license?: string;
+  /** Realtime feeds only: gtfs_rt, siri or gbfs. */
+  protocol?: string | null;
   is_original?: boolean | null;
   download_url?: string | null;
   /** UTC times of day ("HH:MM:SS"); null when ODT does not proxy the feed. */

@@ -5,6 +5,7 @@ import { MdDataset } from "react-icons/md";
 import { DataCatalogTable } from "@/app/[locale]/(site)/data/DataCatalogTable";
 import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { fetchFeedCatalog } from "@/lib/api/dataCatalog";
@@ -12,6 +13,7 @@ import { loadOrError } from "@/lib/api/loadOr404";
 import { PageLoadErrorAlert } from "@/components/PageLoadErrorAlert";
 import { dataCatalog } from "@/lib/nav/breadcrumbTrails";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { dataCatalogLd } from "@/lib/seo/structuredData";
 
 export async function generateMetadata({
   params,
@@ -43,6 +45,7 @@ export default async function DataPage({ params }: { params: Promise<{ locale: s
       breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={dataCatalog(locale, dict)}
     >
+      <JsonLd data={dataCatalogLd(locale, dict)} />
       <PageHeader
         title={dict.dataTitle}
         subtitle={dict.dataSubtitle}

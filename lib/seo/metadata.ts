@@ -3,7 +3,13 @@ import type { Metadata } from "next";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(
+  /\/+$/,
+  "",
+);
+
+/** Language of `x-default`: the one served at `/`. */
+const DEFAULT_LOCALE: Locale = "pl";
 
 const OG_LOCALES: Record<Locale, string> = {
   pl: "pl_PL",
@@ -17,12 +23,29 @@ export function siteUrl(path: string, locale: Locale): string {
   return `${SITE_URL}/${locale}${normalized}`;
 }
 
-function buildAlternates(path: string, locale: Locale): Metadata["alternates"] {
+function buildAlternates(
+  path: string,
+  locale: Locale,
+  contentLocale?: Locale,
+): Metadata["alternates"] {
   const normalized = path.startsWith("/") ? path : path ? `/${path}` : "";
+  // Content in one language only: every locale points at it, with no language versions.
+  if (contentLocale) return { canonical: siteUrl(normalized, contentLocale) };
   return {
     canonical: siteUrl(normalized, locale),
-    languages: Object.fromEntries(locales.map((l) => [l, siteUrl(normalized, l)])),
+    languages: {
+      ...Object.fromEntries(locales.map((l) => [l, siteUrl(normalized, l)])),
+      "x-default": siteUrl(normalized, DEFAULT_LOCALE),
+    },
   };
+}
+
+/**
+ * The preview drawn by app/opengraph-image.tsx. Set on every page: a page's `openGraph`
+ * replaces the parent's, file-based image included.
+ */
+function previewImage(dict: Dictionary) {
+  return { url: "/opengraph-image", width: 1200, height: 630, alt: dict.appName };
 }
 
 export type PageMetaOptions = {
@@ -30,6 +53,10 @@ export type PageMetaOptions = {
   description: string;
   path?: string;
   keywords?: string;
+  /** Set when the content exists in one language only, such as blog posts. */
+  contentLocale?: Locale;
+  /** Blog posts: shared as an article with its dates. */
+  article?: { publishedTime?: string; modifiedTime?: string; authors?: string[] };
 };
 
 export function buildPageMetadata(
@@ -46,20 +73,22 @@ export function buildPageMetadata(
     title,
     description,
     keywords,
-    alternates: buildAlternates(path, locale),
+    alternates: buildAlternates(path, locale, options.contentLocale),
     openGraph: {
-      type: "website",
+      ...(options.article ? { type: "article", ...options.article } : { type: "website" }),
       siteName: dict.appName,
       locale: OG_LOCALES[locale],
       alternateLocale: locales.filter((l) => l !== locale).map((l) => OG_LOCALES[l]),
       title,
       description,
       url,
+      images: [previewImage(dict)],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [previewImage(dict)],
     },
   };
 }
@@ -84,11 +113,13 @@ export function buildSiteFallbackMetadata(dict: Dictionary, locale: Locale): Met
       locale: OG_LOCALES[locale],
       title,
       description,
+      images: [previewImage(dict)],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [previewImage(dict)],
     },
   };
 }

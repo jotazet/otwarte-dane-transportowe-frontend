@@ -165,7 +165,7 @@ function OverviewCards({
             >
               <CardContent>
                 <Box sx={{ color: "primary.main" }}>{c.icon}</Box>
-                <Typography variant="h6" sx={{ mt: 2 }}>
+                <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
                   {c.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1, lineHeight: 1.6 }}>
@@ -192,7 +192,16 @@ function OverviewCards({
   );
 }
 
-export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function HomePageView({
+  locale,
+  dict,
+  signedIn,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+  /** The sign-in cookie is set: show a placeholder, not the visitor's hero, until auth loads. */
+  signedIn: boolean;
+}) {
   const auth = useAuth();
   const p = paths(locale);
 
@@ -266,7 +275,9 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
       >
         <Container maxWidth="lg" sx={{ py: { xs: 5, sm: 7 } }}>
           <Box sx={{ maxWidth: 720 }}>
-            {isLoading ? (
+            {/* Visitors and crawlers get the hero in the server HTML; only a signed-in user
+                waits for the greeting. */}
+            {isLoading && signedIn ? (
               <>
                 <Skeleton variant="text" width="55%" height={48} />
                 <Skeleton variant="text" width="80%" height={32} sx={{ mt: 2 }} />
@@ -282,6 +293,7 @@ export function HomePageView({ locale, dict }: { locale: Locale; dict: Dictionar
                 </Typography>
                 <Typography
                   variant="h6"
+                  component="p"
                   color="text.secondary"
                   sx={{ mt: 2, fontWeight: 500, lineHeight: 1.5 }}
                 >

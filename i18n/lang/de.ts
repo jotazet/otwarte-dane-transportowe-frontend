@@ -475,18 +475,22 @@ export const dictDe: Dictionary = {
   metaDataTitle: "GTFS Polen-Katalog – statische und Realtime-Feeds",
   metaDataDescription:
     "Katalog von GTFS-, NeTEx-, GTFS-RT- und GBFS-Feeds polnischer Verkehrsbetreiber. Feed-Links kopieren oder die API offener Verkehrsdaten nutzen.",
-  metaFeedDetailTitle: "{organization} – statische und Realtime-Feeds",
-  metaFeedDetailDescription:
-    "Statische und Realtime-Feeds von {organization}: Datentypen, Lizenzen und Feed-Links.",
   metaInfoTitle: "Offene Verkehrsdaten – GTFS, NeTEx, Rechtsgrundlage",
   metaInfoDescription:
     "GTFS-, NeTEx-, GTFS-RT- und SIRI-Standards in Polen. Rechtsgrundlage offener Verkehrsdaten, Zusammenarbeit und Kontakt zum ODT-Projekt.",
   metaCasesTitle: "Status der Verkehrsdatenbeschaffung in Polen",
   metaCasesDescription:
     "Prüfe den Status der Beschaffung offener GTFS- und NeTEx-Daten für Verkehrsorganisationen in Polen - öffentliche und private.",
-  metaCaseOrganizationTitle: "{organization} – Status der Datenbeschaffung",
-  metaCaseOrganizationDescription:
-    "Status der Beschaffung von Verkehrsdaten von {organization}: Fallverlauf und Datenanbieter.",
+  metaFeedDetailTitle: "{name} – Feeds ({formats})",
+  metaFeedDetailDescription:
+    "Feeds ({formats}) von {name}: Download-Links und Angaben zur Aktualisierung. Offene Daten des öffentlichen Verkehrs in Polen.",
+  metaOrganizationTitle: "{name} – Status der Datenbeschaffung",
+  metaOrganizationDescription:
+    "{name}: Verlauf der Schritte von ODT, um Zugang zu den Verkehrsdaten dieser Organisation zu erhalten.",
+  metaLatestStatus: "Neuester Status: {status}.",
+  metaRegion: "Region: {region}.",
+  metaDatasetDescription:
+    "Feed {name} von {organization} ({formats}) im ODT-Katalog: Download-Links und Angaben zur Aktualisierung.",
   metaBlogTitle: "Blog über öffentlichen Verkehr und offene Daten",
   metaBlogDescription:
     "Neuigkeiten, Gedanken und Mitteilungen über öffentlichen Verkehr, GTFS, NeTEx und offene Verkehrsdaten in Polen.",
