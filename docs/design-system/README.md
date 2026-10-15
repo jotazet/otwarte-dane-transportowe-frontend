@@ -25,6 +25,7 @@
 - **Status** (stage, fetch status, case status) is shown with text or an icon, never color alone.
 - A **service state** (planner, public API) uses `components/StatusPanel.tsx`: a colour dot centred on the title line, the title, and a one-line explanation.
 - Contrast meets **WCAG 2.1 AA** in both color schemes. Check every new color pair in light and dark: every palette `main` reaches 4.5:1 as text on the scheme's backgrounds and `contrastText` reaches 4.5:1 on `main` and `dark`.
+- Long lists of organizations get a search box above the table (`TableSearchField`): it matches names and regions without diacritics (`lib/search.ts`) and announces the row count to screen readers.
 - Shared table styling comes from `lib/ui/tableSx.ts`; select menus use `SELECT_MENU_MAX_HEIGHT` from `lib/ui/selectMenu.ts`.
 - Code, URLs and raw API responses use `codeBlockSx` (monospace on the muted panel) and `MONOSPACE_FONT` from `lib/ui/codeSx.ts`.
 

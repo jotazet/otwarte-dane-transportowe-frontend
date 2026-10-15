@@ -71,6 +71,9 @@ export default async function CasesPage({ params }: { params: Promise<{ locale: 
             all: dict.all,
             actions: dict.actions,
             edit: dict.edit,
+            searchOrganizationRegion: dict.searchOrganizationRegion,
+            organizationCount: dict.organizationCount,
+            organizationSearchEmpty: dict.organizationSearchEmpty,
             caseStatusLabels: dict.caseStatusLabels,
           }}
         />

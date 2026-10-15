@@ -129,6 +129,9 @@ export const dictDe: Dictionary = {
   license: "Lizenz",
   search: "Suchen",
   searchOrganizationRegion: "Nach Organisation oder Region suchen",
+  organizationCount: "Anzahl der Organisationen: {count}",
+  organizationSearchEmpty:
+    "Keine Organisationen gefunden. Ändern Sie den Suchbegriff oder die Filter.",
   all: "Alle",
   filterRegion: "Region",
   filterStatus: "Status",
