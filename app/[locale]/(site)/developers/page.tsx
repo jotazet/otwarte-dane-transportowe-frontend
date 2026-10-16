@@ -8,6 +8,7 @@ import { PlannerFeedsTable } from "@/components/developers/PlannerFeedsTable";
 import { PlannerStatusCard } from "@/components/developers/PlannerStatusCard";
 import { AppPage } from "@/components/layout/AppPage";
 import { PageHeader } from "@/components/PageHeader";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getDictionary } from "@/i18n/getDictionary";
 import { Locale, locales } from "@/i18n/locales";
 import { loadOrError } from "@/lib/api/loadOr404";
@@ -15,7 +16,8 @@ import { fetchPlannerStatus } from "@/lib/api/planner";
 import { apiBaseUrl } from "@/lib/config";
 import { resolvePageLocale } from "@/lib/i18n/resolvePageLocale";
 import { developersRoot } from "@/lib/nav/breadcrumbTrails";
-import { buildPageMetadata, siteUrl } from "@/lib/seo/metadata";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { webApiLd } from "@/lib/seo/structuredData";
 
 export async function generateMetadata({
   params,
@@ -36,18 +38,8 @@ export async function generateMetadata({
 export default async function DevelopersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale, dict } = await resolvePageLocale(params);
   const baseUrl = apiBaseUrl();
+  const docsUrl = `${baseUrl}/api/planner/v1/docs/`;
   const { data: status } = await loadOrError(fetchPlannerStatus());
-  // Tells search engines and AI tools that this page documents a free web API.
-  const apiJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebAPI",
-    name: dict.metaDevelopersTitle,
-    description: dict.developersSubtitle,
-    url: siteUrl("/developers", locale),
-    documentation: `${baseUrl}/api/planner/v1/docs/`,
-    isAccessibleForFree: true,
-    provider: { "@type": "Organization", name: dict.appName, url: siteUrl("", locale) },
-  };
 
   return (
     <AppPage
@@ -56,11 +48,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
       breadcrumbsLabel={dict.breadcrumbsLabel}
       breadcrumbs={developersRoot(locale, dict)}
     >
-      <script
-        type="application/ld+json"
-        // Built from the dictionary and config only; "<" is escaped as the Next.js JSON-LD guide advises.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(apiJsonLd).replace(/</g, "\\u003c") }}
-      />
+      <JsonLd data={webApiLd(locale, dict, docsUrl)} />
       <PageHeader
         title={dict.developersTitle}
         subtitle={dict.developersSubtitle}
@@ -68,7 +56,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
         actions={
           <Button
             variant="outlined"
-            href={`${baseUrl}/api/planner/v1/docs/`}
+            href={docsUrl}
             target="_blank"
             rel="noopener noreferrer"
             endIcon={<MdOpenInNew aria-hidden />}
