@@ -19,6 +19,7 @@ What search engines and AI tools get from the public pages, and the rules for ne
 | Home | `WebSite`, `Organization` |
 | `/data` | `DataCatalog` |
 | `/data/feeds/{id}` | one `Dataset` per feed, with a `DataDownload` per file or realtime endpoint |
+| `/developers` | `WebAPI` |
 | `/blog/{id}` | `BlogPosting` |
 | Pages with a breadcrumb trail of two or more steps | `BreadcrumbList` (from `AppPage`) |
 

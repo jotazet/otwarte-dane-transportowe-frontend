@@ -33,9 +33,7 @@ export function StatusPanel({
         borderRadius: 1,
       }}
     >
-      {/* Keyed by colour, so the ring plays again when the state changes. */}
       <Box
-        key={color}
         aria-hidden
         sx={{
           position: "relative",
@@ -50,9 +48,10 @@ export function StatusPanel({
             inset: 0,
             borderRadius: "inherit",
             bgcolor: "currentColor",
-            // Three rings, then still: WCAG 2.2.2 allows motion that starts by itself
-            // only if it stops within five seconds.
-            animation: `${pulse} 1.5s ease-out 3`,
+            // Rings for as long as the panel is shown, in every state; none under the
+            // system's reduce-motion setting. WCAG 2.2.2 asks for a way to stop motion that
+            // lasts over 5 s, and W3C lists no technique that relies on that setting alone.
+            animation: `${pulse} 1.5s ease-out infinite`,
             "@media (prefers-reduced-motion: reduce)": { animation: "none" },
           },
         }}

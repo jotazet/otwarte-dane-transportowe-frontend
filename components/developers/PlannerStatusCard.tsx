@@ -123,7 +123,7 @@ export function PlannerStatusCard({
                   {dict.developersCoverageLabel}
                 </Typography>
                 <Suspense fallback={<Skeleton variant="rounded" height={6} sx={{ mt: 1 }} />}>
-                  <CoverageSummary status={status} locale={locale} dict={dict} />
+                  <CoverageSummary locale={locale} dict={dict} />
                 </Suspense>
               </Box>
             ) : null}
@@ -139,16 +139,8 @@ export function PlannerStatusCard({
   );
 }
 
-async function CoverageSummary({
-  status,
-  locale,
-  dict,
-}: {
-  status: PlannerStatus;
-  locale: string;
-  dict: StatusCardDict;
-}) {
-  const { data: coverage } = await loadOrError(fetchPlannerCoverage(status));
+async function CoverageSummary({ locale, dict }: { locale: string; dict: StatusCardDict }) {
+  const { data: coverage } = await loadOrError(fetchPlannerCoverage());
   if (!coverage) {
     return (
       <Typography variant="body2" sx={{ mt: 0.5 }}>

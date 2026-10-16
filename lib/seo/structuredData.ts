@@ -71,6 +71,23 @@ export function dataCatalogLd(
   };
 }
 
+/** The developers page documents a free web API; `docsUrl` is its reference documentation. */
+export function webApiLd(
+  locale: Locale,
+  dict: Pick<Dictionary, "appName" | "metaDevelopersTitle" | "developersSubtitle">,
+  docsUrl: string,
+) {
+  return {
+    "@context": CONTEXT,
+    "@type": "WebAPI",
+    name: dict.metaDevelopersTitle,
+    description: dict.developersSubtitle,
+    url: siteUrl("/developers", locale),
+    documentation: docsUrl,
+    provider: odt(dict),
+  };
+}
+
 /** One Dataset per feed of an organization, with a download per file or realtime endpoint. */
 export function feedDatasetsLd(
   organization: FeedCatalogOrganizationDetail,
