@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Stack from "@mui/material/Stack";
 
 import { AppBreadcrumbs, type BreadcrumbItem } from "@/components/layout/AppBreadcrumbs";
 import { PageSection } from "@/components/PageSection";
@@ -39,7 +38,7 @@ export function AppPage({
           label={breadcrumbsLabel}
         />
       ) : null}
-      <Stack spacing={3}>{children}</Stack>
+      {children}
     </PageSection>
   );
 }

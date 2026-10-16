@@ -177,12 +177,8 @@ export function UserForm({
         home: dict.home,
       }}
     >
-      <>
-        {error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : null}
+      <Stack spacing={2}>
+        {error ? <Alert severity="error">{error}</Alert> : null}
         <Box component="form" onSubmit={save} noValidate>
           <Stack spacing={2}>
             <TextField
@@ -259,7 +255,7 @@ export function UserForm({
           onClose={closePasswordDialog}
           dict={dict}
         />
-      </>
+      </Stack>
     </AccessGate>
   );
 }

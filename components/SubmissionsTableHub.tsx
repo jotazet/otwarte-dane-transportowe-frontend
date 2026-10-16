@@ -254,7 +254,7 @@ export function SubmissionsTableHub({
         config.forbiddenAlternate ? dict[config.forbiddenAlternate] : undefined
       }
     >
-      <Stack spacing={2} sx={listContext === "my" ? { mb: 3 } : undefined}>
+      <Stack spacing={2}>
         {config.showOrgFilterBanner && filterOrgId != null ? (
           <Typography variant="body2" color="text.secondary">
             {dict.filteredByOrganization.replace("{id}", String(filterOrgId))}
