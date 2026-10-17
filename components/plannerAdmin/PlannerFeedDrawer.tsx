@@ -84,6 +84,13 @@ async function remove(
   await ctx.reload();
 }
 
+type Option = { id: number; name: string };
+
+/** The options of a select, with the current value first when they lack it. */
+function withCurrent(options: Option[], id: number, name: string): Option[] {
+  return options.some((o) => o.id === id) ? options : [{ id, name }, ...options];
+}
+
 function FeedDetails({
   ctx,
   feed,
@@ -104,9 +111,10 @@ function FeedDetails({
   const endpoints: Record<string, string> = dict.plannerAdminRealtimeEndpointLabels;
 
   const sameOrganization = candidates.filter((c) => c.organization.id === feed.organization.id);
-  const submissions = sameOrganization.some((c) => c.id === feed.submission)
-    ? sameOrganization
-    : [{ id: feed.submission, name: feed.submission_name }, ...sameOrganization];
+  const submissions = withCurrent(sameOrganization, feed.submission, feed.submission_name);
+  // Its own submission means null (own realtime); an unlisted source shows its id.
+  const realtimeFrom = feed.realtime_from ?? feed.submission;
+  const realtimeSources = withCurrent(submissions, realtimeFrom, `#${realtimeFrom}`);
   const path = plannerAdminPaths.feed(feed.id);
 
   let realtimeText: string | null = null;
@@ -172,6 +180,25 @@ function FeedDetails({
           }
           label={dict.plannerAdminRealtimeToggle}
         />
+        {feed.include_realtime ? (
+          <TextField
+            select
+            size="small"
+            label={dict.plannerAdminRealtimeFrom}
+            value={realtimeFrom}
+            helperText={dict.plannerAdminRealtimeFromHint}
+            onChange={(e) => {
+              const id = Number(e.target.value);
+              void saveFeed(ctx, feed.id, { realtime_from: id === feed.submission ? null : id });
+            }}
+          >
+            {realtimeSources.map((c) => (
+              <MenuItem key={c.id} value={c.id}>
+                {c.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        ) : null}
         {realtimeText ? (
           <Typography variant="body2" color="text.secondary">
             {realtimeText}

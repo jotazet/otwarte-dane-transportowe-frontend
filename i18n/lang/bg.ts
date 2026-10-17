@@ -708,6 +708,9 @@ export const dictBg: Dictionary = {
   plannerAdminLastGood: "Последна валидна версия в графа",
   plannerAdminRealtimeTitle: "Данни в реално време (GTFS-RT)",
   plannerAdminRealtimeToggle: "Изтегляй GTFS-RT на тази организация",
+  plannerAdminRealtimeFrom: "Източник на данните в реално време",
+  plannerAdminRealtimeFromHint:
+    "Променете, когато този фийд е копие на друг фийд на организацията със същите идентификатори на курсовете. Ще започне да работи след следващото изграждане на графа.",
   plannerAdminRealtimePaused: "Спрени: фийд в по-стара версия не получава данни в реално време.",
   plannerAdminRealtimePolled: "Изтеглят се: {list}.",
   plannerAdminRealtimeNextBuild: "Ще започне да работи след следващото изграждане на графа.",
