@@ -718,6 +718,9 @@ export const dictDe: Dictionary = {
   plannerAdminLastGood: "Letzte gültige Version im Graphen",
   plannerAdminRealtimeTitle: "Echtzeitdaten (GTFS-RT)",
   plannerAdminRealtimeToggle: "GTFS-RT dieser Organisation abfragen",
+  plannerAdminRealtimeFrom: "Quelle der Echtzeitdaten",
+  plannerAdminRealtimeFromHint:
+    "Ändern Sie dies, wenn dieser Feed eine Kopie eines anderen Feeds der Organisation mit denselben Fahrt-IDs ist. Wirksam nach der nächsten Graph-Erstellung.",
   plannerAdminRealtimePaused: "Pausiert: Ein Feed in älterer Version erhält keine Echtzeitdaten.",
   plannerAdminRealtimePolled: "Abgefragt: {list}.",
   plannerAdminRealtimeNextBuild: "Wirksam nach der nächsten Graph-Erstellung.",

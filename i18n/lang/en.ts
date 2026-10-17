@@ -704,6 +704,9 @@ export const dictEn: Dictionary = {
   plannerAdminLastGood: "Last good version in the graph",
   plannerAdminRealtimeTitle: "Live data (GTFS-RT)",
   plannerAdminRealtimeToggle: "Poll this organization's GTFS-RT",
+  plannerAdminRealtimeFrom: "Live data source",
+  plannerAdminRealtimeFromHint:
+    "Change it when this feed is a copy of another feed of the organization with the same trip IDs. Takes effect after the next graph build.",
   plannerAdminRealtimePaused: "Paused: a feed in an older version receives no live data.",
   plannerAdminRealtimePolled: "Polled: {list}.",
   plannerAdminRealtimeNextBuild: "Takes effect after the next graph build.",

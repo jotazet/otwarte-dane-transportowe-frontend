@@ -69,6 +69,8 @@ export type PlannerFeed = {
   feed_id: string;
   is_enabled: boolean;
   include_realtime: boolean;
+  /** A submission of the same organization whose GTFS-RT is polled instead, or null for its own. */
+  realtime_from: number | null;
   failure_policy: FailurePolicy;
   last_good_at: string | null;
   active_result: FeedResult | null;

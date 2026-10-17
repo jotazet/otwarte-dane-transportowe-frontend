@@ -703,6 +703,9 @@ export const dictPl = {
   plannerAdminLastGood: "Ostatnia dobra wersja w grafie",
   plannerAdminRealtimeTitle: "Dane na żywo (GTFS-RT)",
   plannerAdminRealtimeToggle: "Odpytuj GTFS-RT tej organizacji",
+  plannerAdminRealtimeFrom: "Źródło danych na żywo",
+  plannerAdminRealtimeFromHint:
+    "Zmień, gdy ten feed jest kopią innego feedu organizacji z tymi samymi identyfikatorami kursów. Zmiana zacznie działać po następnym budowaniu grafu.",
   plannerAdminRealtimePaused: "Wstrzymane: feed w starszej wersji nie dostaje danych na żywo.",
   plannerAdminRealtimePolled: "Odpytywane: {list}.",
   plannerAdminRealtimeNextBuild: "Zacznie działać po następnym budowaniu grafu.",
