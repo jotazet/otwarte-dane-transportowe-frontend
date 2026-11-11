@@ -70,7 +70,7 @@ A release tag `vX.Y.Z` on `main` deploys itself, the same way as the backend ([b
 
 1. **CI** (`.github/workflows/ci.yml`) runs every check on the tag on GitHub's runners. The `deploy` job runs only when they pass, on the self-hosted runner on the server registered to this repository (label `odt-production`, user `odt-runner`), and writes `.env` from the environment's variables (`scripts/deploy/envfile.sh`).
 2. It runs `/usr/local/sbin/odt-deploy-frontend` through sudo as `rocky`, the owner of the checkout. That command checks that the tag is `vX.Y.Z` on `main` and the checkout is clean, checks the tag out and runs its `scripts/deploy/release.sh`.
-3. **`release.sh`** waits for no backend planner graph build to run (a Next.js build beside one risks the OOM killer), keeps the running image as `odt-frontend:previous`, builds the new one with the **new** `.env` while the old container serves, then swaps the container and waits up to 3 minutes for its healthcheck (`/pl`). Any failure stops it and the job turns red; a failure before the swap changes nothing that runs.
+3. **`release.sh`** stops while a backend planner graph build runs (a Next.js build beside one risks the OOM killer; re-run the job when it has finished), keeps the running image as `odt-frontend:previous`, builds the new one with the **new** `.env` while the old container serves, then swaps the container and waits up to 3 minutes for its healthcheck (`/pl`). Any failure stops it and the job turns red; a failure before the swap changes nothing that runs.
 
 There is no database, so there is no backup step.
 

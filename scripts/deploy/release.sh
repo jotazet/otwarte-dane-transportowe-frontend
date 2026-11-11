@@ -34,6 +34,7 @@ install -m 600 "$env_new" .env
 if ! docker compose up -d --wait --wait-timeout 180 frontend; then
     log "the site did not turn healthy" >&2
     docker compose ps >&2
+    docker compose logs --tail 50 frontend >&2
     exit 1
 fi
 log "$tag is live"
