@@ -15,3 +15,10 @@ services:
       # not through the CDN, so the visitor's IP it forwards is kept. A .invalid name
       # never resolves, so leaving API_HOSTNAME unset changes nothing.
       - "${API_HOSTNAME:-unset.invalid}:host-gateway"
+    # A rendered page, not a static file; a release waits for it (scripts/deploy/release.sh).
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/pl"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

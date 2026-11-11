@@ -69,8 +69,8 @@ On production use a release (section 6): its `.env` is generated, and a hand edi
 A release tag `vX.Y.Z` on `main` deploys itself, the same way as the backend ([backend ADR 0013](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/architecture/decisions/0013-release-tags-deploy-from-a-server-runner.md), [backend `docs/deployment.md`, section 20](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/deployment.md#20-releases-automatic-deployment-from-github)). A change that also needs the backend is released there first.
 
 1. **CI** (`.github/workflows/ci.yml`) runs every check on the tag on GitHub's runners. The `deploy` job runs only when they pass, on the self-hosted runner on the server registered to this repository (label `odt-production`, user `odt-runner`), and writes `.env` from the environment's variables (`scripts/deploy/envfile.sh`).
-2. It runs `/usr/local/sbin/odt-deploy-frontend` through sudo as the owner of the checkout, the only command for this repository that `odt-runner` may run that way. It refuses a tag that is not `vX.Y.Z` and a checkout with local changes, fetches the tag, refuses it unless it is on `main`, checks it out and runs that tag's `scripts/deploy/release.sh`.
-3. **`release.sh`**: stops while a backend planner graph build or feed test is running (a container labelled `odt.planner`: a Next.js build beside it risks the OOM killer), tags the running image `odt-frontend:previous`, builds `odt-frontend:latest` with `--pull` and the **new** `.env` (the `NEXT_PUBLIC_*` build args; the old container keeps serving), installs the new `.env`, recreates the container, waits up to 2 minutes for `/pl` to answer inside it, then removes replaced `odt-frontend` images. Any failure stops it and the job turns red; a failure before the container is recreated changes nothing that runs.
+2. It runs `/usr/local/sbin/odt-deploy-frontend` through sudo as `rocky`, the owner of the checkout. That command checks that the tag is `vX.Y.Z` on `main` and the checkout is clean, checks the tag out and runs its `scripts/deploy/release.sh`.
+3. **`release.sh`** waits for no backend planner graph build to run (a Next.js build beside one risks the OOM killer), keeps the running image as `odt-frontend:previous`, builds the new one with the **new** `.env` while the old container serves, then swaps the container and waits up to 3 minutes for its healthcheck (`/pl`). Any failure stops it and the job turns red; a failure before the swap changes nothing that runs.
 
 There is no database, so there is no backup step.
 
@@ -89,16 +89,16 @@ git tag -a v1.0.0 -m "v1.0.0" && git push origin v1.0.0
 _Settings → Environments → New environment_ `production`:
 
 - **Deployment branches and tags:** _Selected branches and tags_, add the tag rule `v*`.
-- **Environment variables:** `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_SITE_URL` (required: without them the build falls back to `http://localhost:8000` and the site still answers), `FRONTEND_BIND`, `FRONTEND_PORT` and `API_HOSTNAME` (optional, section 1). Optionally `DEPLOY_APP_USER`, the owner of the checkout (default `rocky`). There are no secrets: everything here ends up in the public bundle or the Compose file.
+- **Environment variables:** `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_SITE_URL` (required: without them the build falls back to `http://localhost:8000` and the site still answers), `FRONTEND_BIND`, `FRONTEND_PORT` and `API_HOSTNAME` (optional, section 1). There are no secrets: everything here ends up in the public bundle or the Compose file.
 
-Values may hold only letters, digits and `. : / _ -`. Only the variables named in the `deploy` job and `scripts/deploy/envfile.sh` reach the server: a new one goes into `docker-compose.yml`, both of them and this list together.
+Values may hold only letters, digits and `. : / _ -`. Only the variables named in `scripts/deploy/envfile.sh` reach the server (see its header for adding one).
 
 Also under _Settings → Actions → General → Fork pull request workflows from outside collaborators_, choose **Require approval for all outside collaborators**: a pull request can change `ci.yml` and send a job to the server's runner, so read a fork's workflow changes before approving its run.
 
 To copy the current values from the server once (with the [GitHub CLI](https://cli.github.com/), signed in to this repository; the file holds no secrets):
 
 ```bash
-ssh rocky@<host> 'grep -E "^(NEXT_PUBLIC_API_BASE_URL|NEXT_PUBLIC_SITE_URL|FRONTEND_BIND|FRONTEND_PORT|API_HOSTNAME)=" otwarte-dane-transportowe-frontend/.env' > frontend.env
+ssh rocky@<host> 'grep -E "^[A-Z_]+=" otwarte-dane-transportowe-frontend/.env' > frontend.env
 cat frontend.env   # check: no quotes, no comments
 gh variable set --env production -f frontend.env && rm frontend.env
 gh variable list --env production
@@ -106,16 +106,16 @@ gh variable list --env production
 
 ### One-time server setup
 
-The user `odt-runner`, the directory `/opt/actions-runner/` and `/etc/sudoers.d/odt-runner` already exist from the backend (its section 20). As the admin user (`rocky`), with this checkout in `~/otwarte-dane-transportowe-frontend`:
+The user `odt-runner` and the directory `/opt/actions-runner/` already exist from the backend (its section 20). As the admin user (`rocky`), with this checkout in `~/otwarte-dane-transportowe-frontend`:
 
 ```bash
 # The deploy command, owned by root; reinstall it whenever scripts/deploy/odt-deploy-frontend changes.
 sudo install -o root -g root -m 755 scripts/deploy/odt-deploy-frontend /usr/local/sbin/odt-deploy-frontend
 
-# odt-runner may run the two deploy commands as rocky, nothing else.
-echo 'odt-runner ALL=(rocky) NOPASSWD: /usr/local/sbin/odt-deploy, /usr/local/sbin/odt-deploy-frontend' \
-  | sudo tee /etc/sudoers.d/odt-runner > /dev/null
-sudo chmod 440 /etc/sudoers.d/odt-runner && sudo visudo -cf /etc/sudoers.d/odt-runner
+# odt-runner may also run this command as rocky; a file of its own leaves the backend's untouched.
+echo 'odt-runner ALL=(rocky) NOPASSWD: /usr/local/sbin/odt-deploy-frontend' \
+  | sudo tee /etc/sudoers.d/odt-runner-frontend > /dev/null
+sudo chmod 440 /etc/sudoers.d/odt-runner-frontend && sudo visudo -cf /etc/sudoers.d/odt-runner-frontend
 ```
 
 The runner (version, checksum and registration token from this repository's _Settings → Actions → Runners → New self-hosted runner_; the label is the same as the backend's, because a runner registered to one repository never takes another repository's jobs):
@@ -145,7 +145,7 @@ Change the variable in the environment, then deploy: a new release, or _Re-run j
 ### Rolling back
 
 - Release a fix (`vX.Y.Z+1` with the revert), or _Re-run jobs_ on the previous release's run.
-- **Emergency:** `docker image tag odt-frontend:previous odt-frontend:latest && docker compose up -d` runs the previous image without a build. The checkout and `.env` stay on the new release until the next deployment.
+- **Emergency:** `docker image tag odt-frontend:previous odt-frontend:latest && docker compose up -d --wait` runs the previous image without a build. The checkout and `.env` stay on the new release until the next deployment.
 
 ## CORS (backend)
 

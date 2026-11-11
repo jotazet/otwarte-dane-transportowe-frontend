@@ -26,9 +26,10 @@ trap 'rm -f "$env_new"' EXIT
 cat > "$env_new"
 
 cd "$ODT_DIR"
-if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+changes="$(git status --porcelain --untracked-files=no)"
+if [ -n "$changes" ]; then
     echo "odt-deploy-frontend: $ODT_DIR has local changes; commit or discard them first" >&2
-    git status --short --untracked-files=no >&2
+    echo "$changes" >&2
     exit 1
 fi
 git fetch --quiet --force "$REPOSITORY" \

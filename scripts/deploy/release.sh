@@ -1,17 +1,15 @@
 #!/bin/sh
 # Deploys the checked-out release: the image is built with the new .env (NEXT_PUBLIC_* are
 # baked in at build time) while the old container keeps serving, then the new .env is
-# installed, the container recreated, and the site must answer. Any failure stops it there.
+# installed, the container recreated, and it must turn healthy. Any failure stops it there.
 # odt-deploy-frontend runs it after checking out the tag (docs/deployment.md, section 6);
 # it also works by hand from the checkout:
 #
-#   sh scripts/deploy/release.sh <label> <new .env>
+#   sh scripts/deploy/release.sh <tag> <new .env>
 set -eu
 
 tag="$1"
 env_new="$2"
-HEALTH_TRIES=24
-HEALTH_DELAY=5
 
 cd "$(dirname "$0")/../.."
 log() { echo "release: $*"; }
@@ -32,19 +30,16 @@ running="$(docker compose images -q frontend 2>/dev/null || true)"
 docker compose --env-file "$env_new" build --pull frontend
 
 install -m 600 "$env_new" .env
-docker compose up -d frontend
-
-tries=0
-until docker exec odt-frontend wget -q -O /dev/null http://127.0.0.1:3000/pl 2> /dev/null; do
-    tries=$((tries + 1))
-    if [ "$tries" -ge "$HEALTH_TRIES" ]; then
-        log "the site did not answer after $tries tries" >&2
-        docker compose ps >&2
-        exit 1
-    fi
-    sleep "$HEALTH_DELAY"
-done
+# --wait: until the healthcheck in docker-compose.yml passes.
+if ! docker compose up -d --wait --wait-timeout 180 frontend; then
+    log "the site did not turn healthy" >&2
+    docker compose ps >&2
+    exit 1
+fi
 log "$tag is live"
 
 # Only this project's replaced images: the host runs other projects too.
 docker image prune -f --filter label=org.opencontainers.image.title=odt-frontend > /dev/null
+# Build cache older than a week, of every project on the host (as the backend's release
+# does): only a cache, so another project at most builds slower. The release is live.
+docker builder prune -f --filter until=168h > /dev/null || log "could not prune the build cache"

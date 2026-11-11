@@ -14,24 +14,26 @@ REQUIRED="NEXT_PUBLIC_API_BASE_URL NEXT_PUBLIC_SITE_URL"
 OPTIONAL="FRONTEND_BIND FRONTEND_PORT API_HOSTNAME"
 
 path="$1"
+# Without these the build falls back to http://localhost:8000 and still looks healthy.
+for name in $REQUIRED; do
+    eval "value=\${$name:-}"
+    if [ -z "$value" ]; then
+        echo "::error::The production environment has no variable $name."
+        exit 1
+    fi
+done
+
 umask 077
 : > "$path"
 for name in $REQUIRED $OPTIONAL; do
     eval "value=\${$name:-}"
-    if [ -z "$value" ]; then
-        # Without them the build falls back to http://localhost:8000 and still looks healthy.
-        case " $REQUIRED " in
-        *" $name "*)
-            echo "::error::The production environment has no variable $name."
-            exit 1
-            ;;
-        esac
-        continue
-    fi
-    if ! printf '%s' "$value" | grep -Eqx '[A-Za-z0-9.:/_-]+'; then
+    [ -n "$value" ] || continue
+    case "$value" in
+    *[!A-Za-z0-9.:/_-]*)
         echo "::error::$name may hold only letters, digits and . : / _ -"
         exit 1
-    fi
+        ;;
+    esac
     printf '%s=%s\n' "$name" "$value" >> "$path"
 done
 echo "envfile: $(wc -l < "$path") lines -> $path"

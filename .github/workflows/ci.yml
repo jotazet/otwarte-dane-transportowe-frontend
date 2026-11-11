@@ -97,12 +97,10 @@ jobs:
           FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
           API_HOSTNAME: ${{ vars.API_HOSTNAME }}
         run: sh scripts/deploy/envfile.sh "$RUNNER_TEMP/production.env"
-      # odt-deploy-frontend takes the tag as its only argument and the .env on standard input.
+      # odt-deploy-frontend takes the tag as its only argument and the .env on standard input;
+      # rocky owns the checkout (the sudoers rule names it).
       - name: Deploy
-        env:
-          TAG: ${{ github.ref_name }}
-          APP_USER: ${{ vars.DEPLOY_APP_USER || 'rocky' }}
-        run: sudo -n -u "$APP_USER" /usr/local/sbin/odt-deploy-frontend "$TAG" < "$RUNNER_TEMP/production.env"
+        run: sudo -n -u rocky /usr/local/sbin/odt-deploy-frontend "$GITHUB_REF_NAME" < "$RUNNER_TEMP/production.env"
       # The runner is not thrown away after the job.
       - name: Remove the .env
         if: always()
