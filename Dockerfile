@@ -15,6 +15,8 @@ ENV NODE_ENV=production
 RUN npm run build
 # --- runtime ---
 FROM node:20-alpine AS runtime
+# release.sh removes replaced images of this project by this label.
+LABEL org.opencontainers.image.title=odt-frontend
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

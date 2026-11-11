@@ -1,14 +1,18 @@
 name: CI
 
+# Pull requests and main run the checks. A release tag vX.Y.Z runs them too and, when
+# they pass, goes to production through the deploy job (docs/deployment.md, section 6;
+# backend ADR 0013).
 on:
   pull_request:
   push:
     branches: [main]
+    tags: ["v*"]
 
 permissions:
   contents: read
 
-# Only the newest run of a pull request matters. Pushes to main get a group each
+# Only the newest run of a pull request matters. Pushes (main, tags) get a group each
 # (the run ID): a shared group would cancel a waiting run when the next one queues.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.run_id }}
@@ -17,13 +21,21 @@ concurrency:
 jobs:
   frontend:
     runs-on: ubuntu-24.04
+    # A hung build fails here instead of holding the runner for six hours.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          # The token stays out of .git/config, where every later step could read it.
+          persist-credentials: false
+      # npm cache keyed by package-lock.json. A release tag runs without the cache; the
+      # deployment builds its image on the server and takes nothing from this job either.
+      # zizmor cannot evaluate the expression.
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           # Same major as the Dockerfile.
           node-version: "20"
-          cache: npm
+          cache: ${{ github.ref_type != 'tag' && 'npm' || '' }} # zizmor: ignore[cache-poisoning]
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
@@ -32,3 +44,66 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  # The workflows, the deploy scripts and the Compose file they use.
+  production:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      # Template injection, unpinned actions, tokens with more rights than a job needs.
+      - name: Audit the workflows
+        run: >-
+          docker run --rm -v "$PWD:/mnt:ro" -w /mnt
+          ghcr.io/zizmorcore/zizmor:1.32.0@sha256:3014cc8f68f663935f69b3c3e0e41f5ce102b268d97db13db0f62208747f860d
+          --offline --format=github .github/
+      - name: Lint the shell scripts
+        run: >-
+          docker run --rm -v "$PWD:/mnt:ro" -w /mnt
+          koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d
+          --severity=warning scripts/deploy/*.sh scripts/deploy/odt-deploy-frontend
+      - name: Check the Compose file
+        run: docker compose config --quiet
+
+  # A release: a green vX.Y.Z tag on main goes to production.
+  deploy:
+    needs: [frontend, production]
+    if: startsWith(github.ref, 'refs/tags/v')
+    # The runner on the production server, registered to this repository, as the user
+    # odt-runner: no Docker, and through sudo only odt-deploy-frontend as the application's
+    # user (docs/deployment.md, section 6). No other job may use this label.
+    runs-on: [self-hosted, odt-production]
+    # The environment hands its variables only to v* tags (deployment rule in its settings).
+    environment: production
+    timeout-minutes: 20
+    # Never two deployments at once, and never cancel one halfway through.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      # The server refuses a tag that is not vX.Y.Z or not on main (odt-deploy-frontend): a
+      # check here would run from the tag's own workflow file, which the tag's author controls.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      # Keep this list in step with scripts/deploy/envfile.sh.
+      - name: Write .env from the environment's variables
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          FRONTEND_BIND: ${{ vars.FRONTEND_BIND }}
+          FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
+          API_HOSTNAME: ${{ vars.API_HOSTNAME }}
+        run: sh scripts/deploy/envfile.sh "$RUNNER_TEMP/production.env"
+      # odt-deploy-frontend takes the tag as its only argument and the .env on standard input.
+      - name: Deploy
+        env:
+          TAG: ${{ github.ref_name }}
+          APP_USER: ${{ vars.DEPLOY_APP_USER || 'rocky' }}
+        run: sudo -n -u "$APP_USER" /usr/local/sbin/odt-deploy-frontend "$TAG" < "$RUNNER_TEMP/production.env"
+      # The runner is not thrown away after the job.
+      - name: Remove the .env
+        if: always()
+        run: rm -f "$RUNNER_TEMP/production.env"
