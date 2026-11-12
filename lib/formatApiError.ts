@@ -10,11 +10,14 @@ type ApiErrorDict = Pick<
   | "apiErrorNotFound"
   | "apiErrorRateLimited"
   | "apiErrorGeneric"
->;
+> &
+  // Optional so a panel with its own codes (the planner admin) need not ship them all.
+  Partial<Pick<Dictionary, "apiErrorCodes">>;
 
 /**
  * A translated message for a failed request. Never the backend's own text (backend ADR 0006):
- * the error's `code` is looked up in `codeLabels` when given, otherwise the HTTP status is.
+ * the error's `code` is looked up in `codeLabels`, then in `apiErrorCodes`; an unknown code
+ * falls back to the HTTP status.
  */
 export function formatApiError(
   err: unknown,
@@ -22,7 +25,11 @@ export function formatApiError(
   codeLabels?: Record<string, string>,
 ): string {
   if (!(err instanceof ApiError)) return dict.apiErrorGeneric;
-  if (err.code && codeLabels?.[err.code]) return codeLabels[err.code];
+  if (err.code) {
+    const known: Record<string, string> = dict.apiErrorCodes ?? {};
+    const label = codeLabels?.[err.code] ?? known[err.code];
+    if (label) return label;
+  }
   switch (err.status) {
     case 0:
       return dict.apiErrorConnection;

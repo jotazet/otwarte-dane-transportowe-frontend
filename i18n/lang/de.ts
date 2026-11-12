@@ -171,6 +171,81 @@ export const dictDe: Dictionary = {
     "Die Daten wurden nicht gefunden und wurden möglicherweise gelöscht. Laden Sie die Seite neu.",
   apiErrorRateLimited: "Zu viele Anfragen an den Server. Versuchen Sie es in Kürze erneut.",
   apiErrorGeneric: "Der Vorgang konnte nicht ausgeführt werden. Versuchen Sie es in Kürze erneut.",
+  apiErrorCodes: {
+    "feeds.feed_id_required": "Die Download-Adresse enthält keine Feed-Nummer.",
+    "feeds.submissions_forbidden":
+      "Die Liste der Einreichungen ist nur für Datenanbieter und das ODT-Team verfügbar.",
+    "feeds.review_forbidden":
+      "Nur das ODT-Team kann die Stufe einer Einreichung ändern oder sie ablehnen.",
+    "feeds.helper_content_edit_forbidden":
+      "Die Rolle Prüfer kann Einreichungen nur freigeben oder ablehnen, nicht ihren Inhalt ändern.",
+    "feeds.delete_forbidden": "Nur ein Administrator kann Einreichungen löschen.",
+    "feeds.fetch_control_forbidden":
+      "Nur das ODT-Team kann den Feed-Abruf pausieren und fortsetzen.",
+    "feeds.not_proxy_managed":
+      "ODT ruft diesen Feed nicht ab, daher kann der Abruf nicht pausiert werden.",
+    "feeds.stage_changed":
+      "Die Stufe der Einreichung hat sich inzwischen geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+    "feeds.invalid_integer": "Der Filterwert muss eine ganze Zahl sein.",
+    "feeds.invalid_stage": "Die Stufe muss eine Zahl von 1 bis 4 sein.",
+    "feeds.field_locked":
+      "Dieses Feld kann nicht geändert werden, solange die Einreichung geprüft wird oder veröffentlicht ist.",
+    "feeds.url_blocked":
+      "Die URL erfüllt die Sicherheitsregeln von ODT nicht: Sie muss mit http oder https beginnen, und der Hostname muss existieren und auf eine öffentliche Adresse verweisen.",
+    "feeds.static_source_missing":
+      "Geben Sie eine URL an oder laden Sie die Datei des statischen Feeds hoch.",
+    "feeds.static_source_url_and_file":
+      "Geben Sie eine URL an oder laden Sie eine Datei hoch, nicht beides.",
+    "feeds.download_time_required": "Für eine URL ist Download-Zeit 1 (UTC) erforderlich.",
+    "feeds.download_time_with_file":
+      "Download-Zeiten gelten nur für eine URL. Entfernen Sie sie bei einer hochgeladenen Datei.",
+    "feeds.hide_original_with_file":
+      "Das Verbergen der Original-URL und die Autorisierung gelten nur für eine URL-Quelle, nicht für eine hochgeladene Datei.",
+    "feeds.cached_file_with_upload":
+      "Eine hochgeladene Datei kann keine von ODT abgerufene Kopie haben. Wenden Sie sich an das ODT-Team.",
+    "feeds.gtfs_not_zip": "Eine GTFS-Datei muss ein ZIP-Archiv sein.",
+    "feeds.file_too_large": "Die Datei überschreitet die maximale Größe.",
+    "realtime.endpoints_required": "Fügen Sie mindestens einen Endpoint hinzu.",
+    "realtime.endpoints_locked":
+      "Endpoints können nicht hinzugefügt oder entfernt werden, solange die Einreichung geprüft wird oder veröffentlicht ist.",
+    "realtime.endpoint_type_unknown": "Die Einreichung hat keinen Endpoint dieses Typs.",
+    "realtime.endpoint_type_duplicate":
+      "Jeder Endpoint-Typ darf in einer Einreichung nur einmal vorkommen.",
+    "realtime.endpoints_invalid_for_protocol":
+      "Der Endpoint-Typ passt nicht zum gewählten Protokoll. Wenn Sie das Protokoll ändern, geben Sie auch neue Endpoints an.",
+    "realtime.interval_too_short":
+      "Das Aktualisierungsintervall muss mindestens 5 Sekunden betragen.",
+    "realtime.static_submission_required":
+      "Wählen Sie für GTFS-RT und SIRI eine veröffentlichte statische Einreichung.",
+    "realtime.static_submission_not_allowed":
+      "Ein GBFS-Feed kann nicht mit einer statischen Einreichung verknüpft werden.",
+    "realtime.static_submission_other_organization":
+      "Die statische Einreichung muss zur selben Organisation gehören.",
+    "realtime.static_submission_type_mismatch":
+      "Der Typ des statischen Feeds passt nicht zum Protokoll: GTFS-RT erfordert GTFS und SIRI erfordert NeTEx.",
+    "realtime.static_submission_not_published":
+      "Die statische Einreichung ist noch nicht veröffentlicht.",
+    "realtime.static_submission_not_owned":
+      "Sie können nur Ihre eigene statische Einreichung auswählen.",
+    "users.protected_account": "Nur ein Superuser kann dieses Konto ändern.",
+    "users.cannot_delete_self": "Sie können Ihr eigenes Konto nicht löschen.",
+    "users.last_admin":
+      "Dies ist der letzte aktive Administrator. Weisen Sie zuerst einem anderen Benutzer die Rolle Administrator zu.",
+    "users.unknown_role": "Es wurde eine unbekannte Rolle ausgewählt.",
+    "users.wrong_password": "Das aktuelle Passwort ist falsch.",
+    "users.password_too_short": "Das neue Passwort muss mindestens 8 Zeichen lang sein.",
+    "users.password_too_similar":
+      "Das neue Passwort ist dem Benutzernamen oder der E-Mail-Adresse zu ähnlich.",
+    "users.password_too_common": "Das neue Passwort ist zu verbreitet.",
+    "users.password_entirely_numeric": "Das neue Passwort darf nicht nur aus Ziffern bestehen.",
+    "blog.client_ip_unknown":
+      "Ihre IP-Adresse konnte nicht ermittelt werden, daher wurde die Reaktion nicht gespeichert.",
+    "blog.post_id_required": "Der Beitrag für die Reaktion wurde nicht angegeben.",
+    "blog.reaction_daily_limit":
+      "Sie haben das Tageslimit von 10 Reaktionen erreicht. Versuchen Sie es morgen erneut.",
+    "blog.too_many_tags": "Ein Beitrag kann höchstens 5 Tags haben.",
+    "blog.image_too_large": "Das Bild überschreitet die maximale Größe.",
+  },
   addFeed: "Feed hinzufügen",
   myFeeds: "Meine Feeds",
   myFeedsSectionList: "Deine Einreichungen",

@@ -16,7 +16,29 @@ export class ApiError extends Error {
   }
 }
 
-/** An `ApiError` for a failed response, with the code of a `{code, details}` body if it has one. */
+/** A backend error code such as `feeds.field_locked` (`<area>.<snake_case_reason>`). */
+const ERROR_CODE = /^[a-z_]+\.[a-z0-9_]+$/;
+
+/**
+ * The first error code in a DRF field-error body, e.g. `{"stage": ["feeds.invalid_stage"]}`
+ * or `{"static_entry": {"url": ["feeds.url_blocked"]}}`. DRF's own messages are prose and
+ * never match.
+ */
+function fieldErrorCode(value: unknown): string | undefined {
+  if (typeof value === "string") return ERROR_CODE.test(value) ? value : undefined;
+  if (value && typeof value === "object") {
+    for (const item of Object.values(value)) {
+      const code = fieldErrorCode(item);
+      if (code) return code;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * An `ApiError` for a failed response, with the code of a `{code, details}` body, or else the
+ * first code among its field errors, if it has one.
+ */
 export async function apiErrorFrom(
   res: Response,
   message = `HTTP ${res.status}`,
@@ -26,6 +48,8 @@ export async function apiErrorFrom(
     const body: unknown = await res.json();
     if (body && typeof body === "object" && "code" in body && typeof body.code === "string") {
       code = body.code;
+    } else {
+      code = fieldErrorCode(body);
     }
   } catch {
     // Not JSON: no code.
