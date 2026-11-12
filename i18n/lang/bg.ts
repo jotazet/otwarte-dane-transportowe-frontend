@@ -168,6 +168,74 @@ export const dictBg: Dictionary = {
   apiErrorNotFound: "Данните не бяха намерени и може да са изтрити. Презаредете страницата.",
   apiErrorRateLimited: "Твърде много заявки към сървъра. Опитайте отново след малко.",
   apiErrorGeneric: "Операцията не можа да бъде изпълнена. Опитайте отново след малко.",
+  apiErrorCodes: {
+    "feeds.feed_id_required": "Адресът за изтегляне не съдържа номер на фийд.",
+    "feeds.submissions_forbidden":
+      "Списъкът със заявки е достъпен само за доставчици на данни и екипа на ODT.",
+    "feeds.review_forbidden":
+      "Само екипът на ODT може да променя етапа на заявка или да я отхвърля.",
+    "feeds.helper_content_edit_forbidden":
+      "Ролята Проверител може само да одобрява или отхвърля заявки, без да променя съдържанието им.",
+    "feeds.delete_forbidden": "Само администратор може да изтрива заявки.",
+    "feeds.fetch_control_forbidden":
+      "Само екипът на ODT може да спира и възобновява изтеглянето на фийдове.",
+    "feeds.not_proxy_managed":
+      "ODT не изтегля този фийд, затова изтеглянето му не може да бъде спряно.",
+    "feeds.stage_changed":
+      "Етапът на заявката междувременно се промени. Презаредете страницата и опитайте отново.",
+    "feeds.invalid_integer": "Стойността на филтъра трябва да е цяло число.",
+    "feeds.invalid_stage": "Етапът трябва да е число от 1 до 4.",
+    "feeds.field_locked":
+      "Това поле не може да се променя, докато заявката се проверява или е публикувана.",
+    "feeds.url_blocked":
+      "URL адресът не отговаря на правилата за сигурност на ODT: трябва да започва с http или https, а името на хоста трябва да съществува и да сочи към публичен адрес.",
+    "feeds.static_source_missing": "Въведете URL адрес или качете файла на статичния фийд.",
+    "feeds.static_source_url_and_file": "Въведете URL адрес или качете файл, но не и двете.",
+    "feeds.download_time_required": "За URL адрес е необходим час на изтегляне 1 (UTC).",
+    "feeds.download_time_with_file":
+      "Часовете на изтегляне важат само за URL адрес. Премахнете ги при качен файл.",
+    "feeds.hide_original_with_file":
+      "Скриването на оригиналния URL адрес и оторизацията важат само за източник с URL адрес, не за качен файл.",
+    "feeds.cached_file_with_upload":
+      "Качен файл не може да има копие, изтеглено от ODT. Свържете се с екипа на ODT.",
+    "feeds.gtfs_not_zip": "GTFS файлът трябва да е ZIP архив.",
+    "feeds.file_too_large": "Файлът надвишава максималния размер.",
+    "realtime.endpoints_required": "Добавете поне един ендпойнт.",
+    "realtime.endpoints_locked":
+      "Не могат да се добавят или премахват ендпойнти, докато заявката се проверява или е публикувана.",
+    "realtime.endpoint_type_unknown": "Заявката няма ендпойнт от този тип.",
+    "realtime.endpoint_type_duplicate": "Всеки тип ендпойнт може да се среща само веднъж в заявка.",
+    "realtime.endpoints_invalid_for_protocol":
+      "Типът на ендпойнта не съответства на избрания протокол. При смяна на протокола въведете и нови ендпойнти.",
+    "realtime.interval_too_short": "Интервалът на опресняване трябва да е поне 5 секунди.",
+    "realtime.static_submission_required":
+      "За GTFS-RT и SIRI изберете публикувана статична заявка.",
+    "realtime.static_submission_not_allowed":
+      "GBFS фийд не може да бъде свързан със статична заявка.",
+    "realtime.static_submission_other_organization":
+      "Статичната заявка трябва да принадлежи на същата организация.",
+    "realtime.static_submission_type_mismatch":
+      "Типът на статичния фийд не съответства на протокола: GTFS-RT изисква GTFS, а SIRI изисква NeTEx.",
+    "realtime.static_submission_not_published": "Статичната заявка все още не е публикувана.",
+    "realtime.static_submission_not_owned": "Можете да изберете само собствена статична заявка.",
+    "users.protected_account": "Само суперпотребител може да променя този акаунт.",
+    "users.cannot_delete_self": "Не можете да изтриете собствения си акаунт.",
+    "users.last_admin":
+      "Това е последният активен администратор. Първо дайте ролята Администратор на друг потребител.",
+    "users.unknown_role": "Избрана е непозната роля.",
+    "users.wrong_password": "Текущата парола е грешна.",
+    "users.password_too_short": "Новата парола трябва да е поне 8 знака.",
+    "users.password_too_similar":
+      "Новата парола е твърде подобна на потребителското име или имейл адреса.",
+    "users.password_too_common": "Новата парола е твърде често срещана.",
+    "users.password_entirely_numeric": "Новата парола не може да се състои само от цифри.",
+    "blog.client_ip_unknown":
+      "IP адресът ви не можа да бъде определен, затова реакцията не беше запазена.",
+    "blog.post_id_required": "Публикацията за реакцията не е посочена.",
+    "blog.reaction_daily_limit": "Достигнахте дневния лимит от 10 реакции. Опитайте отново утре.",
+    "blog.too_many_tags": "Публикацията може да има най-много 5 тага.",
+    "blog.image_too_large": "Изображението надвишава максималния размер.",
+  },
   addFeed: "Добави фийд",
   myFeeds: "Моите фийдове",
   myFeedsSectionList: "Твоите заявки",

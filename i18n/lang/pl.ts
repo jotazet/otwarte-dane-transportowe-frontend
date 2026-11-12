@@ -166,6 +166,73 @@ export const dictPl = {
   apiErrorNotFound: "Nie znaleziono danych, mogły zostać usunięte. Odśwież stronę.",
   apiErrorRateLimited: "Przekroczono limit zapytań do serwera. Spróbuj ponownie za chwilę.",
   apiErrorGeneric: "Nie udało się wykonać operacji. Spróbuj ponownie za chwilę.",
+  apiErrorCodes: {
+    "feeds.feed_id_required": "Adres pobierania nie zawiera numeru feedu.",
+    "feeds.submissions_forbidden":
+      "Lista zgłoszeń jest dostępna tylko dla dostawców danych i zespołu ODT.",
+    "feeds.review_forbidden": "Tylko zespół ODT może zmieniać etap lub odrzucać zgłoszenia.",
+    "feeds.helper_content_edit_forbidden":
+      "Rola Weryfikator pozwala tylko zatwierdzać lub odrzucać zgłoszenia, bez zmiany ich treści.",
+    "feeds.delete_forbidden": "Tylko administrator może usuwać zgłoszenia.",
+    "feeds.fetch_control_forbidden":
+      "Tylko zespół ODT może wstrzymywać i wznawiać pobieranie feedów.",
+    "feeds.not_proxy_managed":
+      "Ten feed nie jest pobierany przez serwer ODT, więc nie można wstrzymać jego pobierania.",
+    "feeds.stage_changed":
+      "Etap zgłoszenia zmienił się w międzyczasie. Odśwież stronę i spróbuj ponownie.",
+    "feeds.invalid_integer": "Wartość filtra musi być liczbą całkowitą.",
+    "feeds.invalid_stage": "Etap musi być liczbą od 1 do 4.",
+    "feeds.field_locked":
+      "Tego pola nie można zmienić, gdy zgłoszenie jest weryfikowane lub opublikowane.",
+    "feeds.url_blocked":
+      "Adres URL nie spełnia zasad bezpieczeństwa ODT: musi zaczynać się od http lub https, a nazwa hosta musi istnieć i wskazywać adres publiczny.",
+    "feeds.static_source_missing": "Podaj adres URL albo prześlij plik feedu statycznego.",
+    "feeds.static_source_url_and_file": "Podaj adres URL albo prześlij plik, nie oba naraz.",
+    "feeds.download_time_required": "Dla adresu URL podaj godzinę pobierania 1 (UTC).",
+    "feeds.download_time_with_file":
+      "Godziny pobierania dotyczą tylko adresu URL. Usuń je dla przesłanego pliku.",
+    "feeds.hide_original_with_file":
+      "Ukrycie oryginalnego adresu URL i autoryzacja dotyczą tylko źródła z adresem URL, nie przesłanego pliku.",
+    "feeds.cached_file_with_upload":
+      "Przesłany plik nie może mieć kopii pobranej przez serwer ODT. Skontaktuj się z zespołem ODT.",
+    "feeds.gtfs_not_zip": "Plik GTFS musi być archiwum ZIP.",
+    "feeds.file_too_large": "Plik przekracza dopuszczalny rozmiar.",
+    "realtime.endpoints_required": "Dodaj co najmniej jeden endpoint.",
+    "realtime.endpoints_locked":
+      "Nie można dodawać ani usuwać endpointów, gdy zgłoszenie jest weryfikowane lub opublikowane.",
+    "realtime.endpoint_type_unknown": "Zgłoszenie nie ma endpointu tego typu.",
+    "realtime.endpoint_type_duplicate": "Każdy typ endpointu może wystąpić w zgłoszeniu tylko raz.",
+    "realtime.endpoints_invalid_for_protocol":
+      "Typ endpointu nie pasuje do wybranego protokołu. Zmieniając protokół, podaj też nowe endpointy.",
+    "realtime.interval_too_short": "Interwał odświeżania musi wynosić co najmniej 5 sekund.",
+    "realtime.static_submission_required":
+      "Dla GTFS-RT i SIRI wybierz opublikowane zgłoszenie statyczne.",
+    "realtime.static_submission_not_allowed":
+      "Feed GBFS nie może być powiązany ze zgłoszeniem statycznym.",
+    "realtime.static_submission_other_organization":
+      "Zgłoszenie statyczne musi należeć do tej samej organizacji.",
+    "realtime.static_submission_type_mismatch":
+      "Typ feedu statycznego nie pasuje do protokołu: GTFS-RT wymaga GTFS, a SIRI wymaga NeTEx.",
+    "realtime.static_submission_not_published":
+      "Zgłoszenie statyczne nie zostało jeszcze opublikowane.",
+    "realtime.static_submission_not_owned": "Możesz wybrać tylko własne zgłoszenie statyczne.",
+    "users.protected_account": "To konto może zmieniać tylko superużytkownik.",
+    "users.cannot_delete_self": "Nie możesz usunąć własnego konta.",
+    "users.last_admin":
+      "To ostatni aktywny administrator. Najpierw nadaj rolę Administrator innemu użytkownikowi.",
+    "users.unknown_role": "Wybrano nieznaną rolę.",
+    "users.wrong_password": "Obecne hasło jest nieprawidłowe.",
+    "users.password_too_short": "Nowe hasło musi mieć co najmniej 8 znaków.",
+    "users.password_too_similar":
+      "Nowe hasło jest zbyt podobne do nazwy użytkownika lub adresu e-mail.",
+    "users.password_too_common": "Nowe hasło jest zbyt popularne.",
+    "users.password_entirely_numeric": "Nowe hasło nie może składać się z samych cyfr.",
+    "blog.client_ip_unknown": "Nie udało się ustalić adresu IP, więc reakcja nie została zapisana.",
+    "blog.post_id_required": "Nie wskazano wpisu, do którego należy reakcja.",
+    "blog.reaction_daily_limit": "Osiągnięto dzienny limit 10 reakcji. Spróbuj ponownie jutro.",
+    "blog.too_many_tags": "Wpis może mieć najwyżej 5 tagów.",
+    "blog.image_too_large": "Obraz przekracza dopuszczalny rozmiar.",
+  },
   addFeed: "Dodaj feed",
   myFeeds: "Moje feedy",
   myFeedsSectionList: "Twoje zgłoszenia",

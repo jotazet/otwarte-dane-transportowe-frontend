@@ -166,6 +166,73 @@ export const dictEn: Dictionary = {
   apiErrorNotFound: "The data was not found and may have been deleted. Reload the page.",
   apiErrorRateLimited: "Too many requests to the server. Try again in a moment.",
   apiErrorGeneric: "The operation could not be completed. Try again in a moment.",
+  apiErrorCodes: {
+    "feeds.feed_id_required": "The download address does not include a feed number.",
+    "feeds.submissions_forbidden":
+      "The list of submissions is available only to data providers and the ODT team.",
+    "feeds.review_forbidden":
+      "Only the ODT team can change the stage of a submission or reject it.",
+    "feeds.helper_content_edit_forbidden":
+      "The Verifier role can only approve or reject submissions, not change their content.",
+    "feeds.delete_forbidden": "Only an administrator can delete submissions.",
+    "feeds.fetch_control_forbidden": "Only the ODT team can pause and resume feed fetching.",
+    "feeds.not_proxy_managed": "ODT does not fetch this feed, so its fetching cannot be paused.",
+    "feeds.stage_changed":
+      "The stage of the submission changed in the meantime. Reload the page and try again.",
+    "feeds.invalid_integer": "The filter value must be a whole number.",
+    "feeds.invalid_stage": "The stage must be a number from 1 to 4.",
+    "feeds.field_locked":
+      "This field cannot be changed while the submission is being verified or is published.",
+    "feeds.url_blocked":
+      "The URL does not meet ODT security rules: it must start with http or https, and its host name must exist and point to a public address.",
+    "feeds.static_source_missing": "Enter a URL or upload the static feed file.",
+    "feeds.static_source_url_and_file": "Enter a URL or upload a file, not both.",
+    "feeds.download_time_required": "A URL needs download time 1 (UTC).",
+    "feeds.download_time_with_file":
+      "Download times apply only to a URL. Remove them for an uploaded file.",
+    "feeds.hide_original_with_file":
+      "Hiding the original URL and authorization apply only to a URL source, not to an uploaded file.",
+    "feeds.cached_file_with_upload":
+      "An uploaded file cannot have a copy fetched by ODT. Contact the ODT team.",
+    "feeds.gtfs_not_zip": "A GTFS file must be a ZIP archive.",
+    "feeds.file_too_large": "The file exceeds the maximum size.",
+    "realtime.endpoints_required": "Add at least one endpoint.",
+    "realtime.endpoints_locked":
+      "Endpoints cannot be added or removed while the submission is being verified or is published.",
+    "realtime.endpoint_type_unknown": "The submission has no endpoint of this type.",
+    "realtime.endpoint_type_duplicate": "Each endpoint type can appear only once in a submission.",
+    "realtime.endpoints_invalid_for_protocol":
+      "The endpoint type does not match the selected protocol. When changing the protocol, also enter new endpoints.",
+    "realtime.interval_too_short": "The refresh interval must be at least 5 seconds.",
+    "realtime.static_submission_required":
+      "For GTFS-RT and SIRI, select a published static submission.",
+    "realtime.static_submission_not_allowed":
+      "A GBFS feed cannot be linked to a static submission.",
+    "realtime.static_submission_other_organization":
+      "The static submission must belong to the same organization.",
+    "realtime.static_submission_type_mismatch":
+      "The static feed type does not match the protocol: GTFS-RT needs GTFS and SIRI needs NeTEx.",
+    "realtime.static_submission_not_published": "The static submission has not been published yet.",
+    "realtime.static_submission_not_owned": "You can select only your own static submission.",
+    "users.protected_account": "Only a superuser can change this account.",
+    "users.cannot_delete_self": "You cannot delete your own account.",
+    "users.last_admin":
+      "This is the last active administrator. First give the Administrator role to another user.",
+    "users.unknown_role": "An unknown role was selected.",
+    "users.wrong_password": "The current password is incorrect.",
+    "users.password_too_short": "The new password must have at least 8 characters.",
+    "users.password_too_similar":
+      "The new password is too similar to the username or email address.",
+    "users.password_too_common": "The new password is too common.",
+    "users.password_entirely_numeric": "The new password cannot consist of digits only.",
+    "blog.client_ip_unknown":
+      "Your IP address could not be determined, so the reaction was not saved.",
+    "blog.post_id_required": "The post for the reaction was not specified.",
+    "blog.reaction_daily_limit":
+      "You have reached the daily limit of 10 reactions. Try again tomorrow.",
+    "blog.too_many_tags": "A post can have at most 5 tags.",
+    "blog.image_too_large": "The image exceeds the maximum size.",
+  },
   addFeed: "Add feed",
   myFeeds: "My feeds",
   myFeedsSectionList: "Your submissions",

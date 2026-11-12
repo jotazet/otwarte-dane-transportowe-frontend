@@ -82,7 +82,7 @@ Create directories only when there is code for them.
 - Placeholders use `{name}` replaced in code. Never build sentences or counts by concatenating strings; phrase counts so they need no plural form ("Liczba feedów: 5").
 - Rich text in dictionaries goes through `renderRichText` (`lib/richText.tsx`), never `dangerouslySetInnerHTML`.
 - Format dates through `lib/format.ts`, never by hand or with bare `toLocaleString()`. Date-times are shown in `Europe/Warsaw`, the same on the server and in the browser.
-- Show a failed request with `formatApiError(err, dict)`, never `err.message`: it maps the HTTP status to a translated message.
+- Show a failed request with `formatApiError(err, dict)`, never `err.message`: it translates the backend's error code through `apiErrorCodes`, or the HTTP status when there is none. A new backend code gets an entry in `apiErrorCodes` in all four dictionaries.
 
 ## Accessibility
 
