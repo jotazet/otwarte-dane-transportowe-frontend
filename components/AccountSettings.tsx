@@ -104,7 +104,10 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
       };
       // The backend ends every session and returns a new pair for this one;
       // keeping the old, blacklisted refresh token would sign the user out.
-      storeTokens(await apiJson<Tokens>("POST", USER_ME_CHANGE_PASSWORD, body));
+      const tokens = await apiJson<Partial<Tokens>>("POST", USER_ME_CHANGE_PASSWORD, body);
+      if (typeof tokens.access === "string" && typeof tokens.refresh === "string") {
+        storeTokens({ access: tokens.access, refresh: tokens.refresh });
+      }
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");

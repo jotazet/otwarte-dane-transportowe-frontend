@@ -71,12 +71,14 @@ export function UserDetailBody({
     setLoading(true);
     setError(null);
     try {
-      const data = await auth.apiJson<UserDetail>("GET", userDetailPath(userId));
       // The token does not say whether the caller is a superuser; /me does.
-      const manage =
-        !isProtectedAccount(data) || (await auth.apiJson<MeProfile>("GET", USER_ME)).is_superuser;
+      // Without an answer from /me, protected accounts stay read-only.
+      const [data, me] = await Promise.all([
+        auth.apiJson<UserDetail>("GET", userDetailPath(userId)),
+        auth.apiJson<MeProfile>("GET", USER_ME).catch(() => null),
+      ]);
       setUser(data);
-      setCanManage(manage);
+      setCanManage(!isProtectedAccount(data) || me?.is_superuser === true);
     } catch (err) {
       setError(formatApiError(err, dict));
       setUser(null);

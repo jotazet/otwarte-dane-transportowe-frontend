@@ -170,6 +170,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           applyTokens(next);
           return next;
         } catch {
+          // Another tab may have rotated the same refresh token a moment
+          // earlier; its new pair is in storage and still valid.
+          const current = readStoredTokens();
+          if (current && current.refresh !== stored.refresh) {
+            applyTokens(current);
+            return current;
+          }
           clearAuth();
           return null;
         }
