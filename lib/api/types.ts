@@ -65,13 +65,23 @@ export type SubmissionHistoryEvent = {
   stage_after?: number | null;
   actor?: string | null;
   cause?: string;
+  /** Coded reasons of an automatic rejection; `cause` is then empty. */
+  reasons?: RejectionReason[] | null;
   created_at?: string;
 };
 
 /** An automatic rejection reason; see the backend's docs/api/feeds.md. */
 export type RejectionReason = {
   code: string;
-  details?: { endpoint_type?: string; status?: number; protocol?: string };
+  details?: {
+    endpoint_type?: string;
+    status?: number;
+    protocol?: string;
+    error_count?: number;
+    /** GTFS validator notice code -> number of occurrences. */
+    notices?: Record<string, number>;
+    limit_bytes?: number;
+  };
 };
 
 export type SubmissionStageFields = {

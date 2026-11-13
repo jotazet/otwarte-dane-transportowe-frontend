@@ -175,6 +175,10 @@ export const dictDe: Dictionary = {
   apiErrorRateLimited: "Zu viele Anfragen an den Server. Versuchen Sie es in Kürze erneut.",
   apiErrorGeneric: "Der Vorgang konnte nicht ausgeführt werden. Versuchen Sie es in Kürze erneut.",
   apiErrorCodes: {
+    "cases.data_provider_name_taken":
+      "Ein Datenanbieter mit diesem Namen existiert bereits. Geben Sie einen anderen Namen ein.",
+    "cases.organization_exists":
+      "Eine Organisation mit diesem Namen existiert in dieser Region bereits. Geben Sie einen anderen Namen oder eine andere Region ein.",
     "auth.csrf_failed":
       "Es konnte nicht bestätigt werden, dass die Anfrage von dieser Website stammt. Laden Sie die Seite neu und versuchen Sie es erneut.",
     "auth.invalid_credentials": "Ungültiger Benutzername oder Passwort.",
@@ -195,6 +199,7 @@ export const dictDe: Dictionary = {
       "ODT ruft diesen Feed nicht ab, daher kann der Abruf nicht pausiert werden.",
     "feeds.stage_changed":
       "Die Stufe der Einreichung hat sich inzwischen geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+    "feeds.invalid_choice": "Dieser Filterwert wird nicht unterstützt.",
     "feeds.invalid_integer": "Der Filterwert muss eine ganze Zahl sein.",
     "feeds.invalid_stage": "Die Stufe muss eine Zahl von 1 bis 4 sein.",
     "feeds.field_locked":
@@ -412,6 +417,22 @@ export const dictDe: Dictionary = {
       "Die erste Kopie der Daten des Endpoints „{endpoint}“ konnte nicht auf dem ODT-Server gespeichert werden. Versuchen Sie es später erneut.",
   },
   realtimeRejectionReasonUnknown: "Die Einreichung wurde bei der automatischen Prüfung abgelehnt.",
+  gtfsRejectionReasons: {
+    "gtfs_validation.feed_invalid":
+      "Der GTFS-Validator hat Fehler im Feed gefunden. Anzahl der Fehler: {errorCount}.",
+    "gtfs_validation.download_http_error":
+      "Die Feed-URL hat den HTTP-Fehler {status} zurückgegeben, daher konnte der Feed nicht für die Validierung heruntergeladen werden. Prüfen Sie die URL und die Zugangsdaten.",
+    "gtfs_validation.download_too_large":
+      "Die Feed-Datei überschreitet die zulässige Größe von {limit}.",
+    "gtfs_validation.download_url_blocked":
+      "Die Feed-URL erfüllt die Sicherheitsregeln von ODT nicht: Der Hostname existiert nicht, die Adresse ist nicht öffentlich oder eine Weiterleitung ist nicht zulässig.",
+    "gtfs_validation.download_timeout":
+      "Der Server unter der Feed-URL hat nicht rechtzeitig geantwortet.",
+    "gtfs_validation.download_unreachable":
+      "Keine Verbindung zum Server unter der Feed-URL möglich. Prüfen Sie, ob der Server aus dem Internet erreichbar ist.",
+    "gtfs_validation.download_failed":
+      "Der Feed konnte nicht für die Validierung heruntergeladen werden. Prüfen Sie die Feed-URL.",
+  },
   gtfsValidationNotice: "GTFS-Validator: {code}, Vorkommen: {count}",
   gtfsValidationRejectedGeneric:
     "Der Feed hat die automatische GTFS-Validierung nicht bestanden oder konnte für die Validierung nicht heruntergeladen werden. Prüfen Sie die URL und den Inhalt der Datei.",

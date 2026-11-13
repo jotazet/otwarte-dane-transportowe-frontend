@@ -170,6 +170,10 @@ export const dictEn: Dictionary = {
   apiErrorRateLimited: "Too many requests to the server. Try again in a moment.",
   apiErrorGeneric: "The operation could not be completed. Try again in a moment.",
   apiErrorCodes: {
+    "cases.data_provider_name_taken":
+      "A data provider with this name already exists. Enter a different name.",
+    "cases.organization_exists":
+      "An organization with this name already exists in this region. Enter a different name or region.",
     "auth.csrf_failed":
       "Could not confirm that the request came from this site. Reload the page and try again.",
     "auth.invalid_credentials": "Invalid username or password.",
@@ -187,6 +191,7 @@ export const dictEn: Dictionary = {
     "feeds.not_proxy_managed": "ODT does not fetch this feed, so its fetching cannot be paused.",
     "feeds.stage_changed":
       "The stage of the submission changed in the meantime. Reload the page and try again.",
+    "feeds.invalid_choice": "This filter value is not supported.",
     "feeds.invalid_integer": "The filter value must be a whole number.",
     "feeds.invalid_stage": "The stage must be a number from 1 to 4.",
     "feeds.field_locked":
@@ -391,6 +396,20 @@ export const dictEn: Dictionary = {
       'Could not store the first copy of data from endpoint "{endpoint}" on the ODT server. Try again later.',
   },
   realtimeRejectionReasonUnknown: "The submission was rejected during automatic verification.",
+  gtfsRejectionReasons: {
+    "gtfs_validation.feed_invalid":
+      "The GTFS validator found errors in the feed. Number of errors: {errorCount}.",
+    "gtfs_validation.download_http_error":
+      "The feed URL returned HTTP error {status}, so the feed could not be downloaded for validation. Check the URL and the authorization details.",
+    "gtfs_validation.download_too_large": "The feed file exceeds the size limit of {limit}.",
+    "gtfs_validation.download_url_blocked":
+      "The feed URL does not meet ODT security rules: the host name does not exist, the address is not public, or a redirect is not allowed.",
+    "gtfs_validation.download_timeout": "The server at the feed URL did not respond in time.",
+    "gtfs_validation.download_unreachable":
+      "Could not connect to the server at the feed URL. Check that the server is reachable from the internet.",
+    "gtfs_validation.download_failed":
+      "Could not download the feed for validation. Check the feed URL.",
+  },
   gtfsValidationNotice: "GTFS validator: {code}, occurrences: {count}",
   gtfsValidationRejectedGeneric:
     "The feed failed automatic GTFS validation or could not be downloaded for validation. Check the URL and the file contents.",

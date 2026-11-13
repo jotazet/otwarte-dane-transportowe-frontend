@@ -8,7 +8,7 @@
 Hard rule 4 and backend [ADR 0006](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/architecture/decisions/0006-api-error-codes.md): the UI never displays backend text, only translated codes. Some fields still carry text that is not a code:
 
 - a fetch error's `message`, `last_fetch_error_message` and, for an automatic pause, `fetch_pause_reason`: the exception text from fetching a provider's URL (English, sometimes with the URL in it);
-- `rejection_cause` of an automatic GTFS rejection: the validator's notice codes (`code: count, ...`) or English text when the feed could not be downloaded.
+- `rejection_cause` of an automatic GTFS rejection recorded before 2026-11-13: the validator's notice codes (`code: count, ...`) or English text when the feed could not be downloaded. Newer automatic rejections carry coded `rejection_reasons` instead (`gtfs_validation.feed_invalid`, `gtfs_validation.download_*`), translated like realtime ones (`lib/rejectionReasons.ts`), with no raw text.
 
 The ODT team still needs this text to diagnose a broken feed, and older fetch errors (before 2026-11-12) were stored with the URL unredacted, so a token in a query string can be in them.
 

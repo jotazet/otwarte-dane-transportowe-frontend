@@ -6,14 +6,9 @@ import Typography from "@mui/material/Typography";
 
 import { TechnicalDetails } from "@/components/layout/TechnicalDetails";
 import type { Dictionary } from "@/i18n/getDictionary";
-import type { RejectionReason, SubmissionHistoryEvent } from "@/lib/api/types";
+import type { SubmissionHistoryEvent } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
 import { formatRejectionReasons } from "@/lib/rejectionReasons";
-
-/** Realtime history entries also carry coded automatic rejection reasons. */
-export type HistoryTimelineEvent = SubmissionHistoryEvent & {
-  reasons?: RejectionReason[] | null;
-};
 
 export function HistoryTimeline({
   events,
@@ -22,9 +17,9 @@ export function HistoryTimeline({
   showRawCause = false,
   dict,
 }: {
-  events: HistoryTimelineEvent[];
+  events: SubmissionHistoryEvent[];
   locale?: string;
-  /** Translated reasons for the stored text of an automatic rejection (no actor). */
+  /** Translated reasons for the stored text of an older automatic rejection (no actor). */
   automaticCauseReasons?: (cause: string) => string[];
   /** Also offer that stored text as technical details; for Admins only. */
   showRawCause?: boolean;
@@ -32,6 +27,8 @@ export function HistoryTimeline({
     Dictionary,
     | "submissionHistoryEventLabels"
     | "realtimeRejectionReasons"
+    | "gtfsRejectionReasons"
+    | "gtfsValidationNotice"
     | "realtimeRejectionReasonUnknown"
     | "technicalDetailsShow"
     | "technicalDetailsHide"
@@ -42,7 +39,7 @@ export function HistoryTimeline({
     <Stack spacing={1.5}>
       {events.map((ev, i) => {
         const reasons = ev.reasons?.length
-          ? formatRejectionReasons(ev.reasons, dict)
+          ? formatRejectionReasons(ev.reasons, dict, locale)
           : ev.cause && !ev.actor && automaticCauseReasons
             ? automaticCauseReasons(ev.cause)
             : null;

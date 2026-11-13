@@ -7,10 +7,11 @@ type GtfsRejectionDict = Pick<Dictionary, "gtfsValidationNotice" | "gtfsValidati
 const NOTICE_COUNTS = /^[a-z0-9_]+: \d+(, [a-z0-9_]+: \d+)*$/;
 
 /**
- * Translated reasons for an automatic GTFS rejection (a history entry without an actor). The
- * backend still stores the validator's notice codes or English text in `rejection_cause`
- * (backend ADR 0006, not migrated yet): notice codes are listed, any other text gets a generic
- * message. Returns `undefined` for a reviewer's rejection, whose own words are shown as they are.
+ * Translated reasons for an automatic GTFS rejection recorded before `rejection_reasons`
+ * (backend changelog 2026-11-13, no data migration): such a rejection has no actor and keeps the
+ * validator's notice codes or English text in `rejection_cause`. Notice codes are listed, any
+ * other text gets a generic message. Returns `undefined` for a reviewer's rejection, whose own
+ * words are shown as they are.
  */
 export function gtfsRejectionReasons(
   cause: string | null | undefined,
