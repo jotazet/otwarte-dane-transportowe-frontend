@@ -27,6 +27,7 @@ import {
   plannerAdminPaths,
   rangeInterval,
   rangeQuery,
+  TRAFFIC_RANGES,
   type EndpointStats,
   type IpBan,
   type IpClientStats,
@@ -191,7 +192,7 @@ function IpDetailsView({ ctx, ip }: { ctx: PlannerAdminContext; ip: string }) {
           >
             {dict.plannerAdminIpTrafficTitle}
           </Typography>
-          <RangeToggle value={range} onChange={setRange} dict={dict} />
+          <RangeToggle ranges={TRAFFIC_RANGES} value={range} onChange={setRange} dict={dict} />
         </Stack>
         <LoadState loaded={details} dict={dict} />
         {d && !c ? (

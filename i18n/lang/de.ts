@@ -807,6 +807,7 @@ export const dictDe: Dictionary = {
   plannerAdminStatUniqueIps: "IP-Adressen",
   plannerAdminStatErrors: "Fehlerantworten ({share})",
   plannerAdminStatP95: "Antwortzeit p95",
+  plannerAdminStatAvg: "Durchschnittliche Antwortzeit",
   plannerAdminStatRateLimited: "Limit überschritten (429)",
   plannerAdminStatClientErrors: "Client-Fehler (4xx)",
   plannerAdminPendingChanges:
@@ -877,6 +878,8 @@ export const dictDe: Dictionary = {
   plannerAdminSubmission: "Einreichung im Katalog",
   plannerAdminSubmissionHint:
     "Ändern Sie die Einreichung, wenn die Organisation den Feed neu eingereicht hat. Die IDs im Planer bleiben unverändert.",
+  plannerAdminRentalSubmissionHint:
+    "Zur Auswahl stehen veröffentlichte GBFS-Feeds, die der Planer noch nicht nutzt, auch von anderen Organisationen. Das Netz im Planer bleibt unverändert.",
   plannerAdminIncludeInBuild: "In die Graph-Erstellung einbeziehen",
   plannerAdminRemoveFromPlanner: "Aus dem Planer entfernen",
   plannerAdminRemoveFeedConfirm:
@@ -1049,10 +1052,13 @@ export const dictDe: Dictionary = {
     "24h": "24 Stunden",
     "7d": "7 Tage",
     "30d": "30 Tage",
+    "90d": "90 Tage",
   },
   plannerAdminEndpointFilter: "Endpoint: {name}",
   plannerAdminClearFilter: "Filter entfernen",
   plannerAdminEndpointHint: "Klicken Sie auf einen Endpoint, um die Statistik einzugrenzen.",
+  plannerAdminHistoryNote:
+    "Diagramm und Kennzahlen für 90 Tage stammen aus Tageszusammenfassungen ohne IP-Adressen, p95 und Aufteilung nach Endpoint. Die Tabellen unten umfassen die letzten 30 Tage, so lange wird das Anfrageprotokoll aufbewahrt.",
   plannerAdminChartTitleHour: "Anfragen pro Stunde",
   plannerAdminChartTitleDay: "Anfragen pro Tag",
   plannerAdminChartSplit: "Aufschlüsselung",

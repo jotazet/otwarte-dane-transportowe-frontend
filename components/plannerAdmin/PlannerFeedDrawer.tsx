@@ -298,17 +298,16 @@ function RentalDetails({
   const { apiJson, dict } = ctx;
   const result = source.active_result;
   const path = plannerAdminPaths.rentalSource(source.id);
-  // As for feeds: a re-submission of the same organization, not one another source uses.
+  // Any published GBFS submission another source does not use (one submission, one source),
+  // of any organization, so the organization is part of the label.
   const loadCandidates = React.useCallback(() => fetchRentalCandidates(apiJson), [apiJson]);
   const candidates = useApiLoad(loadCandidates).data ?? [];
   const submissions = withCurrent(
-    candidates.filter(
-      (c) =>
-        c.organization.id === source.organization.id &&
-        (c.rental_source === null || c.rental_source === source.id),
-    ),
+    candidates
+      .filter((c) => c.rental_source === null || c.rental_source === source.id)
+      .map((c) => ({ id: c.id, name: `${c.name} · ${c.organization.name}` })),
     source.submission,
-    source.submission_name,
+    `${source.submission_name} · ${source.organization.name}`,
   );
   return (
     <>
@@ -336,7 +335,7 @@ function RentalDetails({
           size="small"
           label={dict.plannerAdminSubmission}
           value={source.submission}
-          helperText={dict.plannerAdminSubmissionHint}
+          helperText={dict.plannerAdminRentalSubmissionHint}
           onChange={(e) => void saveRental(ctx, source.id, { submission: Number(e.target.value) })}
         >
           {submissions.map((c) => (

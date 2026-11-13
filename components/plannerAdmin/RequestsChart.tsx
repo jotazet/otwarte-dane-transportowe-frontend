@@ -110,7 +110,8 @@ export function RequestsChart({ buckets, series, interval, locale, dict }: Chart
           height: PLOT_HEIGHT,
           display: "flex",
           alignItems: "flex-end",
-          gap: "2px",
+          // 90 daily bars need the room on a phone.
+          gap: buckets.length > 60 ? "1px" : "2px",
           borderBottom: 1,
           borderColor: "text.secondary",
         }}

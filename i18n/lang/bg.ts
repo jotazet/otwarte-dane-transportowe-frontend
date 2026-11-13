@@ -789,6 +789,7 @@ export const dictBg: Dictionary = {
   plannerAdminStatUniqueIps: "IP адреси",
   plannerAdminStatErrors: "Отговори с грешка ({share})",
   plannerAdminStatP95: "Време за отговор p95",
+  plannerAdminStatAvg: "Средно време за отговор",
   plannerAdminStatRateLimited: "Превишен лимит (429)",
   plannerAdminStatClientErrors: "Грешки на клиента (4xx)",
   plannerAdminPendingChanges:
@@ -858,6 +859,8 @@ export const dictBg: Dictionary = {
   plannerAdminSubmission: "Заявка в каталога",
   plannerAdminSubmissionHint:
     "Променете заявката, когато организацията е подала фийда отново. Идентификаторите в планера остават същите.",
+  plannerAdminRentalSubmissionHint:
+    "Можете да изберете публикуван GBFS фийд, който планерът още не използва, включително на друга организация. Мрежата в планера остава същата.",
   plannerAdminIncludeInBuild: "Включи в изграждането на графа",
   plannerAdminRemoveFromPlanner: "Премахни от планера",
   plannerAdminRemoveFeedConfirm:
@@ -1025,10 +1028,13 @@ export const dictBg: Dictionary = {
     "24h": "24 часа",
     "7d": "7 дни",
     "30d": "30 дни",
+    "90d": "90 дни",
   },
   plannerAdminEndpointFilter: "Ендпойнт: {name}",
   plannerAdminClearFilter: "Премахни филтъра",
   plannerAdminEndpointHint: "Щракнете върху ендпойнт, за да стесните статистиката.",
+  plannerAdminHistoryNote:
+    "Графиката и стойностите за 90 дни идват от дневните обобщения, които не съдържат IP адреси, p95 и разделяне по ендпойнт. Таблиците по-долу обхващат последните 30 дни – толкова дълго се пази журналът на заявките.",
   plannerAdminChartTitleHour: "Заявки на час",
   plannerAdminChartTitleDay: "Заявки на ден",
   plannerAdminChartSplit: "Разбивка",
