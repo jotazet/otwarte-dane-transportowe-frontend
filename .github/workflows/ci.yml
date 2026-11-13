@@ -28,6 +28,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run format:check
+      - run: npm test
       # No API is reachable here; every page that fetches is rendered on demand.
       - run: npm run build
         env:
