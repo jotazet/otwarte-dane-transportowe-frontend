@@ -298,6 +298,31 @@ export const dictBg: Dictionary = {
   staticSourceFileRequired: "Изберете файл за качване.",
   staticCurrentFile: "Текущ файл: {name}",
   staticChooseNewFile: "Избери нов файл",
+  submissionFeedStatusSection: "Състояние на фийда",
+  submissionGtfsValidation: "Валидиране на GTFS",
+  submissionValidationStatusLabels: {
+    pending: "В процес",
+    valid: "Без грешки",
+    invalid: "Открити са грешки",
+    error: "Не е извършено",
+  },
+  submissionValidationErrorCodes: {
+    "gtfs_validation.file_missing": "Файлът на фийда не е наличен на сървъра на ODT.",
+    "gtfs_validation.validator_unavailable": "Валидаторът не можа да бъде стартиран.",
+    "gtfs_validation.validator_failed": "Валидаторът спря без резултат.",
+    "gtfs_validation.timeout": "Валидирането надвиши лимита от време.",
+    "gtfs_validation.credential_undecryptable":
+      "Сървърът на ODT не може да прочете запазените данни за оторизация на източника, затова не изтегли фийда.",
+  },
+  submissionValidationErrorHint:
+    "Валидирането не можа да се извърши поради проблем от страна на ODT. Екипът на ODT ще го стартира отново.",
+  submissionFetchAutoPausedHint:
+    "Изтеглянето е спряно автоматично след повтарящи се неуспешни опити. Сървърът на ODT опитва отново веднъж на ден и след успешно изтегляне се връща към обичайния график.",
+  submissionFetchManualPausedHint: "Изтеглянето е спряно от екипа на ODT.",
+  submissionFetchErrorsRecent: "Грешки при изтегляне през последните 30 дни",
+  submissionFetchErrorsEmpty: "През последните 30 дни няма грешки при изтегляне.",
+  submissionFetchHttpError: "HTTP грешка {status}",
+  submissionLinkedRealtimeSection: "Свързани заявки в реално време",
   unnamed: "без име",
   tabStaticSubmission: "Статичен фийд",
   tabRealtimeSubmission: "Фийд в реално време",

@@ -295,6 +295,31 @@ export const dictPl = {
   staticSourceFileRequired: "Wybierz plik do przesłania.",
   staticCurrentFile: "Obecny plik: {name}",
   staticChooseNewFile: "Wybierz nowy plik",
+  submissionFeedStatusSection: "Stan feedu",
+  submissionGtfsValidation: "Walidacja GTFS",
+  submissionValidationStatusLabels: {
+    pending: "W toku",
+    valid: "Bez błędów",
+    invalid: "Wykryto błędy",
+    error: "Nie przeprowadzono",
+  },
+  submissionValidationErrorCodes: {
+    "gtfs_validation.file_missing": "Plik feedu jest niedostępny na serwerze ODT.",
+    "gtfs_validation.validator_unavailable": "Nie udało się uruchomić walidatora.",
+    "gtfs_validation.validator_failed": "Walidator zakończył pracę bez wyniku.",
+    "gtfs_validation.timeout": "Walidacja przekroczyła limit czasu.",
+    "gtfs_validation.credential_undecryptable":
+      "Serwer ODT nie może odczytać zapisanych danych autoryzacji źródła, dlatego nie pobrał feedu.",
+  },
+  submissionValidationErrorHint:
+    "Walidacja nie została przeprowadzona z powodu problemu po stronie ODT. Zespół ODT uruchomi ją ponownie.",
+  submissionFetchAutoPausedHint:
+    "Pobieranie wstrzymano automatycznie po kolejnych nieudanych próbach. Serwer ODT ponawia próbę raz na dobę, a po udanym pobraniu wraca do zwykłego harmonogramu.",
+  submissionFetchManualPausedHint: "Pobieranie wstrzymał zespół ODT.",
+  submissionFetchErrorsRecent: "Błędy pobierania z ostatnich 30 dni",
+  submissionFetchErrorsEmpty: "W ostatnich 30 dniach nie wystąpiły błędy pobierania.",
+  submissionFetchHttpError: "Błąd HTTP {status}",
+  submissionLinkedRealtimeSection: "Powiązane zgłoszenia realtime",
   unnamed: "bez nazwy",
   tabStaticSubmission: "Feed statyczny",
   tabRealtimeSubmission: "Feed realtime",

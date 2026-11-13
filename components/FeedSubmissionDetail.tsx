@@ -25,6 +25,14 @@ import { HistoryTimeline } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
+import {
+  LinkedRealtimeSubmissions,
+  type LinkedRealtimeSubmission,
+} from "@/components/submissions/LinkedRealtimeSubmissions";
+import {
+  StaticFeedStatusPanel,
+  type StaticValidationStatus,
+} from "@/components/submissions/StaticFeedStatusPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
@@ -54,6 +62,8 @@ type StaticEntry = FetchHealthFields & {
   is_original?: boolean;
   hide_original?: boolean;
   auth_type?: string;
+  validation_status?: StaticValidationStatus;
+  validation_message?: string;
 };
 
 type FeedDetail = {
@@ -66,6 +76,7 @@ type FeedDetail = {
   is_rejected: boolean;
   rejection_cause?: string | null;
   static_entry?: StaticEntry | null;
+  realtime_submissions?: LinkedRealtimeSubmission[];
   submitted_by?: number;
   submitted_by_username?: string | null;
   history?: SubmissionHistoryEvent[];
@@ -207,6 +218,15 @@ export function FeedSubmissionDetail({
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =
     isDjangoAdmin && row.current_stage >= 2 && row.current_stage <= 4 && !row.is_rejected;
+
+  // Only GTFS has automatic validation; for other types the status stays "pending".
+  const validationStatus =
+    row.data_type === "gtfs" ? (row.static_entry?.validation_status ?? null) : null;
+  // Reviewers get the full FeedFetchHealthPanel above; the owner a read-only view.
+  const ownerFetchHealth =
+    isOwner && !showHelperPanel && row.current_stage >= 4 && row.static_entry?.fetch_status != null
+      ? row.static_entry
+      : null;
 
   const authTypeSelectOptions = authTypeOptions(dict);
   // Only an owner or Admin at stage 1 (incl. after a rejection) may switch between URL and file.
@@ -423,6 +443,17 @@ export function FeedSubmissionDetail({
           title={dict.fetchHealthSection}
           health={row.static_entry}
           onChanged={() => void load()}
+        />
+      ) : null}
+
+      {validationStatus || ownerFetchHealth ? (
+        <StaticFeedStatusPanel
+          locale={locale}
+          dict={dict}
+          submissionId={row.id}
+          validationStatus={validationStatus}
+          validationMessage={row.static_entry?.validation_message}
+          fetchHealth={ownerFetchHealth}
         />
       ) : null}
 
@@ -682,6 +713,15 @@ export function FeedSubmissionDetail({
             </Stack>
           )}
         </FormSection>
+      ) : null}
+
+      {row.realtime_submissions?.length ? (
+        <LinkedRealtimeSubmissions
+          locale={locale}
+          dict={dict}
+          listContext={listContext}
+          items={row.realtime_submissions}
+        />
       ) : null}
 
       {row.history?.length ? (

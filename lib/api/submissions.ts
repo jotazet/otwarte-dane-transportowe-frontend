@@ -9,6 +9,7 @@ export const submissionsPaths = {
   combined: "/api/data_manager/submissions/",
   feedList: "/api/data_manager/feed-submissions/",
   feedDetail: (id: number) => `/api/data_manager/feed-submissions/${id}/`,
+  feedFetchErrors: (id: number) => `/api/data_manager/feed-submissions/${id}/fetch-errors/`,
   feedDownloadStatic: (id: number, endpointPk: number) =>
     `/api/data_manager/feed-submissions/${id}/download/static/${endpointPk}/`,
   realtimeList: "/api/data_manager/realtime-submissions/",
