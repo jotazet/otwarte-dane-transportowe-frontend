@@ -22,6 +22,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // No "X-Powered-By: Next.js" on every response.
   poweredByHeader: false,
+  // The Docker image runs .next/standalone (server.js and only the traced dependencies)
+  // instead of `next start` with the whole node_modules (Dockerfile).
+  output: "standalone",
   // The app never uses next/image; with the optimiser off, /_next/image
   // answers 404 instead of being attack surface with no user.
   images: { unoptimized: true },

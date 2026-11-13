@@ -1,0 +1,70 @@
+#!/bin/sh
+# Deploys a release tag of the frontend (docs/deployment.md, section 6); the deploy job runs
+# it on the production runner. Installed by hand as /usr/local/sbin/odt-deploy-frontend,
+# owned by root, and run through sudo as the system user odt, which owns the deployment
+# directory: the runner may run nothing else. The same design as the backend's odt-deploy
+# (backend ADR 0016).
+#
+#   odt-deploy-frontend vX.Y.Z
+#
+# Asks GitHub for the tag's commit, refuses it unless it is on main, downloads that commit's
+# Compose file and deploy scripts into the deployment directory and hands it to that
+# release's own scripts/deploy/release.sh, which runs the image CI built for the tag. The
+# tag is the only input: every setting on the server comes from the root-owned host file
+# (NEXT_PUBLIC_* are in the image). There is no checkout on the server. Kept small so it
+# rarely needs reinstalling; the steps of a deployment live in release.sh.
+set -eu
+
+ODT_DIR=/srv/odt-frontend
+REPOSITORY=jotazet/otwarte-dane-transportowe-frontend
+API="https://api.github.com/repos/$REPOSITORY"
+# Port, bind address, the API's host name, memory limit: written by root, never by a release.
+HOST_ENV=/etc/odt/frontend-host.env
+# What production needs from the repository; everything else is in the image.
+DEPLOY_FILES="docker-compose.yml scripts/deploy"
+
+tag="${1:-}"
+if ! printf '%s\n' "$tag" | grep -Eqx 'v[0-9]+\.[0-9]+\.[0-9]+'; then
+    echo "odt-deploy-frontend: expected a release tag vX.Y.Z, got '$tag'" >&2
+    exit 2
+fi
+
+if [ ! -f "$HOST_ENV" ] \
+    || [ -n "$(find "$HOST_ENV" "${HOST_ENV%/*}" -maxdepth 0 \( ! -user root -o -perm /022 \) -print)" ]; then
+    echo "odt-deploy-frontend: $HOST_ENV is missing, or it or its directory is not root's alone" >&2
+    exit 1
+fi
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+# One field of a GitHub API answer.
+field() {
+    curl -fsS --retry 3 -H 'Accept: application/vnd.github+json' "$API/$1" \
+        | python3 -I -c 'import json, sys; print(json.load(sys.stdin)[sys.argv[1]])' "$2"
+}
+commit="$(field "commits/$tag" sha)"
+main="$(field commits/main sha)"
+# "identical" or "ahead": main contains the tag's commit.
+case "$(field "compare/$commit...$main" status)" in
+    identical | ahead) ;;
+    *)
+        echo "odt-deploy-frontend: $tag ($commit) is not on main" >&2
+        exit 1
+        ;;
+esac
+
+# The release's files, by commit: a tag moved after the check above changes nothing.
+mkdir "$work/src"
+curl -fsSL --retry 3 "https://codeload.github.com/$REPOSITORY/tar.gz/$commit" \
+    | tar -xz -C "$work/src" --strip-components=1
+mkdir -p "$ODT_DIR/scripts"
+rm -rf "$ODT_DIR/scripts/deploy"
+for path in $DEPLOY_FILES; do
+    cp -R "$work/src/$path" "$ODT_DIR/$path"
+done
+
+# release.sh records the version that runs as ODT_VERSION in .env.
+running="$(sed -n 's/^ODT_VERSION=//p' "$ODT_DIR/.env" 2>/dev/null | tail -n 1)"
+echo "odt-deploy-frontend: ${running:-none} -> $tag ($commit)"
+sh "$ODT_DIR/scripts/deploy/release.sh" "$tag" "$HOST_ENV"

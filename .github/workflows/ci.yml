@@ -1,14 +1,18 @@
 name: CI
 
+# Pull requests and main run the checks. Main and tags also push the production image to
+# ghcr.io. A release tag vX.Y.Z runs them too and, when they pass, goes to production
+# through the deploy job (docs/deployment.md, section 6; backend ADR 0013 and 0016).
 on:
   pull_request:
   push:
     branches: [main]
+    tags: ["v*"]
 
 permissions:
   contents: read
 
-# Only the newest run of a pull request matters. Pushes to main get a group each
+# Only the newest run of a pull request matters. Pushes (main, tags) get a group each
 # (the run ID): a shared group would cancel a waiting run when the next one queues.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.run_id }}
@@ -17,13 +21,21 @@ concurrency:
 jobs:
   frontend:
     runs-on: ubuntu-24.04
+    # A hung build fails here instead of holding the runner for six hours.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The token stays out of .git/config, where every later step could read it.
+          persist-credentials: false
+      # npm cache keyed by package-lock.json. A release tag runs without the cache; the
+      # image job builds the release image in Docker and takes nothing from this job.
+      # zizmor cannot evaluate the expression.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           # Same major as the Dockerfile.
-          node-version: "20"
-          cache: npm
+          node-version: "24"
+          cache: ${{ github.ref_type != 'tag' && 'npm' || '' }} # zizmor: ignore[cache-poisoning]
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
@@ -33,3 +45,102 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  # The workflows, the deploy scripts, the Compose file they use and the image.
+  production:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Template injection, unpinned actions, tokens with more rights than a job needs.
+      - name: Audit the workflows
+        run: >-
+          docker run --rm -v "$PWD:/mnt:ro" -w /mnt
+          ghcr.io/zizmorcore/zizmor:1.32.0@sha256:3014cc8f68f663935f69b3c3e0e41f5ce102b268d97db13db0f62208747f860d
+          --offline --format=github .github/
+      - name: Lint the shell scripts
+        run: >-
+          docker run --rm -v "$PWD:/mnt:ro" -w /mnt
+          koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d
+          --severity=warning scripts/deploy/*.sh scripts/deploy/odt-deploy-frontend
+      - name: Check the Compose file
+        run: docker compose -f docker-compose.yml config --quiet
+      # The image starts as in production (read-only, no capabilities, the limits) and
+      # renders a page. No API is reachable here; the pages show their error state.
+      - run: docker build --tag ghcr.io/jotazet/odt-frontend:ci .
+      - name: Check that the image starts and turns healthy
+        env:
+          ODT_VERSION: ci
+        run: |
+          if ! docker compose -f docker-compose.yml up -d --no-build --wait --wait-timeout 120; then
+            docker compose -f docker-compose.yml logs
+            exit 1
+          fi
+          docker compose -f docker-compose.yml down
+
+  # The production image of main and of every tag, in GitHub's registry: the server pulls
+  # the tag's image instead of building it (backend ADR 0016). Not for pull requests.
+  image:
+    needs: [frontend, production]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # NEXT_PUBLIC_* are inlined into the bundle, so they are public: repository variables,
+      # not the production environment, which only the deploy job gets.
+      - name: Build and push ghcr.io/jotazet/odt-frontend
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          # Without them the build falls back to localhost and the site still answers.
+          if [ -z "$NEXT_PUBLIC_API_BASE_URL" ] || [ -z "$NEXT_PUBLIC_SITE_URL" ]; then
+            echo "::error::Set the repository variables NEXT_PUBLIC_API_BASE_URL and NEXT_PUBLIC_SITE_URL."
+            exit 1
+          fi
+          image=ghcr.io/jotazet/odt-frontend
+          if [ "$REF_TYPE" = tag ]; then version="$REF_NAME"; else version=main; fi
+          printf '%s' "$TOKEN" | docker login ghcr.io --username "$ACTOR" --password-stdin
+          docker build --pull \
+            --build-arg NEXT_PUBLIC_API_BASE_URL --build-arg NEXT_PUBLIC_SITE_URL \
+            --tag "$image:$version" --tag "$image:sha-$SHA" .
+          docker push --all-tags "$image"
+          docker logout ghcr.io
+
+  # A release: a green vX.Y.Z tag on main goes to production.
+  deploy:
+    needs: [frontend, production, image]
+    if: startsWith(github.ref, 'refs/tags/v')
+    # The runner on the production server, registered to this repository, as the user
+    # odt-runner: no Docker, and through sudo only odt-deploy-frontend as odt, the owner of
+    # the deployment directory (docs/deployment.md, section 6). No other job may use this
+    # label.
+    runs-on: [self-hosted, odt-production]
+    # The environment admits only v* tags (deployment rule in its settings).
+    environment: production
+    timeout-minutes: 20
+    # Never two deployments at once, and never cancel one halfway through.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      # The tag is the only input: the server refuses one that is not vX.Y.Z or not on main
+      # (a check here would run from the tag's own workflow file, which the tag's author
+      # controls), and takes every setting from its own root-owned host file.
+      - name: Deploy
+        env:
+          TAG: ${{ github.ref_name }}
+        run: sudo -n -u odt /usr/local/sbin/odt-deploy-frontend "$TAG"
