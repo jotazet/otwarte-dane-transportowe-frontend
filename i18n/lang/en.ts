@@ -395,7 +395,7 @@ export const dictEn: Dictionary = {
     "realtime.endpoint_cache_failed":
       'Could not store the first copy of data from endpoint "{endpoint}" on the ODT server. Try again later.',
   },
-  realtimeRejectionReasonUnknown: "The submission was rejected during automatic verification.",
+  rejectionReasonUnknown: "The submission was rejected during automatic verification.",
   gtfsRejectionReasons: {
     "gtfs_validation.feed_invalid":
       "The GTFS validator found errors in the feed. Number of errors: {errorCount}.",

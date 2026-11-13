@@ -1,14 +1,15 @@
 import type { Dictionary } from "@/i18n/getDictionary";
 import type { RejectionReason } from "@/lib/api/types";
 import { formatBytes, formatNumber } from "@/lib/format";
+import { gtfsNoticeLine } from "@/lib/gtfsRejection";
 import { fill } from "@/lib/i18n/fill";
 
-type RejectionReasonDict = Pick<
+export type RejectionReasonDict = Pick<
   Dictionary,
   | "realtimeRejectionReasons"
   | "gtfsRejectionReasons"
   | "gtfsValidationNotice"
-  | "realtimeRejectionReasonUnknown"
+  | "rejectionReasonUnknown"
 >;
 
 // Standard format names, never translated.
@@ -27,25 +28,23 @@ const PROTOCOL_NAMES: Record<string, string> = {
 export function formatRejectionReasons(
   reasons: RejectionReason[],
   dict: RejectionReasonDict,
-  locale = "pl",
+  locale: string,
 ): string[] {
   const messages: Record<string, string> = {
     ...dict.realtimeRejectionReasons,
     ...dict.gtfsRejectionReasons,
   };
   return reasons.flatMap(({ code, details = {} }) => {
-    const template = Object.hasOwn(messages, code)
-      ? messages[code]
-      : dict.realtimeRejectionReasonUnknown;
+    const template = Object.hasOwn(messages, code) ? messages[code] : dict.rejectionReasonUnknown;
     const message = fill(template, {
       endpoint: details.endpoint_type ?? "",
       status: String(details.status ?? ""),
       protocol: PROTOCOL_NAMES[details.protocol ?? ""] ?? details.protocol ?? "",
-      errorCount: formatNumber(details.error_count ?? 0, locale),
+      errorCount: details.error_count != null ? formatNumber(details.error_count, locale) : "",
       limit: details.limit_bytes != null ? formatBytes(details.limit_bytes, locale) : "",
     });
     const notices = Object.entries(details.notices ?? {}).map(([notice, count]) =>
-      fill(dict.gtfsValidationNotice, { code: notice, count: formatNumber(count, locale) }),
+      gtfsNoticeLine(notice, count, dict, locale),
     );
     return [message, ...notices];
   });

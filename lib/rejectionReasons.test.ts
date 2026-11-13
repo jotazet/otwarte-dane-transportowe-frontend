@@ -27,6 +27,7 @@ describe("formatRejectionReasons", () => {
     const reasons = formatRejectionReasons(
       [{ code: "gtfs_validation.feed_invalid", details: { error_count: 3, notices: {} } }],
       dictPl,
+      "pl",
     );
     expect(reasons).toEqual(["Walidator GTFS wykrył błędy w feedzie. Liczba błędów: 3."]);
   });
@@ -50,7 +51,7 @@ describe("formatRejectionReasons", () => {
     "gtfs_validation.download_unreachable",
     "gtfs_validation.download_failed",
   ])("translates %s without details", (code) => {
-    const [reason] = formatRejectionReasons([{ code, details: {} }], dictPl);
+    const [reason] = formatRejectionReasons([{ code, details: {} }], dictPl, "pl");
     expect(reason).toBe((dictPl.gtfsRejectionReasons as Record<string, string>)[code]);
     expect(reason).not.toMatch(/\{\w+\}/);
   });
@@ -73,8 +74,8 @@ describe("formatRejectionReasons", () => {
 
   it("never shows an unknown code", () => {
     for (const code of ["gtfs_validation.something_new", "toString"]) {
-      expect(formatRejectionReasons([{ code }], dictPl)).toEqual([
-        dictPl.realtimeRejectionReasonUnknown,
+      expect(formatRejectionReasons([{ code }], dictPl, "pl")).toEqual([
+        dictPl.rejectionReasonUnknown,
       ]);
     }
   });

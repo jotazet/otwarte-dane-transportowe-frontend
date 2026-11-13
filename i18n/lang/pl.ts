@@ -396,7 +396,7 @@ export const dictPl = {
     "realtime.endpoint_cache_failed":
       "Nie udało się zapisać pierwszej kopii danych z endpointu „{endpoint}” na serwerze ODT. Spróbuj ponownie później.",
   },
-  realtimeRejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
+  rejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
   gtfsRejectionReasons: {
     "gtfs_validation.feed_invalid":
       "Walidator GTFS wykrył błędy w feedzie. Liczba błędów: {errorCount}.",

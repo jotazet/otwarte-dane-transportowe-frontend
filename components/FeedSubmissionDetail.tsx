@@ -221,6 +221,7 @@ export function FeedSubmissionDetail({
           row.rejection_cause,
           latestEvent?.event_type === "rejected" && !latestEvent.actor,
           dict,
+          locale,
         );
   const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
 
@@ -768,7 +769,7 @@ export function FeedSubmissionDetail({
           <HistoryTimeline
             events={row.history}
             locale={locale}
-            automaticCauseReasons={(cause) => gtfsRejectionReasons(cause, true, dict) ?? []}
+            automaticCauseReasons={(cause) => gtfsRejectionReasons(cause, true, dict, locale) ?? []}
             showRawCause={isAdmin}
             dict={dict}
           />

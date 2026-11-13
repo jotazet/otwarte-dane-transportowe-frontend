@@ -399,7 +399,7 @@ export const dictBg: Dictionary = {
     "realtime.endpoint_cache_failed":
       "Първото копие на данните от ендпойнта „{endpoint}“ не можа да бъде записано на сървъра на ODT. Опитайте отново по-късно.",
   },
-  realtimeRejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
+  rejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
   gtfsRejectionReasons: {
     "gtfs_validation.feed_invalid":
       "GTFS валидаторът откри грешки във фийда. Брой грешки: {errorCount}.",

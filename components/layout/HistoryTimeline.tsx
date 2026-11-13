@@ -8,7 +8,7 @@ import { TechnicalDetails } from "@/components/layout/TechnicalDetails";
 import type { Dictionary } from "@/i18n/getDictionary";
 import type { SubmissionHistoryEvent } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
-import { formatRejectionReasons } from "@/lib/rejectionReasons";
+import { formatRejectionReasons, type RejectionReasonDict } from "@/lib/rejectionReasons";
 
 export function HistoryTimeline({
   events,
@@ -23,16 +23,11 @@ export function HistoryTimeline({
   automaticCauseReasons?: (cause: string) => string[];
   /** Also offer that stored text as technical details; for Admins only. */
   showRawCause?: boolean;
-  dict: Pick<
-    Dictionary,
-    | "submissionHistoryEventLabels"
-    | "realtimeRejectionReasons"
-    | "gtfsRejectionReasons"
-    | "gtfsValidationNotice"
-    | "realtimeRejectionReasonUnknown"
-    | "technicalDetailsShow"
-    | "technicalDetailsHide"
-  >;
+  dict: RejectionReasonDict &
+    Pick<
+      Dictionary,
+      "submissionHistoryEventLabels" | "technicalDetailsShow" | "technicalDetailsHide"
+    >;
 }) {
   const eventLabels: Record<string, string> = dict.submissionHistoryEventLabels;
   return (
