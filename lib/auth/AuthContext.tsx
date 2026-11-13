@@ -10,7 +10,13 @@ import {
   UPLOAD_TIMEOUT_MS,
   type ApiJson,
 } from "@/lib/api/http";
-import { postSession, SESSION_LOGIN, SESSION_LOGOUT, SESSION_REFRESH } from "@/lib/api/session";
+import {
+  postSession,
+  SESSION_CHANGE_PASSWORD,
+  SESSION_LOGIN,
+  SESSION_LOGOUT,
+  SESSION_REFRESH,
+} from "@/lib/api/session";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { isJwtExpired } from "@/lib/auth/jwt";
@@ -36,6 +42,8 @@ export function isAuthReady(status: AuthStatus): status is "anonymous" | "authen
 type AuthContextValue = AuthState & {
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => void;
+  /** Rejects with an `ApiError` (e.g. 400 `users.wrong_password`); the session goes on. */
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   getAccessToken: () => string | null;
   apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
@@ -243,6 +251,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return access;
   }, [refreshAccess]);
 
+  const changePassword = React.useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      const body = { current_password: currentPassword, new_password: newPassword };
+      // Under the refresh lock: the backend blacklists every refresh token of the user and sets
+      // a new cookie, which a refresh in another tab must not overwrite. The access token is
+      // taken outside it, because a refresh needs the same lock.
+      const post = (access: string) =>
+        withRefreshLock(() =>
+          postSession<{ access: string }>(SESSION_CHANGE_PASSWORD, body, access),
+        );
+      let result: { access: string };
+      try {
+        result = await post(await validAccess());
+      } catch (err) {
+        // The access token expired on the way: refresh and retry once, as apiJson does. A 401
+        // comes before the password is checked, so nothing has changed yet.
+        if (!(err instanceof ApiError && err.status === 401)) throw err;
+        const next = await refreshAccess();
+        if (!next) throw err;
+        result = await post(next);
+      }
+      // A refresh still in flight sent the old cookie: its failure must not end this session.
+      epochRef.current += 1;
+      applyAccess(result.access);
+      broadcast("login");
+    },
+    [applyAccess, broadcast, refreshAccess, validAccess],
+  );
+
   const apiJson = React.useCallback(
     async <T,>(method: string, path: string, body?: unknown): Promise<T> => {
       const url = `${apiBaseUrl()}${path}`;
@@ -335,12 +372,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
       logout,
+      changePassword,
       getAccessToken,
       apiJson,
       apiForm,
       apiBlob,
     }),
-    [apiBlob, apiForm, apiJson, getAccessToken, login, logout, state],
+    [apiBlob, apiForm, apiJson, changePassword, getAccessToken, login, logout, state],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

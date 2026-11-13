@@ -539,8 +539,6 @@ export const dictDe: Dictionary = {
   passwordMismatch: "Passwörter stimmen nicht überein.",
   emailChanged: "E-Mail-Adresse wurde geändert.",
   passwordChanged: "Passwort wurde geändert.",
-  passwordChangedSignInAgain:
-    "Das Passwort wurde geändert, die Sitzung konnte jedoch nicht erneuert werden. Melden Sie sich mit dem neuen Passwort erneut an.",
   userCreated: "Benutzer erstellt.",
   userSaved: "Änderungen gespeichert.",
   searchUsers: "Nach Benutzername oder E-Mail suchen",

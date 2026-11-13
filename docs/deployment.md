@@ -63,7 +63,7 @@ Pages also get an enforced `Content-Security-Policy` header with a per-request n
 
 Sign-in uses the API's cookie sessions ([ADR 0011](architecture/decisions/0011-session-cookie-auth-with-access-token-in-memory.md), [backend ADR 0017](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/architecture/decisions/0017-refresh-token-in-an-httponly-cookie-for-the-website.md)). It works only when:
 
-- the backend is a release with `/api/auth/session/` ([OtwarteDaneTransportowe-backend#141](https://github.com/jotazet/OtwarteDaneTransportowe-backend/pull/141)). **Release that backend first**: a frontend release before it can sign nobody in;
+- the backend is a release with `/api/auth/session/` ([OtwarteDaneTransportowe-backend#141](https://github.com/jotazet/OtwarteDaneTransportowe-backend/pull/141)). **Release that backend first**: a frontend release before it can sign nobody in. The password change on the account page also needs `/api/auth/session/change-password/` ([OtwarteDaneTransportowe-backend#147](https://github.com/jotazet/OtwarteDaneTransportowe-backend/pull/147)): without it the form fails and the password stays unchanged;
 - the site's origin (e.g. `https://odt.org.pl`) is in the backend's `CORS_ALLOWED_ORIGINS`, which is also the allowlist of its CSRF check;
 - the site and `NEXT_PUBLIC_API_BASE_URL` are the same site (`odt.org.pl` and `api.odt.org.pl`), so the browser sends the API's `SameSite=Strict` refresh cookie. Locally, `http://localhost:3000` and `http://localhost:8000` are the same site, but `127.0.0.1` and `localhost` are not.
 

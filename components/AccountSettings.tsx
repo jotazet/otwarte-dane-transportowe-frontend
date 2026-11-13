@@ -20,15 +20,13 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import {
   USER_ME,
   USER_ME_CHANGE_EMAIL,
-  USER_ME_CHANGE_PASSWORD,
   type ChangeEmailBody,
-  type ChangePasswordBody,
   type MeProfile,
 } from "@/lib/api/users";
 import { formatRole } from "@/lib/auth/roleLabels";
 
 export function AccountSettings({ dict }: { dict: Dictionary }) {
-  const { apiJson, login } = useAuth();
+  const { apiJson, changePassword } = useAuth();
   const [profile, setProfile] = React.useState<MeProfile | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -98,22 +96,11 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
     }
     setPasswordPending(true);
     try {
-      const body: ChangePasswordBody = {
-        current_password: currentPassword,
-        new_password: newPassword,
-      };
-      // The backend ends every session, this browser's refresh cookie included. The pair it
-      // returns cannot go into the HttpOnly cookie, so sign in again with the new password.
-      await apiJson("POST", USER_ME_CHANGE_PASSWORD, body);
+      await changePassword(currentPassword, newPassword);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      try {
-        await login({ username: profile?.username ?? "", password: body.new_password });
-        setPasswordSuccess(dict.passwordChanged);
-      } catch {
-        setPasswordError(dict.passwordChangedSignInAgain);
-      }
+      setPasswordSuccess(dict.passwordChanged);
     } catch (err) {
       setPasswordError(formatApiError(err, dict));
     } finally {

@@ -523,8 +523,6 @@ export const dictBg: Dictionary = {
   passwordMismatch: "Паролите не съвпадат.",
   emailChanged: "Имейл адресът беше променен.",
   passwordChanged: "Паролата беше променена.",
-  passwordChangedSignInAgain:
-    "Паролата беше променена, но сесията не можа да бъде подновена. Влезте отново с новата парола.",
   userCreated: "Потребителят е създаден.",
   userSaved: "Промените са запазени.",
   searchUsers: "Търси по потребителско име или имейл",

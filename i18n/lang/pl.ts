@@ -520,8 +520,6 @@ export const dictPl = {
   passwordMismatch: "Hasła nie są identyczne.",
   emailChanged: "Adres e-mail został zmieniony.",
   passwordChanged: "Hasło zostało zmienione.",
-  passwordChangedSignInAgain:
-    "Hasło zostało zmienione, ale nie udało się wznowić sesji. Zaloguj się ponownie nowym hasłem.",
   userCreated: "Użytkownik utworzony.",
   userSaved: "Zapisano zmiany.",
   searchUsers: "Szukaj po loginie lub e-mailu",

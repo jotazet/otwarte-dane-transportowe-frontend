@@ -12,7 +12,6 @@ export function userResetPasswordPath(id: number) {
 
 export const USER_ME = "/api/users/me/";
 export const USER_ME_CHANGE_EMAIL = "/api/users/me/change-email/";
-export const USER_ME_CHANGE_PASSWORD = "/api/users/me/change-password/";
 
 export const ALL_ASSIGNABLE_ROLES: AppRole[] = [
   "Admin",
@@ -66,9 +65,4 @@ export type MeProfile = UserRecord;
 export type ChangeEmailBody = {
   current_password: string;
   new_email: string;
-};
-
-export type ChangePasswordBody = {
-  current_password: string;
-  new_password: string;
 };
