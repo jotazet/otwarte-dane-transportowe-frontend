@@ -25,6 +25,7 @@ import { PlannerTrafficTab } from "@/components/plannerAdmin/PlannerTrafficTab";
 import { plannerErrorMessage } from "@/components/plannerAdmin/shared";
 import type { ApiJson } from "@/lib/api/http";
 import {
+  BUILDS_MAX,
   plannerAdminPaths,
   type BuildSchedule,
   type GraphBuild,
@@ -47,6 +48,8 @@ export type PlannerCore = {
   feeds: PlannerFeed[];
   rentals: PlannerRentalSource[];
   builds: GraphBuild[];
+  /** All builds on the backend; `builds` holds the newest of them. */
+  buildsCount: number;
   schedule: BuildSchedule;
   osm: OsmDownload[];
   settings: PlannerSettings;
@@ -76,6 +79,8 @@ export type PlannerAdminContext = {
   openDrawer: (target: DrawerTarget) => void;
   openTab: (tab: PlannerAdminTab) => void;
   requestBuild: () => Promise<void>;
+  /** Loads the next page of older builds into `core.builds`. */
+  showMoreBuilds: () => Promise<void>;
 };
 
 const BUILDS_PAGE_SIZE = 20;
@@ -83,24 +88,33 @@ const OSM_PAGE_SIZE = 20;
 /** While a build or an OSM download runs, the panel refreshes itself this often. */
 const BUSY_REFRESH_MS = 20_000;
 
-/** What changes while a build or an OSM download runs; the rest of the core stays as it is. */
-async function loadJobs(apiJson: ApiJson) {
+/**
+ * What changes while a build or an OSM download runs; the rest of the core stays as it is.
+ * `buildsShown` builds come in one page, so a new build cannot shift one out between pages.
+ */
+async function loadJobs(apiJson: ApiJson, buildsShown: number) {
   const get = <T,>(path: string) => apiJson<T>("GET", path);
   const [status, builds, osm] = await Promise.all([
     get<PlannerAdminStatus>(plannerAdminPaths.status),
-    get<PaginatedResponse<GraphBuild>>(`${plannerAdminPaths.builds}?page_size=${BUILDS_PAGE_SIZE}`),
+    get<PaginatedResponse<GraphBuild>>(`${plannerAdminPaths.builds}?page_size=${buildsShown}`),
     get<PaginatedResponse<OsmDownload>>(`${plannerAdminPaths.osm}?page_size=${OSM_PAGE_SIZE}`),
   ]);
-  return { status, builds: builds.results, osm: osm.results, loadedAt: new Date().toISOString() };
+  return {
+    status,
+    builds: builds.results,
+    buildsCount: builds.count,
+    osm: osm.results,
+    loadedAt: new Date().toISOString(),
+  };
 }
 
-async function loadCore(apiJson: ApiJson): Promise<PlannerCore> {
+async function loadCore(apiJson: ApiJson, buildsShown: number): Promise<PlannerCore> {
   const get = <T,>(path: string) => apiJson<T>("GET", path);
   const [status, feeds, rentals, builds, schedule, osm, settings] = await Promise.all([
     get<PlannerAdminStatus>(plannerAdminPaths.status),
     fetchAllPages<PlannerFeed>(get, plannerAdminPaths.feeds),
     fetchAllPages<PlannerRentalSource>(get, plannerAdminPaths.rentalSources),
-    get<PaginatedResponse<GraphBuild>>(`${plannerAdminPaths.builds}?page_size=${BUILDS_PAGE_SIZE}`),
+    get<PaginatedResponse<GraphBuild>>(`${plannerAdminPaths.builds}?page_size=${buildsShown}`),
     get<BuildSchedule>(plannerAdminPaths.schedule),
     get<PaginatedResponse<OsmDownload>>(`${plannerAdminPaths.osm}?page_size=${OSM_PAGE_SIZE}`),
     get<PlannerSettings>(plannerAdminPaths.settings),
@@ -110,6 +124,7 @@ async function loadCore(apiJson: ApiJson): Promise<PlannerCore> {
     feeds,
     rentals,
     builds: builds.results,
+    buildsCount: builds.count,
     schedule,
     osm: osm.results,
     settings,
@@ -158,9 +173,11 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
     cancel: dict.cancel,
   });
 
+  const buildsShown = React.useRef(BUILDS_PAGE_SIZE);
+
   const reload = React.useCallback(async () => {
     try {
-      setCore(await loadCore(apiJson));
+      setCore(await loadCore(apiJson, buildsShown.current));
       setLoadError(null);
     } catch (e) {
       setLoadError(plannerErrorMessage(e, dict));
@@ -183,7 +200,7 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
       if (document.visibilityState === "hidden") return;
       void (async () => {
         try {
-          const jobs = await loadJobs(apiJson);
+          const jobs = await loadJobs(apiJson, buildsShown.current);
           setCore((c) => (c ? { ...c, ...jobs } : c));
         } catch {
           // The next tick tries again; the panel keeps the last data.
@@ -242,6 +259,16 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
     }
   }, [apiJson, confirm, dict, notify, reload]);
 
+  const showMoreBuilds = React.useCallback(async () => {
+    buildsShown.current = Math.min(buildsShown.current + BUILDS_PAGE_SIZE, BUILDS_MAX);
+    try {
+      const jobs = await loadJobs(apiJson, buildsShown.current);
+      setCore((c) => (c ? { ...c, ...jobs } : c));
+    } catch (e) {
+      notify(plannerErrorMessage(e, dict), "error");
+    }
+  }, [apiJson, dict, notify]);
+
   if (!core) {
     return loadError ? (
       <Alert
@@ -271,6 +298,7 @@ function PlannerAdminPanel({ locale, dict }: { locale: string; dict: PlannerAdmi
     openDrawer: setDrawer,
     openTab,
     requestBuild,
+    showMoreBuilds,
   };
 
   return (

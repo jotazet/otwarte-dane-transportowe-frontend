@@ -16,6 +16,7 @@ import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import type { PlannerAdminDict } from "@/components/plannerAdmin/plannerAdminDict";
 import {
+  isBanActive,
   plannerAdminPaths,
   TRAFFIC_RANGES,
   type BuildStatus,
@@ -289,7 +290,11 @@ export async function saveRental(
 export async function liftBan(ctx: PlannerAdminContext, ban: IpBan) {
   try {
     await ctx.apiJson("DELETE", plannerAdminPaths.ipBan(ban.id));
-    ctx.notify(fill(ctx.dict.plannerAdminUnbanned, { network: ban.network }));
+    // An expired ban no longer blocks anyone: removing it only tidies the list.
+    const message = isBanActive(ban)
+      ? ctx.dict.plannerAdminUnbanned
+      : ctx.dict.plannerAdminBanDeleted;
+    ctx.notify(fill(message, { network: ban.network }));
   } catch (e) {
     ctx.notify(plannerErrorMessage(e, ctx.dict), "error");
   }

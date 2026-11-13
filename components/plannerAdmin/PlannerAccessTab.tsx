@@ -65,7 +65,7 @@ export function PlannerAccessTab({ ctx }: { ctx: PlannerAdminContext }) {
 
 function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
   const { apiJson, dict, locale } = ctx;
-  const [creating, setCreating] = React.useState(false);
+  const [dialog, setDialog] = React.useState<ApiKey | "new" | null>(null);
   const keys = useApiLoad(
     React.useCallback(
       () => fetchAllPages<ApiKey>((p) => apiJson("GET", p), plannerAdminPaths.apiKeys),
@@ -81,6 +81,16 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
     try {
       await apiJson("PATCH", plannerAdminPaths.apiKey(key.id), { is_active: false });
       ctx.notify(fill(dict.plannerAdminKeyRevokedToast, { name: key.name }));
+    } catch (e) {
+      ctx.notify(plannerErrorMessage(e, dict), "error");
+    }
+    keys.reload();
+  };
+
+  const reactivate = async (key: ApiKey) => {
+    try {
+      await apiJson("PATCH", plannerAdminPaths.apiKey(key.id), { is_active: true });
+      ctx.notify(fill(dict.plannerAdminKeyReactivatedToast, { name: key.name }));
     } catch (e) {
       ctx.notify(plannerErrorMessage(e, dict), "error");
     }
@@ -105,7 +115,7 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
           <Button
             variant="contained"
             startIcon={<MdAdd aria-hidden />}
-            onClick={() => setCreating(true)}
+            onClick={() => setDialog("new")}
           >
             {dict.plannerAdminNewKey}
           </Button>
@@ -171,12 +181,19 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
                         }
                       />
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                      <Button size="small" onClick={() => setDialog(key)}>
+                        {dict.plannerAdminEdit}
+                      </Button>
                       {key.is_active ? (
                         <Button size="small" color="error" onClick={() => void revoke(key)}>
                           {dict.plannerAdminKeyRevoke}
                         </Button>
-                      ) : null}
+                      ) : (
+                        <Button size="small" onClick={() => void reactivate(key)}>
+                          {dict.plannerAdminKeyReactivate}
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -187,9 +204,9 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
       ) : null}
       <PlannerApiKeyDialog
         ctx={ctx}
-        open={creating}
-        onClose={() => setCreating(false)}
-        onCreated={keys.reload}
+        target={dialog}
+        onClose={() => setDialog(null)}
+        onSaved={keys.reload}
       />
     </Card>
   );
@@ -198,6 +215,7 @@ function ApiKeysCard({ ctx }: { ctx: PlannerAdminContext }) {
 function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
   const { apiJson, dict, locale } = ctx;
   const [banFor, setBanFor] = React.useState<string | null>(null);
+  const [editing, setEditing] = React.useState<IpBan | null>(null);
   const bans = useApiLoad(
     React.useCallback(
       () => fetchAllPages<IpBan>((p) => apiJson("GET", p), plannerAdminPaths.ipBans),
@@ -274,9 +292,12 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
                             date: formatDateTime(ban.expires_at, locale),
                           })}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                    <Button size="small" onClick={() => setEditing(ban)}>
+                      {isBanActive(ban) ? dict.plannerAdminEdit : dict.plannerAdminBanRenew}
+                    </Button>
                     <Button size="small" onClick={() => void unban(ban)}>
-                      {dict.plannerAdminUnban}
+                      {isBanActive(ban) ? dict.plannerAdminUnban : dict.plannerAdminBanDelete}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -288,7 +309,11 @@ function BansCard({ ctx }: { ctx: PlannerAdminContext }) {
       <PlannerBanDialog
         ctx={ctx}
         network={banFor}
-        onClose={() => setBanFor(null)}
+        ban={editing}
+        onClose={() => {
+          setBanFor(null);
+          setEditing(null);
+        }}
         onBanned={bans.reload}
       />
     </Card>

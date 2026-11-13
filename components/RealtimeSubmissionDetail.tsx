@@ -6,21 +6,23 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
-import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
-import { PasswordTextField } from "@/components/PasswordTextField";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
 import { HistoryTimeline, type HistoryTimelineEvent } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
+import { RealtimeEndpointsEditor } from "@/components/submissions/RealtimeEndpointsEditor";
+import {
+  RealtimeStaticSubmissionSelect,
+  useEligibleStatics,
+} from "@/components/submissions/RealtimeStaticSubmissionSelect";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
@@ -30,19 +32,19 @@ import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
-import { authTypeOptions } from "@/lib/data/authTypes";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
+import { SOURCE_UPDATE_INTERVAL_DEFAULT } from "@/lib/data/intervalChoices";
 import {
-  hideOriginalOnAuthChange,
-  isHideOriginalLockedByAuth,
-  resolveHideOriginal,
-} from "@/lib/data/hideOriginalAuth";
-import {
-  isNoSourceUpdate,
-  parseSourceUpdateInterval,
-  SOURCE_UPDATE_INTERVAL_MAX,
-  SOURCE_UPDATE_INTERVAL_MIN,
-} from "@/lib/data/intervalChoices";
+  endpointPayload,
+  endpointsForProtocol,
+  isRealtimeProtocol,
+  nextEndpointUid,
+  parseEndpointInterval,
+  REALTIME_PROTOCOLS,
+  requiresStaticSubmission,
+  type RealtimeProtocol,
+  type RtEndpointDraft,
+} from "@/lib/data/realtimeEndpoints";
 import { formatApiError } from "@/lib/formatApiError";
 import { text } from "@/lib/format";
 import { formatRejectionReasons } from "@/lib/rejectionReasons";
@@ -76,16 +78,24 @@ type RtDetail = {
   history?: HistoryTimelineEvent[];
 };
 
-type EndpointDraft = {
-  id?: number;
-  endpoint_type: string;
-  url: string;
-  interval: string;
-  is_original: boolean;
-  hide_original: boolean;
-  auth_type: string;
-  auth_value: string;
-};
+function endpointDrafts(d: RtDetail): RtEndpointDraft[] {
+  return (d.endpoints ?? []).map((ep) => ({
+    uid: nextEndpointUid(),
+    endpoint_type: ep.endpoint_type ?? "",
+    url: ep.url ?? "",
+    interval: String(ep.interval ?? SOURCE_UPDATE_INTERVAL_DEFAULT),
+    storedInterval: ep.interval ?? undefined,
+    is_original: ep.is_original !== false,
+    hide_original: !!ep.hide_original,
+    auth_type: ep.auth_type ?? "",
+    auth_value: "",
+  }));
+}
+
+/** Compares endpoints as the API would receive them. */
+function sameEndpoints(a: RtEndpointDraft[], b: RtEndpointDraft[]): boolean {
+  return JSON.stringify(a.map(endpointPayload)) === JSON.stringify(b.map(endpointPayload));
+}
 
 export function RealtimeSubmissionDetail({
   locale,
@@ -110,7 +120,12 @@ export function RealtimeSubmissionDetail({
   const [name, setName] = React.useState("");
   const [note, setNote] = React.useState("");
   const [license, setLicense] = React.useState("");
-  const [endpointsDraft, setEndpointsDraft] = React.useState<EndpointDraft[]>([]);
+  const [protocol, setProtocol] = React.useState<RealtimeProtocol>("gtfs_rt");
+  const [staticSubId, setStaticSubId] = React.useState<number | "">("");
+  const [endpointsDraft, setEndpointsDraft] = React.useState<RtEndpointDraft[]>([]);
+  // The endpoints as loaded, to send `endpoints` only when one changed: the backend
+  // recreates them on every write, which loses their fetch history.
+  const [savedEndpoints, setSavedEndpoints] = React.useState<RtEndpointDraft[]>([]);
 
   const applyDetail = React.useCallback((d: RtDetail) => {
     setRow(d);
@@ -119,18 +134,11 @@ export function RealtimeSubmissionDetail({
     setName(d.name ?? "");
     setNote(d.note ?? "");
     setLicense(d.license ?? "");
-    setEndpointsDraft(
-      (d.endpoints ?? []).map((ep) => ({
-        id: typeof ep.id === "number" ? ep.id : undefined,
-        endpoint_type: String(ep.endpoint_type ?? ""),
-        url: String(ep.url ?? ""),
-        interval: typeof ep.interval === "number" ? String(ep.interval) : "60",
-        is_original: ep.is_original !== false,
-        hide_original: !!ep.hide_original,
-        auth_type: ep.auth_type ?? "",
-        auth_value: "",
-      })),
-    );
+    setProtocol(isRealtimeProtocol(d.protocol) ? d.protocol : "gtfs_rt");
+    setStaticSubId(d.static_submission ?? "");
+    const drafts = endpointDrafts(d);
+    setEndpointsDraft(drafts);
+    setSavedEndpoints(drafts);
   }, []);
 
   const authStatus = auth.status;
@@ -169,25 +177,46 @@ export function RealtimeSubmissionDetail({
 
   const listHref = submissionListPath(locale, listContext);
 
-  const authTypeSelectOptions = authTypeOptions(dict);
+  const user = perms.user;
+  const isOwner =
+    user?.userId != null && row?.submitted_by != null && user.userId === row.submitted_by;
+  const sourcePerms =
+    row && user
+      ? perms.feedSource({
+          isOwner,
+          currentStage: row.current_stage,
+          isRejected: row.is_rejected,
+          isHelper: hasHelperAccess(user),
+        })
+      : null;
+  // Stage 1 and after a rejection: the backend accepts a new protocol, static
+  // submission and set of endpoints.
+  const canEditStructure = sourcePerms?.canEditFullSource ?? false;
+  const eligible = useEligibleStatics(
+    canEditStructure && row ? row.transport_organization : null,
+    protocol,
+    dict,
+  );
+
+  function changeProtocol(value: string) {
+    if (!row || !isRealtimeProtocol(value)) return;
+    setProtocol(value);
+    setStaticSubId(value === row.protocol ? (row.static_submission ?? "") : "");
+    setEndpointsDraft((rows) => endpointsForProtocol(rows, value));
+  }
 
   async function saveMeta() {
-    if (!row || auth.status !== "authenticated" || !perms.user) return;
-    const user = perms.user;
-    const isOwner =
-      user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
-    const sourcePerms = perms.feedSource({
-      isOwner,
-      currentStage: row.current_stage,
-      isRejected: row.is_rejected,
-      isHelper: hasHelperAccess(user),
-    });
-    if (sourcePerms.canHelperReviewOnly) return;
+    if (!row || !sourcePerms || sourcePerms.canHelperReviewOnly) return;
     setError(null);
-    if (endpointsDraft.some((ep) => parseSourceUpdateInterval(ep.interval) === null)) {
+    if (endpointsDraft.some((ep) => parseEndpointInterval(ep) === null)) {
       setError(dict.sourceUpdateIntervalRange);
       return;
     }
+    if (canEditStructure && requiresStaticSubmission(protocol) && staticSubId === "") {
+      setError(dict.fieldRequired);
+      return;
+    }
+    const endpointsChanged = !sameEndpoints(endpointsDraft, savedEndpoints);
     try {
       const body: Record<string, unknown> = {
         note: note.trim(),
@@ -195,27 +224,20 @@ export function RealtimeSubmissionDetail({
       };
       if (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
         body.name = name.trim();
-        body.endpoints = endpointsDraft.map((e) => {
-          const o: Record<string, unknown> = {
-            endpoint_type: e.endpoint_type,
-            url: e.url.trim(),
-            interval: parseSourceUpdateInterval(e.interval) ?? 0,
-            is_original: e.is_original,
-            hide_original: resolveHideOriginal(e.auth_type, e.hide_original),
-          };
-          if (typeof e.id === "number") o.id = e.id;
-          if (e.auth_type) {
-            o.auth_type = e.auth_type;
-            if (e.auth_value.trim()) o.auth_value = e.auth_value.trim();
-          } else o.auth_type = "";
-          return o;
-        });
+        if (canEditStructure) {
+          if (protocol !== row.protocol) body.protocol = protocol;
+          const staticId = staticSubId === "" ? null : staticSubId;
+          if (staticId !== (row.static_submission ?? null)) body.static_submission = staticId;
+        }
+        if (endpointsChanged) body.endpoints = endpointsDraft.map(endpointPayload);
       } else if (sourcePerms.canEditLimitedMeta) {
-        body.endpoints = endpointsDraft.map((e) => ({
-          endpoint_type: e.endpoint_type,
-          interval: Math.max(0, Number(e.interval) || 0),
-          ...(typeof e.id === "number" ? { id: e.id } : {}),
-        }));
+        // Only intervals can change here; the backend fills in the other fields.
+        if (endpointsChanged) {
+          body.endpoints = endpointsDraft.map((e) => ({
+            endpoint_type: e.endpoint_type,
+            interval: parseEndpointInterval(e),
+          }));
+        }
       } else return;
 
       await auth.apiJson("PATCH", submissionsPaths.realtimeDetail(row.id), body);
@@ -278,7 +300,7 @@ export function RealtimeSubmissionDetail({
     }
   }
 
-  if (auth.status !== "authenticated" || !row) {
+  if (auth.status !== "authenticated" || !row || !user || !sourcePerms) {
     return (
       <SubmissionDetailAuthGate locale={locale} dict={dict} error={error} hasData={!!row}>
         <></>
@@ -286,7 +308,6 @@ export function RealtimeSubmissionDetail({
     );
   }
 
-  const user = perms.user!;
   const forbidden = !canViewSubmissionInContext(user, {
     listContext,
     submittedBy: row.submitted_by,
@@ -300,14 +321,6 @@ export function RealtimeSubmissionDetail({
     );
   }
 
-  const isOwner =
-    user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
-  const sourcePerms = perms.feedSource({
-    isOwner,
-    currentStage: row.current_stage,
-    isRejected: row.is_rejected,
-    isHelper: hasHelperAccess(user),
-  });
   const showHelperPanel = hasHelperAccess(user) || user.isDjangoAdmin;
   const canSaveProvider =
     !sourcePerms.canHelperReviewOnly &&
@@ -405,6 +418,26 @@ export function RealtimeSubmissionDetail({
       {!sourcePerms.canHelperReviewOnly && (isOwner || user.isDjangoAdmin) ? (
         <FormSection title={dict.endpoints}>
           <Stack spacing={2}>
+            {canEditStructure ? (
+              <>
+                <InlineSelect
+                  fullWidth
+                  label={dict.protocol}
+                  value={protocol}
+                  onChange={changeProtocol}
+                  options={REALTIME_PROTOCOLS.map((p) => ({ value: p, label: p }))}
+                />
+                {requiresStaticSubmission(protocol) ? (
+                  <RealtimeStaticSubmissionSelect
+                    dict={dict}
+                    {...eligible}
+                    value={staticSubId}
+                    onChange={setStaticSubId}
+                    currentId={protocol === row.protocol ? (row.static_submission ?? null) : null}
+                  />
+                ) : null}
+              </>
+            ) : null}
             <TextField
               label={dict.name}
               value={name}
@@ -423,141 +456,15 @@ export function RealtimeSubmissionDetail({
               value={license}
               onChange={(e) => setLicense(e.target.value)}
             />
-            {endpointsDraft.map((ep, idx) => (
-              <Stack
-                key={ep.id ?? idx}
-                spacing={1}
-                sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}
-              >
-                <TextField
-                  label={dict.feedTypes}
-                  value={ep.endpoint_type}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setEndpointsDraft((prev) =>
-                      prev.map((x, i) => (i === idx ? { ...x, endpoint_type: v } : x)),
-                    );
-                  }}
-                  disabled={fieldsLocked}
-                />
-                <TextField
-                  label={dict.feedUrl}
-                  value={ep.url}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setEndpointsDraft((prev) =>
-                      prev.map((x, i) => (i === idx ? { ...x, url: v } : x)),
-                    );
-                  }}
-                  disabled={fieldsLocked}
-                />
-                <TextField
-                  label={dict.sourceUpdateInterval}
-                  type="number"
-                  value={ep.interval}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setEndpointsDraft((prev) =>
-                      prev.map((x, i) =>
-                        i === idx
-                          ? {
-                              ...x,
-                              interval: v,
-                              hide_original: isNoSourceUpdate(v) ? false : x.hide_original,
-                            }
-                          : x,
-                      ),
-                    );
-                  }}
-                  disabled={fieldsLocked}
-                  required
-                  slotProps={{
-                    htmlInput: {
-                      min: SOURCE_UPDATE_INTERVAL_MIN,
-                      max: SOURCE_UPDATE_INTERVAL_MAX,
-                      step: 1,
-                      inputMode: "numeric",
-                    },
-                  }}
-                />
-                <InlineSelect
-                  fullWidth
-                  label={dict.authType}
-                  value={ep.auth_type}
-                  onChange={(v) => {
-                    setEndpointsDraft((prev) =>
-                      prev.map((x, i) =>
-                        i === idx
-                          ? { ...x, auth_type: v, hide_original: hideOriginalOnAuthChange(v) }
-                          : x,
-                      ),
-                    );
-                  }}
-                  options={authTypeSelectOptions}
-                  disabled={fieldsLocked}
-                />
-                {ep.auth_type ? (
-                  <PasswordTextField
-                    label={dict.authValue}
-                    value={ep.auth_value}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setEndpointsDraft((prev) =>
-                        prev.map((x, i) => (i === idx ? { ...x, auth_value: v } : x)),
-                      );
-                    }}
-                    helperText={dict.authValueEditHint}
-                    autoComplete="new-password"
-                    disabled={fieldsLocked}
-                    showPasswordLabel={dict.showPassword}
-                    hidePasswordLabel={dict.hidePassword}
-                  />
-                ) : null}
-                <Stack direction="row" spacing={2}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={ep.is_original}
-                        onChange={(e) =>
-                          setEndpointsDraft((prev) =>
-                            prev.map((x, i) =>
-                              i === idx ? { ...x, is_original: e.target.checked } : x,
-                            ),
-                          )
-                        }
-                        disabled={fieldsLocked}
-                      />
-                    }
-                    label={dict.original}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={resolveHideOriginal(ep.auth_type, ep.hide_original)}
-                        onChange={(e) =>
-                          setEndpointsDraft((prev) =>
-                            prev.map((x, i) =>
-                              i === idx ? { ...x, hide_original: e.target.checked } : x,
-                            ),
-                          )
-                        }
-                        disabled={
-                          fieldsLocked ||
-                          isHideOriginalLockedByAuth(ep.auth_type) ||
-                          isNoSourceUpdate(ep.interval)
-                        }
-                      />
-                    }
-                    label={dict.hideOriginal}
-                  />
-                </Stack>
-                {row.static_submission ? (
-                  <Typography variant="caption" color="text.secondary">
-                    {dict.downloadRealtimeHint}
-                  </Typography>
-                ) : null}
-              </Stack>
-            ))}
+            <RealtimeEndpointsEditor
+              dict={dict}
+              protocol={protocol}
+              endpoints={endpointsDraft}
+              onChange={setEndpointsDraft}
+              authValueHint={dict.authValueEditHint}
+              canAddRemove={canEditStructure}
+              sourceLocked={fieldsLocked}
+            />
             {canSaveProvider && (
               <Button variant="contained" onClick={() => void saveMeta()}>
                 {dict.save}
@@ -566,6 +473,9 @@ export function RealtimeSubmissionDetail({
           </Stack>
           {row.static_submission && row.endpoints?.some((ep) => typeof ep.id === "number") ? (
             <Stack spacing={1.5} sx={{ mt: 2 }}>
+              <Typography variant="caption" color="text.secondary">
+                {dict.downloadRealtimeHint}
+              </Typography>
               {(row.endpoints ?? []).map((ep) =>
                 typeof ep.id === "number" ? (
                   <Stack

@@ -24,7 +24,7 @@ import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasAdminAccess } from "@/lib/auth/permissions";
 import { fetchAllPages } from "@/lib/api/types";
-import { USERS_BASE, type UserRecord } from "@/lib/api/users";
+import { isProtectedAccount, USERS_BASE, type UserRecord } from "@/lib/api/users";
 import { formatRole, formatRoles as formatRoleList } from "@/lib/auth/roleLabels";
 import { paths } from "@/lib/nav/routes";
 import { text } from "@/lib/format";
@@ -250,6 +250,14 @@ export function UsersHub({ locale, dict }: { locale: string; dict: Dictionary })
                         >
                           {text(u.username)}
                         </Link>
+                        {isProtectedAccount(u) ? (
+                          <Chip
+                            size="small"
+                            variant="outlined"
+                            label={dict.userProtectedAccount}
+                            sx={{ ml: 1 }}
+                          />
+                        ) : null}
                       </TableCell>
                       <TableCell>{text(u.email)}</TableCell>
                       <TableCell>{text(u.first_name)}</TableCell>
