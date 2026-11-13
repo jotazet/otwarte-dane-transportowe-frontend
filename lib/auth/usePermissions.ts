@@ -5,6 +5,7 @@ import {
   canAdminEditSourceOnPublishedStages,
   canBlogEditPost,
   canDeleteFeedSubmission,
+  canDeleteTransportOrganization,
   canEditFeedSourceFields,
   canEditFullSource,
   canHelperReviewOnly,
@@ -42,6 +43,7 @@ export function usePermissions() {
     hasHelperAccess: () => (user ? hasHelperAccess(user) : false),
     hasDataProviderAccess: () => (user ? hasDataProviderAccess(user) : false),
     hasBlogManageAccess: () => (user ? hasBlogManageAccess(user) : false),
+    canDeleteTransportOrganization: () => (user ? canDeleteTransportOrganization(user) : false),
     canBlogEditPost: (authorId: number | null | undefined) =>
       user ? canBlogEditPost(user, authorId) : false,
     feedSource: (

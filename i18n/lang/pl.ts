@@ -362,7 +362,12 @@ export const dictPl = {
   downloadRealtimeHint:
     "Pobieranie wymaga zsynchronizowanego pliku na serwerze - w przeciwnym razie nie uda się go pobrać.",
   filteredByOrganization: "Zgłoszenia organizacji #{id}",
-  confirmDeleteOrganization: "Usunąć tę organizację?",
+  organizationDeleteTitle: "Usunąć organizację „{name}”?",
+  organizationDeleteConsequence:
+    "Zostaną usunięte także wszystkie zgłoszenia tej organizacji, w tym opublikowane feedy. Ich adresy URL w katalogu przestaną działać.",
+  organizationDeleteCounts: "Liczba zgłoszeń: {submissions}, w tym opublikowanych: {published}.",
+  organizationDeleteIrreversible: "Tej operacji nie można cofnąć.",
+  organizationDeleteConfirm: "Usuń organizację",
   confirmDeleteStatus: "Usunąć ten status?",
   confirmDeleteProvider: "Usunąć tego dostawcę danych?",
   confirmDeletePost: "Usunąć ten wpis?",

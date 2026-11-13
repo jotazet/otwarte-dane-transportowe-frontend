@@ -1,5 +1,6 @@
 "use client";
 
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -14,6 +15,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 import { MdAdd, MdDelete, MdEdit } from "react-icons/md";
 
 import { OrganizationProvidersPanel } from "@/components/OrganizationProvidersPanel";
@@ -23,6 +25,7 @@ import type { TransportOrganizationDetail } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasHelperAccess } from "@/lib/auth/permissions";
+import { formatApiError } from "@/lib/formatApiError";
 import { caseStatusLabel } from "@/lib/cases/statusChoices";
 import { formatDateTime, text } from "@/lib/format";
 import { tableHeadRowSx } from "@/lib/ui/tableSx";
@@ -48,17 +51,19 @@ export function OrganizationDetailBody({
   const auth = useAuth();
   const router = useRouter();
   const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
+  const [error, setError] = React.useState<string | null>(null);
   const canManage =
     auth.status === "authenticated" &&
     hasHelperAccess({ roles: auth.user.roles, isDjangoAdmin: auth.user.isDjangoAdmin });
 
   async function deleteStatus(id: number) {
     if (!(await confirm(dict.confirmDeleteStatus, { confirmLabel: dict.delete }))) return;
+    setError(null);
     try {
       await auth.apiJson("DELETE", `/api/cases/case-statuses/${id}/`);
       router.refresh();
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(formatApiError(err, dict));
     }
   }
 
@@ -120,6 +125,7 @@ export function OrganizationDetailBody({
               </Tooltip>
             ) : null}
           </Stack>
+          {error ? <Alert severity="error">{error}</Alert> : null}
           {statuses.length ? (
             <Card>
               <CardContent>

@@ -378,7 +378,12 @@ export const dictDe: Dictionary = {
   downloadRealtimeHint:
     "Erfordert eine synchronisierte Datei auf dem Server - sonst schlägt der Download fehl.",
   filteredByOrganization: "Einreichungen der Organisation #{id}",
-  confirmDeleteOrganization: "Diese Organisation löschen?",
+  organizationDeleteTitle: "Organisation „{name}“ löschen?",
+  organizationDeleteConsequence:
+    "Alle Einreichungen dieser Organisation werden ebenfalls gelöscht, auch veröffentlichte Feeds. Ihre URLs im Katalog funktionieren dann nicht mehr.",
+  organizationDeleteCounts: "Einreichungen: {submissions}, davon veröffentlicht: {published}.",
+  organizationDeleteIrreversible: "Dieser Vorgang kann nicht rückgängig gemacht werden.",
+  organizationDeleteConfirm: "Organisation löschen",
   confirmDeleteStatus: "Diesen Status löschen?",
   confirmDeleteProvider: "Diesen Datenanbieter löschen?",
   confirmDeletePost: "Diesen Beitrag löschen?",

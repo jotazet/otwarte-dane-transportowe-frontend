@@ -13,8 +13,16 @@ import { CrudFormCard } from "@/components/layout/CrudFormCard";
 import { useConfirm } from "@/components/layout/useConfirm";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
+import { submissionsPaths } from "@/lib/api/submissions";
+import {
+  fetchAllPages,
+  type FeedSubmissionListItem,
+  type RealtimeSubmissionListItem,
+} from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { usePermissions } from "@/lib/auth/usePermissions";
 import { formatApiError } from "@/lib/formatApiError";
+import { formatNumber } from "@/lib/format";
 import { isValidEmail, isValidUrl } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
@@ -37,6 +45,7 @@ export function OrganizationForm({
   };
 }) {
   const { apiJson } = useAuth();
+  const canDelete = usePermissions().canDeleteTransportOrganization();
   const router = useRouter();
   const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const p = paths(locale);
@@ -87,9 +96,46 @@ export function OrganizationForm({
     }
   }
 
+  /** Submissions deleted together with the organization, or null when they cannot be listed. */
+  async function countSubmissions(id: number) {
+    try {
+      const get = <T,>(path: string) => apiJson<T>("GET", path);
+      const q = `?transport_organization=${id}`;
+      const [staticRows, realtimeRows] = await Promise.all([
+        fetchAllPages<FeedSubmissionListItem>(get, `${submissionsPaths.feedList}${q}`),
+        fetchAllPages<RealtimeSubmissionListItem>(get, `${submissionsPaths.realtimeList}${q}`),
+      ]);
+      const rows = [...staticRows, ...realtimeRows];
+      return {
+        submissions: rows.length,
+        published: rows.filter((r) => r.current_stage === 4).length,
+      };
+    } catch {
+      return null;
+    }
+  }
+
   async function remove() {
     if (orgId == null) return;
-    if (!(await confirm(dict.confirmDeleteOrganization, { confirmLabel: dict.delete }))) return;
+    setPending(true);
+    const counts = await countSubmissions(orgId);
+    setPending(false);
+    const message = [
+      dict.organizationDeleteConsequence,
+      counts
+        ? dict.organizationDeleteCounts
+            .replace("{submissions}", formatNumber(counts.submissions, locale))
+            .replace("{published}", formatNumber(counts.published, locale))
+        : null,
+      dict.organizationDeleteIrreversible,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const title = dict.organizationDeleteTitle.replace(
+      "{name}",
+      initial?.transport_organization?.trim() || name.trim(),
+    );
+    if (!(await confirm(message, { title, confirmLabel: dict.organizationDeleteConfirm }))) return;
     setPending(true);
     try {
       await apiJson("DELETE", casesPaths.organization(orgId));
@@ -164,8 +210,8 @@ export function OrganizationForm({
             cancelLabel={dict.cancel}
             pending={pending}
             saveDisabled={!name.trim() || !region.trim()}
-            deleteLabel={orgId != null ? dict.delete : undefined}
-            onDelete={orgId != null ? () => void remove() : undefined}
+            deleteLabel={orgId != null && canDelete ? dict.delete : undefined}
+            onDelete={orgId != null && canDelete ? () => void remove() : undefined}
             hint={orgId != null ? dict.caseHint : undefined}
           />
         </Stack>

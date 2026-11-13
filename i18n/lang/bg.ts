@@ -364,7 +364,12 @@ export const dictBg: Dictionary = {
   downloadRealtimeHint:
     "Изтеглянето изисква синхронизиран файл на сървъра - в противен случай няма да е успешно.",
   filteredByOrganization: "Заявки на организация #{id}",
-  confirmDeleteOrganization: "Да се изтрие ли тази организация?",
+  organizationDeleteTitle: "Да се изтрие ли организацията „{name}“?",
+  organizationDeleteConsequence:
+    "Ще бъдат изтрити и всички заявки на тази организация, включително публикуваните фийдове. Техните URL адреси в каталога ще спрат да работят.",
+  organizationDeleteCounts: "Заявки: {submissions}, от тях публикувани: {published}.",
+  organizationDeleteIrreversible: "Това действие не може да бъде отменено.",
+  organizationDeleteConfirm: "Изтрий организацията",
   confirmDeleteStatus: "Да се изтрие ли този статус?",
   confirmDeleteProvider: "Да се изтрие ли този доставчик на данни?",
   confirmDeletePost: "Да се изтрие ли тази публикация?",

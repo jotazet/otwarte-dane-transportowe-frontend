@@ -360,7 +360,12 @@ export const dictEn: Dictionary = {
   downloadRealtimeHint:
     "Requires a synchronized file on the server - otherwise the download will fail.",
   filteredByOrganization: "Submissions of organization #{id}",
-  confirmDeleteOrganization: "Delete this organization?",
+  organizationDeleteTitle: "Delete the organization “{name}”?",
+  organizationDeleteConsequence:
+    "All submissions of this organization will be deleted too, published feeds included. Their URLs in the catalogue will stop working.",
+  organizationDeleteCounts: "Submissions: {submissions}, of which published: {published}.",
+  organizationDeleteIrreversible: "This cannot be undone.",
+  organizationDeleteConfirm: "Delete organization",
   confirmDeleteStatus: "Delete this status?",
   confirmDeleteProvider: "Delete this data provider?",
   confirmDeletePost: "Delete this post?",
