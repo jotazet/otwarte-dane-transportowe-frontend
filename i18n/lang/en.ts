@@ -439,6 +439,9 @@ export const dictEn: Dictionary = {
   addUser: "Add user",
   userActive: "Active",
   userInactive: "Inactive",
+  userProtectedAccount: "Protected account",
+  userProtectedAccountNotice:
+    "This account has access to the Django admin site. Only a superuser can edit it, delete it or reset its password.",
   userRoles: "Roles",
   email: "Email",
   accountStatus: "Account status",

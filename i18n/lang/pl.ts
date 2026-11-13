@@ -441,6 +441,9 @@ export const dictPl = {
   addUser: "Dodaj użytkownika",
   userActive: "Aktywny",
   userInactive: "Nieaktywny",
+  userProtectedAccount: "Konto chronione",
+  userProtectedAccountNotice:
+    "To konto ma dostęp do panelu administracyjnego Django. Edytować je, usuwać i resetować jego hasło może tylko superużytkownik.",
   userRoles: "Role",
   email: "E-mail",
   accountStatus: "Status konta",
