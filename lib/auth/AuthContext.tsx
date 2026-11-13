@@ -15,7 +15,7 @@ import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissio
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
 import type { RoleSet } from "@/lib/auth/roles";
 
-type Tokens = {
+export type Tokens = {
   access: string;
   refresh: string;
 };
@@ -38,6 +38,8 @@ export function isAuthReady(status: AuthStatus): status is "anonymous" | "authen
 type AuthContextValue = AuthState & {
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => void;
+  /** Stores a token pair the API returned outside login and refresh (password change). */
+  storeTokens: (tokens: Tokens) => void;
   getAccessToken: () => string | null;
   apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
@@ -168,6 +170,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           applyTokens(next);
           return next;
         } catch {
+          // Another tab may have rotated the same refresh token a moment
+          // earlier; its new pair is in storage and still valid.
+          const current = readStoredTokens();
+          if (current && current.refresh !== stored.refresh) {
+            applyTokens(current);
+            return current;
+          }
           clearAuth();
           return null;
         }
@@ -205,8 +214,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = React.useCallback(() => {
+    // Blacklist the refresh token so a copy of it stops working. The local
+    // session ends whether or not the request succeeds.
+    const refresh = readStoredTokens()?.refresh;
+    if (refresh) postJson("/api/auth/logout/", { refresh }).catch(() => {});
     clearAuth();
   }, [clearAuth]);
+
+  // Sign-in, refresh and sign-out in another tab change the stored tokens;
+  // follow them so this tab does not look signed in after a sign-out there.
+  React.useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      // A null key means the whole storage was cleared.
+      if (e.key !== STORAGE_KEY && e.key !== null) return;
+      const tokens = readStoredTokens();
+      if (tokens) {
+        setState({ status: "authenticated", tokens, user: userFromAccess(tokens.access) });
+      } else {
+        setState({ status: "anonymous", user: null, tokens: null });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const getAccessToken = React.useCallback(() => {
     if (state.status !== "authenticated") return null;
@@ -323,12 +353,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
       logout,
+      storeTokens: applyTokens,
       getAccessToken,
       apiJson,
       apiForm,
       apiBlob,
     }),
-    [apiBlob, apiForm, apiJson, getAccessToken, login, logout, state],
+    [apiBlob, apiForm, apiJson, applyTokens, getAccessToken, login, logout, state],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

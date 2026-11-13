@@ -13,6 +13,7 @@ import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { formatApiError } from "@/lib/formatApiError";
+import { CASES_MAX_LENGTH } from "@/lib/cases/maxLength";
 import { isValidEmail, isValidUrl } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
@@ -105,12 +106,14 @@ export function DataProviderForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.providerName } }}
             disabled={pending}
           />
           <TextField
             label={dict.website}
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.website } }}
             disabled={pending}
           />
           <TextField
@@ -118,6 +121,7 @@ export function DataProviderForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.email } }}
             disabled={pending}
           />
           <CrudFormActions

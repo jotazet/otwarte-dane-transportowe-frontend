@@ -232,6 +232,15 @@ export const dictEn: Dictionary = {
       "You have reached the daily limit of 10 reactions. Try again tomorrow.",
     "blog.too_many_tags": "A post can have at most 5 tags.",
     "blog.image_too_large": "The image exceeds the maximum size.",
+    "blog.tag_too_long": "A tag can have at most 16 characters.",
+    "fetch.credential_undecryptable":
+      "The ODT server cannot decrypt the stored source credentials, so it did not fetch the feed. The problem is on ODT's side: the ODT team must correct the encryption key configuration.",
+    "gtfs_validation.file_missing": "The feed file is not available on the ODT server.",
+    "gtfs_validation.validator_unavailable": "The GTFS validator could not be started.",
+    "gtfs_validation.validator_failed": "The GTFS validator stopped or returned no report.",
+    "gtfs_validation.timeout": "Validation did not finish within the time limit.",
+    "gtfs_validation.credential_undecryptable":
+      "The ODT server cannot decrypt the stored source credentials, so it did not fetch the feed for validation.",
   },
   addFeed: "Add feed",
   myFeeds: "My feeds",
@@ -289,6 +298,28 @@ export const dictEn: Dictionary = {
   staticSourceFile: "Upload file",
   chooseFile: "Choose file",
   noFileSelected: "No file selected",
+  staticSourceResubmitHint:
+    "After you save changes to the source, the submission returns to data verification.",
+  staticSourceFileRequired: "Choose a file to upload.",
+  staticCurrentFile: "Current file: {name}",
+  staticChooseNewFile: "Choose new file",
+  submissionFeedStatusSection: "Feed status",
+  submissionGtfsValidation: "GTFS validation",
+  submissionValidationStatusLabels: {
+    pending: "In progress",
+    valid: "No errors",
+    invalid: "Errors found",
+    error: "Not run",
+  },
+  submissionValidationErrorHint:
+    "Validation could not run because of a problem on ODT's side. The ODT team will run it again.",
+  submissionFetchAutoPausedHint:
+    "Fetching was paused automatically after repeated failures. ODT's server retries once a day and returns to the normal schedule after a successful fetch.",
+  submissionFetchManualPausedHint: "Fetching was paused by the ODT team.",
+  submissionFetchErrorsRecent: "Fetch errors in the last 30 days",
+  submissionFetchErrorsEmpty: "No fetch errors in the last 30 days.",
+  submissionFetchHttpError: "HTTP error {status}",
+  submissionLinkedRealtimeSection: "Linked realtime submissions",
   unnamed: "unnamed",
   tabStaticSubmission: "Static submission",
   tabRealtimeSubmission: "Realtime submission",
@@ -325,7 +356,8 @@ export const dictEn: Dictionary = {
   rejected: "Rejected",
   published: "Published",
   rejectionCause: "Rejection cause",
-  rejectionCauseHint: "Optional - provide when rejecting a submission.",
+  rejectionCauseHint:
+    "Required. Describe what needs to be corrected – the submitter will see this text.",
   realtimeRejectionReasons: {
     "realtime.static_submission_missing":
       "The realtime feed is not linked to a static submission. For GTFS-RT and SIRI, select a published static submission.",
@@ -349,6 +381,9 @@ export const dictEn: Dictionary = {
       'Could not store the first copy of data from endpoint "{endpoint}" on the ODT server. Try again later.',
   },
   realtimeRejectionReasonUnknown: "The submission was rejected during automatic verification.",
+  gtfsValidationNotice: "GTFS validator: {code}, occurrences: {count}",
+  gtfsValidationRejectedGeneric:
+    "The feed failed automatic GTFS validation or could not be downloaded for validation. Check the URL and the file contents.",
   applyStage: "Apply stage",
   rejectSubmission: "Reject",
   reviewSubmission: "Submission review",
@@ -439,6 +474,9 @@ export const dictEn: Dictionary = {
   addUser: "Add user",
   userActive: "Active",
   userInactive: "Inactive",
+  userProtectedAccount: "Protected account",
+  userProtectedAccountNotice:
+    "This account has access to the Django admin site. Only a superuser can edit it, delete it or reset its password.",
   userRoles: "Roles",
   email: "Email",
   accountStatus: "Account status",
@@ -501,10 +539,15 @@ export const dictEn: Dictionary = {
   fetchErrorsDays: "Range (days)",
   fetchErrorType: "Error type",
   fetchErrorSource: "Source",
-  fetchErrorMessage: "Message",
+  fetchErrorMessage: "Details",
   fetchErrorDate: "Date",
   fetchErrorsEmpty: "No fetch errors in the selected range.",
   fetchErrorsTotal: "Total errors: {n}",
+  fetchErrorsEndpointType: "Endpoint type",
+  fetchErrorHttpStatus: "HTTP response code: {status}",
+  fetchPauseAfterFailures: "Consecutive failed fetches: {n}",
+  technicalDetailsShow: "Show technical details",
+  technicalDetailsHide: "Hide technical details",
   sourceStatic: "Static",
   sourceRealtime: "Realtime",
   fetchStatusLabels: {
@@ -518,6 +561,7 @@ export const dictEn: Dictionary = {
     connection_error: "Connection error",
     http_error: "HTTP error",
     invalid_content: "Invalid content",
+    auth_error: "Credential error",
   },
   metaFeedOpsTitle: "Feed management – proxy fetching",
   metaFeedOpsDescription:
@@ -812,6 +856,20 @@ export const dictEn: Dictionary = {
       "The feed has no trips in the graph window (from yesterday to two months ahead).",
     "planner.rt_url_blocked":
       "The URL leads to a private network, so the planner does not poll it.",
+    "planner.rt_url_unsupported":
+      "The URL contains the characters ${, which OTP reads as a variable, so the planner does not poll it.",
+    "planner.feed_other_organization": "Select a feed of the same organization.",
+    "planner.feed_not_gtfs": "Select a GTFS submission.",
+    "planner.feed_not_gbfs": "Select a GBFS submission.",
+    "planner.invalid_feed_id":
+      "The ID must have 2 to 32 characters: lowercase letters, digits and hyphens. It cannot start with a hyphen.",
+    "planner.feed_id_immutable": "The feed ID cannot be changed.",
+    "planner.invalid_network":
+      "Invalid value. Enter an IPv4 or IPv6 address or network, or, as a network ID, 2 to 32 characters: lowercase letters, digits and hyphens.",
+    "planner.network_immutable": "The network ID cannot be changed.",
+    "planner.invalid_range": "The start of the range must be before its end.",
+    "planner.too_many_buckets":
+      "The range is too long for the selected interval. Select a shorter range or a longer interval.",
     "planner.rental_source_not_published": "The GBFS submission is no longer published.",
     "planner.rental_source_without_gbfs": "The submission has no gbfs.json endpoint.",
     "planner.rental_source_requires_auth":
@@ -862,6 +920,8 @@ export const dictEn: Dictionary = {
   plannerAdminBuildsHint:
     "Polish time. The served graph and one previous graph are kept, so only the previous one can be restored.",
   plannerAdminBuildsEmpty: "The graph has not been built yet.",
+  plannerAdminBuildsShown: "Showing {shown} of {total}",
+  plannerAdminBuildsShowMore: "Show older builds",
   plannerAdminColNumber: "No.",
   plannerAdminColState: "Status",
   plannerAdminColStart: "Start",
@@ -1101,6 +1161,22 @@ export const dictEn: Dictionary = {
   plannerAdminBanExpired: "Expired: {date}",
   plannerAdminBanAddedBy: "Added by: {user}",
   plannerAdminUnban: "Unblock",
+  plannerAdminEdit: "Edit",
+  plannerAdminKeyEditTitle: "Edit API key",
+  plannerAdminKeySave: "Save key",
+  plannerAdminKeySaved: "The key “{name}” has been saved.",
+  plannerAdminKeySaveFailed: "Could not save the key. Check the email address and the limits.",
+  plannerAdminKeyReactivate: "Reactivate",
+  plannerAdminKeyReactivatedToast: "The key “{name}” is active again.",
+  plannerAdminBanEditTitle: "Edit block",
+  plannerAdminBanSave: "Save block",
+  plannerAdminBanSaved: "Saved the block on {network}.",
+  plannerAdminBanSaveFailed:
+    "Could not save the block. The address may be invalid or already blocked.",
+  plannerAdminBanExpiryKeep: "Unchanged ({date})",
+  plannerAdminBanRenew: "Renew",
+  plannerAdminBanDelete: "Delete",
+  plannerAdminBanDeleted: "Removed the expired block on {network}.",
   plannerAdminPublicApiTitle: "Public API",
   plannerAdminPublicApiSwitch: "Public planner API",
   plannerAdminPublicApiOnBody: "Endpoints under /api/planner/v1/ respond to all clients.",

@@ -47,3 +47,15 @@ export function formatApiError(
       return dict.apiErrorGeneric;
   }
 }
+
+/**
+ * The translation of a code the backend stores in a text field (`validation_message`, a fetch
+ * error's `message`), or `undefined` when the value is not a known code.
+ */
+export function errorCodeLabel(
+  value: string | null | undefined,
+  dict: Pick<Dictionary, "apiErrorCodes">,
+): string | undefined {
+  const known: Record<string, string> = dict.apiErrorCodes;
+  return value && Object.hasOwn(known, value) ? known[value] : undefined;
+}

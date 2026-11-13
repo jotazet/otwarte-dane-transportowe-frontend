@@ -21,11 +21,13 @@ import { ApiError } from "@/lib/api/http";
 import {
   LIMIT_GROUPS,
   plannerAdminPaths,
+  type ApiKey,
   type CreatedApiKey,
   type LimitGroup,
 } from "@/lib/api/plannerAdmin";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { useCopyToClipboard } from "@/lib/ui/useCopyToClipboard";
+import { fill } from "@/lib/i18n/fill";
 
 type Draft = { name: string; email: string; note: string; limits: Record<LimitGroup, string> };
 
@@ -36,19 +38,38 @@ const EMPTY: Draft = {
   limits: { plan: "", realtime: "", lookup: "" },
 };
 
-/** Creates a key and shows the plain key once; the backend keeps only its hash. */
+function keyDraft(key: ApiKey): Draft {
+  const limit = (value: number | null) => (value === null ? "" : String(value));
+  return {
+    name: key.name,
+    email: key.contact_email,
+    note: key.note,
+    limits: {
+      plan: limit(key.plan_per_minute),
+      realtime: limit(key.realtime_per_minute),
+      lookup: limit(key.lookup_per_minute),
+    },
+  };
+}
+
+/**
+ * Creates a key and shows the plain key once (the backend keeps only its hash), or edits the
+ * name, contact and limits of an existing one.
+ */
 export function PlannerApiKeyDialog({
   ctx,
-  open,
+  target,
   onClose,
-  onCreated,
+  onSaved,
 }: {
   ctx: PlannerAdminContext;
-  open: boolean;
+  /** "new" to create a key, a key to edit it, null when closed. */
+  target: ApiKey | "new" | null;
   onClose: () => void;
-  onCreated: () => void;
+  onSaved: () => void;
 }) {
   const { dict } = ctx;
+  const editing = target !== null && target !== "new" ? target : null;
   const [draft, setDraft] = React.useState<Draft>(EMPTY);
   const [created, setCreated] = React.useState<string | null>(null);
   const { copied, copy } = useCopyToClipboard();
@@ -61,7 +82,7 @@ export function PlannerApiKeyDialog({
   );
 
   const reset = () => {
-    setDraft(EMPTY);
+    setDraft(editing ? keyDraft(editing) : EMPTY);
     setCreated(null);
     setTouched(false);
     setError(null);
@@ -73,26 +94,35 @@ export function PlannerApiKeyDialog({
     if (nameMissing || badLimit) return;
     setSending(true);
     setError(null);
+    const body = {
+      name: draft.name.trim(),
+      contact_email: draft.email.trim(),
+      note: draft.note.trim(),
+      ...Object.fromEntries(
+        LIMIT_GROUPS.map((g) => [
+          `${g}_per_minute`,
+          draft.limits[g].trim() ? Number(draft.limits[g]) : null,
+        ]),
+      ),
+    };
     try {
-      const key = await ctx.apiJson<CreatedApiKey>("POST", plannerAdminPaths.apiKeys, {
-        name: draft.name.trim(),
-        contact_email: draft.email.trim(),
-        note: draft.note.trim(),
-        ...Object.fromEntries(
-          LIMIT_GROUPS.map((g) => [
-            `${g}_per_minute`,
-            draft.limits[g].trim() ? Number(draft.limits[g]) : null,
-          ]),
-        ),
-      });
-      setCreated(key.key);
-      onCreated();
+      if (editing) {
+        await ctx.apiJson<ApiKey>("PATCH", plannerAdminPaths.apiKey(editing.id), body);
+        ctx.notify(fill(dict.plannerAdminKeySaved, { name: body.name }));
+        onSaved();
+        onClose();
+      } else {
+        const key = await ctx.apiJson<CreatedApiKey>("POST", plannerAdminPaths.apiKeys, body);
+        setCreated(key.key);
+        onSaved();
+      }
     } catch (err) {
       // A 400 is a field error (e-mail or limits), sent without a code.
+      const fieldError = editing
+        ? dict.plannerAdminKeySaveFailed
+        : dict.plannerAdminKeyCreateFailed;
       setError(
-        err instanceof ApiError && err.status === 400
-          ? dict.plannerAdminKeyCreateFailed
-          : plannerErrorMessage(err, dict),
+        err instanceof ApiError && err.status === 400 ? fieldError : plannerErrorMessage(err, dict),
       );
     } finally {
       setSending(false);
@@ -101,7 +131,7 @@ export function PlannerApiKeyDialog({
 
   return (
     <Dialog
-      open={open}
+      open={target !== null}
       onClose={created ? undefined : onClose}
       maxWidth="sm"
       fullWidth
@@ -162,7 +192,9 @@ export function PlannerApiKeyDialog({
         </>
       ) : (
         <form onSubmit={(e) => void submit(e)} noValidate>
-          <DialogTitle>{dict.plannerAdminKeyDialogTitle}</DialogTitle>
+          <DialogTitle>
+            {editing ? dict.plannerAdminKeyEditTitle : dict.plannerAdminKeyDialogTitle}
+          </DialogTitle>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField
@@ -226,7 +258,7 @@ export function PlannerApiKeyDialog({
           <DialogActions>
             <Button onClick={onClose}>{dict.cancel}</Button>
             <Button type="submit" variant="contained" disabled={sending}>
-              {dict.plannerAdminKeyCreate}
+              {editing ? dict.plannerAdminKeySave : dict.plannerAdminKeyCreate}
             </Button>
           </DialogActions>
         </form>

@@ -3,6 +3,7 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 
+import { TechnicalDetails } from "@/components/layout/TechnicalDetails";
 import type { Dictionary } from "@/i18n/getDictionary";
 
 const STAGE_SEVERITY: Record<number, "info" | "warning" | "success"> = {
@@ -20,6 +21,7 @@ export function StageBanner({
   rejectionReasons,
   rejectedLabel,
   fixHint,
+  rawCause,
   dict,
 }: {
   stage: number;
@@ -30,7 +32,15 @@ export function StageBanner({
   rejectionReasons?: string[];
   rejectedLabel: string;
   fixHint?: string;
-  dict: Pick<Dictionary, "submissionStagePendingApprovalNote" | "submissionStagePublishedNote">;
+  /** Untranslated backend text behind `rejectionReasons`; pass it for Admins only. */
+  rawCause?: string | null;
+  dict: Pick<
+    Dictionary,
+    | "submissionStagePendingApprovalNote"
+    | "submissionStagePublishedNote"
+    | "technicalDetailsShow"
+    | "technicalDetailsHide"
+  >;
 }) {
   if (isRejected) {
     const hasReasons = rejectionReasons !== undefined && rejectionReasons.length > 0;
@@ -46,6 +56,7 @@ export function StageBanner({
             ))}
           </Box>
         ) : null}
+        {hasReasons && rawCause ? <TechnicalDetails text={rawCause} dict={dict} /> : null}
       </Alert>
     );
   }
