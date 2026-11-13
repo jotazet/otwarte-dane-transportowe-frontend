@@ -596,6 +596,9 @@ export const dictPl = {
   metaCasesTitle: "Statusy pozyskiwania danych transportowych w Polsce",
   metaCasesDescription:
     "Sprawdzaj statusy pozyskiwania otwartych danych GTFS i NeTEx dla organizacji transportowych w Polsce - publicznych i prywatnych.",
+  metaProvidersTitle: "Dostawcy danych transportowych w Polsce",
+  metaProvidersDescription:
+    "Osoby i instytucje, od których pozyskiwane są otwarte dane transportowe w Polsce – strony internetowe i adresy kontaktowe.",
   metaFeedDetailTitle: "{name} – feedy {formats}",
   metaFeedDetailDescription:
     "Feedy {formats} organizacji {name}: linki do pobrania i informacje o aktualizacji. Otwarte dane transportu publicznego w Polsce.",

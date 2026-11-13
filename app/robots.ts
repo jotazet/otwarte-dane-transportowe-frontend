@@ -25,7 +25,7 @@ const DISALLOW = [
   "/*/cases/organizations/new",
   "/*/cases/organizations/*/edit",
   "/*/cases/organizations/*/statuses",
-  "/*/cases/data-providers",
+  "/*/cases/data-providers/", // the list itself is public
   "/*?*returnUrl=", // /login?returnUrl=… — nieskończenie wiele wariantów tego samego URL-a
 ];
 
