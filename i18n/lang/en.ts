@@ -355,6 +355,8 @@ export const dictEn: Dictionary = {
   submissionStagePendingApprovalNote:
     "{stage} – the submission is awaiting a decision by the ODT team.",
   submissionStagePublishedNote: "{stage} – the feed is visible in the catalog.",
+  submissionStageReturnedNote:
+    "{stage} – the ODT team returned the submission for changes. Update the source and save it to send the submission back to data verification.",
   status: "Status",
   rejected: "Rejected",
   published: "Published",
@@ -393,7 +395,7 @@ export const dictEn: Dictionary = {
   backToList: "Back to submissions",
   submissionNameAndNoteSection: "Name and note",
   staticEntrySection: "Static file",
-  downloadStatic: "Download file (ZIP)",
+  downloadStatic: "Download file",
   downloadRealtime: "Download realtime file",
   downloadRealtimeHint:
     "Requires a synchronized file on the server - otherwise the download will fail.",

@@ -21,6 +21,7 @@ export function StageBanner({
   rejectionReasons,
   rejectedLabel,
   fixHint,
+  stageNote,
   rawCause,
   dict,
 }: {
@@ -32,6 +33,8 @@ export function StageBanner({
   rejectionReasons?: string[];
   rejectedLabel: string;
   fixHint?: string;
+  /** Replaces the default note of a stage that is not rejected; holds a `{stage}` placeholder. */
+  stageNote?: string;
   /** Untranslated backend text behind `rejectionReasons`; pass it for Admins only. */
   rawCause?: string | null;
   dict: Pick<
@@ -62,11 +65,12 @@ export function StageBanner({
   }
   const severity = STAGE_SEVERITY[stage] ?? "info";
   const message =
-    stage === 3
+    stageNote ??
+    (stage === 3
       ? dict.submissionStagePendingApprovalNote
       : stage === 4
         ? dict.submissionStagePublishedNote
-        : "{stage}";
+        : "{stage}");
   // Split around the placeholder so the stage label can stay bold.
   const [before, after] = message.split("{stage}");
   return (

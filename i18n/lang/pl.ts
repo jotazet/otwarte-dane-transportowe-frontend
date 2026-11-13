@@ -356,6 +356,8 @@ export const dictPl = {
   },
   submissionStagePendingApprovalNote: "{stage} – zgłoszenie czeka na decyzję zespołu ODT.",
   submissionStagePublishedNote: "{stage} – feed jest widoczny w katalogu.",
+  submissionStageReturnedNote:
+    "{stage} – zespół ODT zwrócił zgłoszenie do poprawy. Popraw źródło i zapisz je, aby zgłoszenie wróciło do weryfikacji danych.",
   status: "Status",
   rejected: "Odrzucone",
   published: "Opublikowane",
@@ -394,7 +396,7 @@ export const dictPl = {
   backToList: "Wróć do listy zgłoszeń",
   submissionNameAndNoteSection: "Nazwa i notatka",
   staticEntrySection: "Plik statyczny",
-  downloadStatic: "Pobierz plik (ZIP)",
+  downloadStatic: "Pobierz plik",
   downloadRealtime: "Pobierz plik realtime",
   downloadRealtimeHint:
     "Pobieranie wymaga zsynchronizowanego pliku na serwerze - w przeciwnym razie nie uda się go pobrać.",

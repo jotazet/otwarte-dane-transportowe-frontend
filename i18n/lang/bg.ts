@@ -358,6 +358,8 @@ export const dictBg: Dictionary = {
   },
   submissionStagePendingApprovalNote: "{stage} – заявката очаква решение на екипа на ODT.",
   submissionStagePublishedNote: "{stage} – фийдът е видим в каталога.",
+  submissionStageReturnedNote:
+    "{stage} – екипът на ODT върна заявката за корекции. Актуализирайте източника и го запазете, за да се върне заявката към проверка на данните.",
   status: "Статус",
   rejected: "Отхвърлено",
   published: "Публикувано",
@@ -397,7 +399,7 @@ export const dictBg: Dictionary = {
   backToList: "Обратно към списъка със заявки",
   submissionNameAndNoteSection: "Име и бележка",
   staticEntrySection: "Статичен файл",
-  downloadStatic: "Изтегли файла (ZIP)",
+  downloadStatic: "Изтегли файла",
   downloadRealtime: "Изтегли файла в реално време",
   downloadRealtimeHint:
     "Изтеглянето изисква синхронизиран файл на сървъра - в противен случай няма да е успешно.",
