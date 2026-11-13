@@ -16,7 +16,7 @@
 | Motion | none: `transitions` in the theme sets every duration to 0 and every CSS transition MUI generates to `none`, and the Skeleton animation is off; don't set timeouts per component; the one exception is the status dot of `StatusPanel`, which sends out a ring every 1.5 s for as long as it is shown, and none under `prefers-reduced-motion` (a deliberate choice: WCAG 2.2.2 asks for a way to stop motion that lasts over 5 s, and W3C lists no technique that relies on that system setting alone; a pause control would close the gap) |
 | Chart series | `palette.chart.series1`–`series4`: blue, amber, violet, red, in this fixed order; light `#2A78D6` `#EDA100` `#4A3AA7` `#E34948`, dark `#3987E5` `#C98500` `#9085E9` `#E66767`. Checked for colour-blind separation of neighbours in both schemes; amber is under 3:1 on white, so charts that use it also have a legend and a table view |
 
-`app/globals.css` repeats the page background per color scheme so the first paint matches the theme; keep the two in sync.
+`app/globals.css` repeats the page background per color scheme so the first paint matches the theme; keep the two in sync. It also sets `scrollbar-gutter: stable` on `<html>`, so a page short enough to need no scrollbar keeps the same width as a long one and the layout doesn't shift sideways between pages. Modals don't lock scrolling (`disableScrollLock` in `theme.ts`), so MUI adds no compensating padding on top of the gutter.
 
 ## Rules
 
