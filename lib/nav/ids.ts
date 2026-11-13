@@ -1,12 +1,11 @@
 /**
- * Parsuje segment URL na dodatnie ID całkowite.
- * Odrzuca ułamki, zero, wartości ujemne, notację wykładniczą i puste stringi
- * (`Number.isFinite` przepuszcza `1.5`, `0`, `-3`, `1e3`, `"  "`).
+ * Parses a URL segment or query value into a positive integer id.
+ * Accepts digits only: rejects fractions, zero, negative values, exponent
+ * notation, surrounding whitespace and empty strings, all of which `Number()`
+ * would let through.
  */
 export function parseNumericId(raw: string | null | undefined): number | null {
-  if (raw == null) return null;
-  const trimmed = String(raw).trim();
-  if (!/^\d+$/.test(trimmed)) return null;
-  const n = Number(trimmed);
+  if (raw == null || !/^\d+$/.test(raw)) return null;
+  const n = Number(raw);
   return Number.isInteger(n) && n > 0 ? n : null;
 }
