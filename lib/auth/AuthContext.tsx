@@ -13,6 +13,7 @@ import {
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
+import { createTokenRefresher } from "@/lib/auth/tokenRefresher";
 import { contentDispositionFileName } from "@/lib/download";
 import type { RoleSet } from "@/lib/auth/roles";
 
@@ -151,43 +152,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState({ status: "anonymous", user: null, tokens: null });
   }, []);
 
-  const refreshInFlight = React.useRef<Promise<Tokens | null> | null>(null);
-
-  const refreshAccess = React.useCallback((): Promise<Tokens | null> => {
-    // Requests that find the access token expired at the same time share one
-    // refresh: a second refresh with the same, by then blacklisted, token
-    // would fail and log the user out.
-    if (!refreshInFlight.current) {
-      refreshInFlight.current = (async () => {
-        const stored = readStoredTokens();
-        if (!stored?.refresh) return null;
-        try {
-          // The backend rotates refresh tokens and blacklists the old one, so
-          // the new one must replace it or the next refresh fails.
-          const res = await postJson<{ access: string; refresh?: string }>(
-            "/api/auth/token/refresh/",
-            { refresh: stored.refresh },
-          );
-          const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
-          applyTokens(next);
-          return next;
-        } catch {
-          // Another tab may have rotated the same refresh token a moment
-          // earlier; its new pair is in storage and still valid.
-          const current = readStoredTokens();
-          if (current && current.refresh !== stored.refresh) {
-            applyTokens(current);
-            return current;
-          }
-          clearAuth();
-          return null;
-        }
-      })().finally(() => {
-        refreshInFlight.current = null;
-      });
-    }
-    return refreshInFlight.current;
-  }, [applyTokens, clearAuth]);
+  // One refresher for the provider's lifetime (applyTokens and clearAuth never change), so
+  // concurrent requests share its refresh in flight.
+  const refreshAccess = React.useMemo(
+    () =>
+      createTokenRefresher({
+        readStored: readStoredTokens,
+        request: (refresh) =>
+          postJson<{ access: string; refresh?: string }>("/api/auth/token/refresh/", { refresh }),
+        apply: applyTokens,
+        clear: clearAuth,
+      }),
+    [applyTokens, clearAuth],
+  );
 
   React.useLayoutEffect(() => {
     void (async () => {
