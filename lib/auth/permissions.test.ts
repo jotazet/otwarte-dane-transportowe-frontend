@@ -39,7 +39,6 @@ describe("claimsFromAccessToken", () => {
       lastName: "Nowak",
       groups: ["DataProvider"],
       isDjangoAdmin: false,
-      isStaff: false,
     });
     expect([...c.roles]).toEqual(["DataProvider"]);
   });
@@ -54,11 +53,9 @@ describe("claimsFromAccessToken", () => {
     expect([...claims({ role: "Editor" }).roles]).toEqual(["Editor"]);
   });
 
-  it("marks the Admin group as Django admin, but not is_staff alone", () => {
+  it("marks the Admin group as Django admin, but not an is_staff claim alone", () => {
     expect(claims({ roles: ["Admin"] }).isDjangoAdmin).toBe(true);
-    const staff = claims({ is_staff: true, roles: [] });
-    expect(staff.isStaff).toBe(true);
-    expect(staff.isDjangoAdmin).toBe(false);
+    expect(claims({ is_staff: true, roles: [] }).isDjangoAdmin).toBe(false);
   });
 
   it("prefers the username typed at login and rejects non-numeric ids", () => {
@@ -127,7 +124,6 @@ describe("role checks", () => {
 describe("feed source edit context", () => {
   const base: FeedSourceEditContext = {
     isDjangoAdmin: false,
-    isStaff: false,
     isHelper: false,
     isOwner: true,
     currentStage: 1,
@@ -159,12 +155,12 @@ describe("feed source edit context", () => {
     expect(canHelperReviewOnly(at({ isHelper: true, isDjangoAdmin: true }))).toBe(false);
   });
 
-  it("lets Admin edit the source at stages 2-4, but not staff without Admin", () => {
+  it("lets Admin edit the source at stages 2-4, but not a non-owner without Admin", () => {
     const admin = at({ isOwner: false, isDjangoAdmin: true, currentStage: 3 });
     expect(canAdminEditSourceOnPublishedStages(admin)).toBe(true);
     expect(canEditFeedSourceFields(admin)).toBe(true);
-    const staff = at({ isOwner: false, isStaff: true, currentStage: 3 });
-    expect(canEditFeedSourceFields(staff)).toBe(false);
+    const other = at({ isOwner: false, currentStage: 3 });
+    expect(canEditFeedSourceFields(other)).toBe(false);
   });
 
   it("gives a stranger nothing", () => {
