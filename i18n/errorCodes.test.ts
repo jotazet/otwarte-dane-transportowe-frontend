@@ -8,7 +8,7 @@
  *
  *   (cd ../OtwarteDaneTransportowe-backend && grep -rhoE --include='*.py' \
  *     --exclude-dir=tests --exclude-dir=migrations --exclude='settings*.py' \
- *     "'(blog|feeds|fetch|gtfs_validation|realtime|users|planner)\.[a-z_]+'" \
+ *     "'(auth|blog|feeds|fetch|gtfs_validation|realtime|users|planner)\.[a-z_]+'" \
  *     accounts blog cases data_manager OtwarteDaneTransportowe \
  *     planner/api/serializers.py planner/api/views.py planner/models.py \
  *     planner/otp_config.py planner/pipeline.py \

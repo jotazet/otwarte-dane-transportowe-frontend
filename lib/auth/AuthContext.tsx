@@ -10,26 +10,22 @@ import {
   UPLOAD_TIMEOUT_MS,
   type ApiJson,
 } from "@/lib/api/http";
+import { postSession, SESSION_LOGIN, SESSION_LOGOUT, SESSION_REFRESH } from "@/lib/api/session";
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
-import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
-import { createTokenRefresher } from "@/lib/auth/tokenRefresher";
+import { isJwtExpired } from "@/lib/auth/jwt";
+import { createTokenRefresher, withRefreshLock } from "@/lib/auth/tokenRefresher";
 import { contentDispositionFileName } from "@/lib/download";
 import type { RoleSet } from "@/lib/auth/roles";
-
-export type Tokens = {
-  access: string;
-  refresh: string;
-};
 
 export type AuthUser = AuthUserClaims & {
   roles: RoleSet;
 };
 
 type AuthState =
-  | { status: "loading"; user: null; tokens: null }
-  | { status: "anonymous"; user: null; tokens: null }
-  | { status: "authenticated"; user: AuthUser; tokens: Tokens };
+  | { status: "loading"; user: null; access: null }
+  | { status: "anonymous"; user: null; access: null }
+  | { status: "authenticated"; user: AuthUser; access: string };
 
 export type AuthStatus = AuthState["status"];
 
@@ -40,8 +36,6 @@ export function isAuthReady(status: AuthStatus): status is "anonymous" | "authen
 type AuthContextValue = AuthState & {
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => void;
-  /** Stores a token pair the API returned outside login and refresh (password change). */
-  storeTokens: (tokens: Tokens) => void;
   getAccessToken: () => string | null;
   apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
@@ -49,36 +43,54 @@ type AuthContextValue = AuthState & {
   apiBlob: (path: string) => Promise<{ blob: Blob; fileName: string | null }>;
 };
 
-const STORAGE_KEY = "odt.jwt";
+const ANONYMOUS: AuthState = { status: "anonymous", user: null, access: null };
+
+/** The token pair older releases kept in localStorage (ADR 0011 removed it). */
+const LEGACY_TOKENS_KEY = "odt.jwt";
 const USERNAME_KEY = "odt.username";
-const AUTH_COOKIE = "odt.auth";
+/** Sign-in and sign-out reach the site's other tabs on this channel; no token travels on it. */
+const AUTH_CHANNEL = "odt-auth";
+type AuthMessage = "login" | "logout";
+
+/**
+ * A flag cookie without a token: "this browser may have a session". proxy.ts gates the pages
+ * that need a login with it, and a page load restores the session only when it is set. It must
+ * outlive the refresh cookie (JWT_REFRESH_DAYS, renewed by every refresh): a stale flag costs
+ * one refresh that fails and clears it, a missing one hides a live session.
+ */
+const AUTH_FLAG = "odt.auth";
+const AUTH_FLAG_MAX_AGE_S = 30 * 24 * 60 * 60;
 
 function secureCookieSuffix() {
-  return typeof location !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
+  return location.protocol === "https:" ? "; Secure" : "";
 }
 
-/** The flag lives as long as the refresh token, so proxy.ts stops trusting a dead session. */
-function setAuthCookieFlag(refresh: string) {
-  if (typeof document === "undefined") return;
-  const exp = decodeJwt(refresh)?.exp;
-  const maxAge = typeof exp === "number" ? Math.max(0, exp - Math.floor(Date.now() / 1000)) : 0;
-  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax${secureCookieSuffix()}`;
+function setAuthFlag() {
+  document.cookie = `${AUTH_FLAG}=1; path=/; max-age=${AUTH_FLAG_MAX_AGE_S}; SameSite=Lax${secureCookieSuffix()}`;
 }
 
-function clearAuthCookieFlag() {
-  if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax${secureCookieSuffix()}`;
+function clearAuthFlag() {
+  document.cookie = `${AUTH_FLAG}=; path=/; max-age=0; SameSite=Lax${secureCookieSuffix()}`;
 }
 
-function readStoredTokens(): Tokens | null {
+function hasAuthFlag(): boolean {
+  return document.cookie.split("; ").includes(`${AUTH_FLAG}=1`);
+}
+
+/**
+ * Removes the tokens an older release kept in localStorage and blacklists their refresh token,
+ * which anyone who copied it could otherwise keep using. The session itself is not carried
+ * over: its user signs in once more.
+ */
+function dropLegacyTokens() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const json = JSON.parse(raw) as Partial<Tokens>;
-    if (typeof json.access !== "string" || typeof json.refresh !== "string") return null;
-    return { access: json.access, refresh: json.refresh };
+    const raw = localStorage.getItem(LEGACY_TOKENS_KEY);
+    if (!raw) return;
+    localStorage.removeItem(LEGACY_TOKENS_KEY);
+    const refresh: unknown = (JSON.parse(raw) as { refresh?: unknown }).refresh;
+    if (typeof refresh === "string") postJson("/api/auth/logout/", { refresh }).catch(() => {});
   } catch {
-    return null;
+    // Storage blocked or not JSON: nothing to blacklist.
   }
 }
 
@@ -87,15 +99,6 @@ function readStoredUsername(): string | null {
     return localStorage.getItem(USERNAME_KEY);
   } catch {
     return null;
-  }
-}
-
-function writeStoredTokens(tokens: Tokens | null) {
-  try {
-    if (!tokens) localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
-  } catch {
-    // ignore
   }
 }
 
@@ -113,115 +116,118 @@ function userFromAccess(access: string, loginUsername?: string | null): AuthUser
   return { ...claims, roles: claims.roles };
 }
 
-/** Synchronous read for bootstrapping UI before React auth state settles. */
-export function getStoredAuthUser(options?: { includeExpired?: boolean }): AuthUser | null {
-  const t = readStoredTokens();
-  if (!t?.access) return null;
-  if (!options?.includeExpired && isJwtExpired(t.access)) return null;
-  try {
-    return userFromAccess(t.access);
-  } catch {
-    return null;
-  }
-}
-
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = React.useState<AuthState>({
     status: "loading",
     user: null,
-    tokens: null,
+    access: null,
   });
+  // The access token lives in memory only (ADR 0011). A ref, so requests read the newest one
+  // without waiting for a render.
+  const accessRef = React.useRef<string | null>(null);
+  // Posting on the channel this tab listens on: a channel never receives its own messages.
+  const channelRef = React.useRef<BroadcastChannel | null>(null);
+  const broadcast = React.useCallback((message: AuthMessage) => {
+    channelRef.current?.postMessage(message);
+  }, []);
 
-  const applyTokens = React.useCallback((tokens: Tokens, loginUsername?: string | null) => {
-    writeStoredTokens(tokens);
-    setAuthCookieFlag(tokens.refresh);
-    const user = userFromAccess(tokens.access, loginUsername);
-    setState({
-      status: "authenticated",
-      tokens,
-      user,
+  const applyAccess = React.useCallback((access: string, loginUsername?: string | null) => {
+    accessRef.current = access;
+    setAuthFlag();
+    setState({ status: "authenticated", access, user: userFromAccess(access, loginUsername) });
+  }, []);
+
+  /** Ends the session in this tab; `keepShared` leaves the flag and username other tabs use. */
+  const clearAuth = React.useCallback((keepShared = false) => {
+    accessRef.current = null;
+    if (!keepShared) {
+      writeStoredUsername(null);
+      clearAuthFlag();
+    }
+    setState(ANONYMOUS);
+  }, []);
+
+  // One refresher for the provider's lifetime (applyAccess and clearAuth never change), so
+  // concurrent requests share its refresh in flight. Created on first use: its callbacks
+  // write accessRef, which React allows outside render only.
+  const refresherRef = React.useRef<(() => Promise<string | null>) | null>(null);
+  const refreshAccess = React.useCallback(() => {
+    refresherRef.current ??= createTokenRefresher({
+      request: () => postSession<{ access: string }>(SESSION_REFRESH),
+      withLock: withRefreshLock,
+      apply: (access) => applyAccess(access),
+      // Only the API's answer that there is no session (401) clears what the tabs share. After
+      // a network error or a rate limit another tab may still be signed in, and without the
+      // flag proxy.ts would send it to the login page.
+      clear: (err) => clearAuth(!(err instanceof ApiError && err.status === 401)),
     });
-  }, []);
-
-  const clearAuth = React.useCallback(() => {
-    writeStoredTokens(null);
-    writeStoredUsername(null);
-    clearAuthCookieFlag();
-    setState({ status: "anonymous", user: null, tokens: null });
-  }, []);
-
-  // One refresher for the provider's lifetime (applyTokens and clearAuth never change), so
-  // concurrent requests share its refresh in flight.
-  const refreshAccess = React.useMemo(
-    () =>
-      createTokenRefresher({
-        readStored: readStoredTokens,
-        request: (refresh) =>
-          postJson<{ access: string; refresh?: string }>("/api/auth/token/refresh/", { refresh }),
-        apply: applyTokens,
-        clear: clearAuth,
-      }),
-    [applyTokens, clearAuth],
-  );
+    return refresherRef.current();
+  }, [applyAccess, clearAuth]);
 
   React.useLayoutEffect(() => {
+    dropLegacyTokens();
     void (async () => {
-      const t = readStoredTokens();
-      if (!t?.refresh) {
-        setState({ status: "anonymous", user: null, tokens: null });
-        return;
-      }
-      if (t.access && !isJwtExpired(t.access)) {
-        applyTokens(t);
+      // Without the flag there is no session to restore: anonymous visitors make no request.
+      if (!hasAuthFlag()) {
+        setState(ANONYMOUS);
         return;
       }
       // Through the shared refresh: Strict Mode runs this effect twice in
       // development, and components may already be calling the API.
       await refreshAccess();
     })();
-  }, [applyTokens, refreshAccess]);
+  }, [refreshAccess]);
+
+  // Follow sign-in and sign-out in the site's other tabs. They share the refresh cookie, so
+  // after a sign-in this tab gets its own access token through a refresh.
+  React.useEffect(() => {
+    if (typeof BroadcastChannel === "undefined") return;
+    const channel = new BroadcastChannel(AUTH_CHANNEL);
+    channel.onmessage = (e: MessageEvent<AuthMessage>) => {
+      if (e.data === "logout") clearAuth();
+      else if (e.data === "login") void refreshAccess();
+    };
+    channelRef.current = channel;
+    return () => {
+      channelRef.current = null;
+      channel.close();
+    };
+  }, [clearAuth, refreshAccess]);
 
   const login = React.useCallback(
     async (creds: { username: string; password: string }) => {
-      const tokens = await postJson<Tokens>("/api/auth/token/", creds);
+      const { access } = await postSession<{ access: string }>(SESSION_LOGIN, creds);
       writeStoredUsername(creds.username.trim());
-      applyTokens(tokens, creds.username.trim());
+      applyAccess(access, creds.username.trim());
+      broadcast("login");
     },
-    [applyTokens],
+    [applyAccess, broadcast],
   );
 
   const logout = React.useCallback(() => {
-    // Blacklist the refresh token so a copy of it stops working. The local
-    // session ends whether or not the request succeeds.
-    const refresh = readStoredTokens()?.refresh;
-    if (refresh) postJson("/api/auth/logout/", { refresh }).catch(() => {});
+    // Blacklists the refresh cookie and clears it. Under the refresh lock, so a refresh in
+    // another tab cannot set a new cookie after it. The local session ends whether or not
+    // the request succeeds.
+    withRefreshLock(() => postSession(SESSION_LOGOUT)).catch(() => {});
     clearAuth();
-  }, [clearAuth]);
-
-  // Sign-in, refresh and sign-out in another tab change the stored tokens;
-  // follow them so this tab does not look signed in after a sign-out there.
-  React.useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      // A null key means the whole storage was cleared.
-      if (e.key !== STORAGE_KEY && e.key !== null) return;
-      const tokens = readStoredTokens();
-      if (tokens) {
-        setState({ status: "authenticated", tokens, user: userFromAccess(tokens.access) });
-      } else {
-        setState({ status: "anonymous", user: null, tokens: null });
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+    broadcast("logout");
+  }, [broadcast, clearAuth]);
 
   const getAccessToken = React.useCallback(() => {
     if (state.status !== "authenticated") return null;
-    if (isJwtExpired(state.tokens.access)) return null;
-    return state.tokens.access;
+    if (isJwtExpired(state.access)) return null;
+    return state.access;
   }, [state]);
+
+  /** A usable access token, refreshed when it has expired. */
+  const validAccess = React.useCallback(async (): Promise<string> => {
+    const current = accessRef.current;
+    const access = current && !isJwtExpired(current) ? current : await refreshAccess();
+    if (!access) throw new ApiError(401, "Login required");
+    return access;
+  }, [refreshAccess]);
 
   const apiJson = React.useCallback(
     async <T,>(method: string, path: string, body?: unknown): Promise<T> => {
@@ -239,16 +245,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       };
 
-      let tokens = readStoredTokens();
-      if (!tokens?.access || isJwtExpired(tokens.access)) {
-        tokens = (await refreshAccess()) ?? null;
-      }
-      if (!tokens?.access) throw new ApiError(401, "Login required");
-
-      let res = await fetchWithTimeout(url, buildInit(tokens.access));
+      let res = await fetchWithTimeout(url, buildInit(await validAccess()));
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetchWithTimeout(url, buildInit(next.access));
+        if (next) res = await fetchWithTimeout(url, buildInit(next));
       }
       if (!res.ok) {
         throw await apiErrorFrom(res);
@@ -256,7 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
     },
-    [refreshAccess],
+    [refreshAccess, validAccess],
   );
 
   const apiForm = React.useCallback(
@@ -271,16 +271,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: form,
       });
 
-      let tokens = readStoredTokens();
-      if (!tokens?.access || isJwtExpired(tokens.access)) {
-        tokens = (await refreshAccess()) ?? null;
-      }
-      if (!tokens?.access) throw new ApiError(401, "Login required");
-
-      let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
+      let res = await fetchWithTimeout(url, buildInit(await validAccess()), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
+        if (next) res = await fetchWithTimeout(url, buildInit(next), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
         throw await apiErrorFrom(res);
@@ -288,7 +282,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.status === 204) return undefined as T;
       return (await res.json()) as T;
     },
-    [refreshAccess],
+    [refreshAccess, validAccess],
   );
 
   const apiBlob = React.useCallback(
@@ -299,16 +293,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { Authorization: `Bearer ${access}` },
       });
 
-      let tokens = readStoredTokens();
-      if (!tokens?.access || isJwtExpired(tokens.access)) {
-        tokens = (await refreshAccess()) ?? null;
-      }
-      if (!tokens?.access) throw new ApiError(401, "Login required");
-
-      let res = await fetchWithTimeout(url, buildInit(tokens.access), UPLOAD_TIMEOUT_MS);
+      let res = await fetchWithTimeout(url, buildInit(await validAccess()), UPLOAD_TIMEOUT_MS);
       if (res.status === 401) {
         const next = await refreshAccess();
-        if (next) res = await fetchWithTimeout(url, buildInit(next.access), UPLOAD_TIMEOUT_MS);
+        if (next) res = await fetchWithTimeout(url, buildInit(next), UPLOAD_TIMEOUT_MS);
       }
       if (!res.ok) {
         throw await apiErrorFrom(res);
@@ -316,7 +304,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const fileName = contentDispositionFileName(res.headers.get("Content-Disposition"));
       return { blob: await res.blob(), fileName };
     },
-    [refreshAccess],
+    [refreshAccess, validAccess],
   );
 
   const value: AuthContextValue = React.useMemo(
@@ -333,13 +321,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
       logout,
-      storeTokens: applyTokens,
       getAccessToken,
       apiJson,
       apiForm,
       apiBlob,
     }),
-    [apiBlob, apiForm, apiJson, applyTokens, getAccessToken, login, logout, state],
+    [apiBlob, apiForm, apiJson, getAccessToken, login, logout, state],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

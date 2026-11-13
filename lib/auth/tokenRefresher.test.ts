@@ -1,100 +1,130 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { Tokens } from "@/lib/auth/AuthContext";
+import { ApiError } from "@/lib/api/http";
 import { createTokenRefresher } from "@/lib/auth/tokenRefresher";
 
-/** A refresher over an in-memory store, as AuthContext wires it to localStorage. */
-function setup(
-  stored: Tokens | null,
-  request: (refresh: string) => Promise<{ access: string; refresh?: string }>,
-) {
-  const store = { tokens: stored };
-  const deps = {
-    readStored: vi.fn(() => store.tokens),
-    request: vi.fn(request),
-    apply: vi.fn((tokens: Tokens) => {
-      store.tokens = tokens;
-    }),
-    clear: vi.fn(() => {
-      store.tokens = null;
-    }),
+const MISSING = new ApiError(401, "HTTP 401", "auth.refresh_cookie_missing");
+const INVALID = new ApiError(401, "HTTP 401", "auth.refresh_cookie_invalid");
+
+/** Runs `fn` at once, as `withRefreshLock` does without the Web Locks API. */
+const noLock = <T>(fn: () => Promise<T>) => fn();
+
+/** A lock shared by several refreshers, as `navigator.locks` is by the site's tabs. */
+function sharedLock() {
+  let tail: Promise<unknown> = Promise.resolve();
+  return <T>(fn: () => Promise<T>): Promise<T> => {
+    const run = tail.then(fn);
+    tail = run.catch(() => {});
+    return run;
   };
-  return { store, deps, refresh: createTokenRefresher(deps) };
 }
 
-const OLD = { access: "access-1", refresh: "refresh-1" };
+/**
+ * The browser's refresh cookie and the backend's rotation: every refresh replaces the cookie
+ * and blacklists the old token. `send` returns the cookie the request left with and a function
+ * that answers it, so a test can interleave two tabs.
+ */
+function cookieServer() {
+  const server = { cookie: 1, requests: 0 };
+  const answer = (sent: number) => {
+    if (sent !== server.cookie) throw INVALID;
+    server.cookie += 1;
+    return { access: `access-${server.cookie}` };
+  };
+  const request = async () => {
+    server.requests += 1;
+    const sent = server.cookie;
+    await Promise.resolve();
+    return answer(sent);
+  };
+  return { server, request };
+}
+
+function setup(request: () => Promise<{ access: string }>, withLock = noLock) {
+  const deps = {
+    request: vi.fn(request),
+    withLock,
+    apply: vi.fn(),
+    clear: vi.fn(),
+  };
+  return { deps, refresh: createTokenRefresher(deps) };
+}
 
 describe("createTokenRefresher", () => {
-  it("replaces the rotated refresh token with the new one", async () => {
-    const { store, deps, refresh } = setup(OLD, async () => ({
-      access: "access-2",
-      refresh: "refresh-2",
-    }));
-    await expect(refresh()).resolves.toEqual({ access: "access-2", refresh: "refresh-2" });
-    expect(deps.request).toHaveBeenCalledWith("refresh-1");
-    expect(store.tokens).toEqual({ access: "access-2", refresh: "refresh-2" });
+  it("applies the access token of the rotated cookie", async () => {
+    const { server, request } = cookieServer();
+    const { deps, refresh } = setup(request);
+    await expect(refresh()).resolves.toBe("access-2");
+    expect(deps.apply).toHaveBeenCalledWith("access-2");
+    expect(server.cookie).toBe(2);
   });
 
-  it("keeps the refresh token when the backend does not rotate it", async () => {
-    const { store, refresh } = setup(OLD, async () => ({ access: "access-2" }));
-    await refresh();
-    expect(store.tokens).toEqual({ access: "access-2", refresh: "refresh-1" });
-  });
-
-  it("sends one request for concurrent refreshes", async () => {
-    let resolve: (value: { access: string; refresh: string }) => void = () => {};
-    const { deps, refresh } = setup(
-      OLD,
-      () =>
-        new Promise((r) => {
-          resolve = r;
-        }),
-    );
-    const first = refresh();
-    const second = refresh();
-    resolve({ access: "access-2", refresh: "refresh-2" });
-    const results = await Promise.all([first, second]);
-    expect(deps.request).toHaveBeenCalledTimes(1);
-    expect(results[0]).toEqual(results[1]);
+  it("sends one request for concurrent refreshes in a tab", async () => {
+    const { server, request } = cookieServer();
+    const { refresh } = setup(request);
+    const results = await Promise.all([refresh(), refresh()]);
+    expect(server.requests).toBe(1);
+    expect(results).toEqual(["access-2", "access-2"]);
   });
 
   it("refreshes again once the previous refresh has finished", async () => {
-    let n = 1;
-    const { deps, refresh } = setup(OLD, async () => {
-      n += 1;
-      return { access: `access-${n}`, refresh: `refresh-${n}` };
+    const { server, request } = cookieServer();
+    const { refresh } = setup(request);
+    await refresh();
+    await expect(refresh()).resolves.toBe("access-3");
+    expect(server.requests).toBe(2);
+  });
+
+  it("runs the refreshes of two tabs one after the other under the shared lock", async () => {
+    const { server, request } = cookieServer();
+    const lock = sharedLock();
+    const tabA = setup(request, lock);
+    const tabB = setup(request, lock);
+    const results = await Promise.all([tabA.refresh(), tabB.refresh()]);
+    // The second tab's request left with the cookie the first one set: no retry needed.
+    expect(results).toEqual(["access-2", "access-3"]);
+    expect(server.requests).toBe(2);
+    expect(tabB.deps.clear).not.toHaveBeenCalled();
+  });
+
+  it("retries once when another tab rotated the cookie during the request", async () => {
+    const { server, request } = cookieServer();
+    const tabA = setup(request);
+    const tabB = setup(request);
+    // Without a lock both leave with cookie 1; tab A rotates it first.
+    const results = await Promise.all([tabA.refresh(), tabB.refresh()]);
+    expect(results).toEqual(["access-2", "access-3"]);
+    expect(tabB.deps.request).toHaveBeenCalledTimes(2);
+    expect(tabB.deps.clear).not.toHaveBeenCalled();
+    expect(server.cookie).toBe(3);
+  });
+
+  it("ends the session when the retry is refused too", async () => {
+    const { deps, refresh } = setup(async () => {
+      throw INVALID;
     });
-    await refresh();
-    await refresh();
+    await expect(refresh()).resolves.toBeNull();
     expect(deps.request).toHaveBeenCalledTimes(2);
-    expect(deps.request).toHaveBeenLastCalledWith("refresh-2");
-  });
-
-  it("adopts the pair another tab stored while its own refresh failed", async () => {
-    const other = { access: "access-tab", refresh: "refresh-tab" };
-    const { store, deps, refresh } = setup(OLD, async () => {
-      // The other tab rotated refresh-1 first, so the backend has blacklisted it.
-      store.tokens = other;
-      throw new Error("401");
-    });
-    await expect(refresh()).resolves.toEqual(other);
-    expect(deps.clear).not.toHaveBeenCalled();
-    expect(deps.apply).toHaveBeenCalledWith(other);
-  });
-
-  it("ends the session when the refresh token is refused", async () => {
-    const { store, deps, refresh } = setup(OLD, async () => {
-      throw new Error("401");
-    });
-    await expect(refresh()).resolves.toBeNull();
     expect(deps.clear).toHaveBeenCalledTimes(1);
-    expect(store.tokens).toBeNull();
+    expect(deps.apply).not.toHaveBeenCalled();
   });
 
-  it("does not call the API without a stored refresh token", async () => {
-    const { deps, refresh } = setup(null, async () => ({ access: "x" }));
+  it("treats a missing cookie as no session, without a retry", async () => {
+    const { deps, refresh } = setup(async () => {
+      throw MISSING;
+    });
     await expect(refresh()).resolves.toBeNull();
-    expect(deps.request).not.toHaveBeenCalled();
-    expect(deps.clear).not.toHaveBeenCalled();
+    expect(deps.request).toHaveBeenCalledTimes(1);
+    expect(deps.clear).toHaveBeenCalledExactlyOnceWith(MISSING);
+  });
+
+  it("does not retry other failures and passes them on", async () => {
+    const offline = new ApiError(0, "Connection failed");
+    const { deps, refresh } = setup(async () => {
+      throw offline;
+    });
+    await expect(refresh()).resolves.toBeNull();
+    expect(deps.request).toHaveBeenCalledTimes(1);
+    expect(deps.clear).toHaveBeenCalledExactlyOnceWith(offline);
   });
 });
