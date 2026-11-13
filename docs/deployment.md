@@ -55,6 +55,8 @@ Server-side rendering forwards that IP to the API, so the backend rate-limits ea
 
 The application sets its own security headers on every response (`securityHeaders` in `next.config.ts`), including `Strict-Transport-Security` for two years without `includeSubDomains`: serve the site's domain over HTTPS only. The reverse proxy does not need to add them.
 
+Pages also get a `Content-Security-Policy-Report-Only` header with a per-request nonce, set in `proxy.ts` ([ADR 0008](architecture/decisions/0008-content-security-policy-with-nonce.md)). Its `connect-src` and `img-src` allow the origin of `NEXT_PUBLIC_API_BASE_URL`, which is read at build time. Do not let the reverse proxy or CDN inject scripts into the HTML (e.g. Cloudflare analytics, email obfuscation, Rocket Loader): they would violate the policy.
+
 ## 5. Updates
 
 ```bash
