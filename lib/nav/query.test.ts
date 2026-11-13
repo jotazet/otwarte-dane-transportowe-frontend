@@ -15,9 +15,7 @@ describe("parseOrganizationQueryParam", () => {
     expect(parseOrganizationQueryParam("abc")).toBeUndefined();
   });
 
-  // `Number()` turns " " into 0 and accepts "1.5", "-3" and "0x10", none of which is an
-  // organization id: the list then filters by a value the backend rejects or never matches.
-  it.fails.each([" ", "1.5", "-3", "0x10"])("ignores %j, which is not an id", (value) => {
+  it.each([" ", "1.5", "-3", "0x10"])("ignores %j, which is not an id", (value) => {
     expect(parseOrganizationQueryParam(value)).toBeUndefined();
   });
 });

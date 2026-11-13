@@ -25,26 +25,8 @@ import { describe, expect, it } from "vitest";
 import backendCodes from "@/lib/__fixtures__/backend-error-codes.json";
 import { dictPl } from "@/i18n/lang/pl";
 
-/** Codes with no translation yet. Issue #36 adds them; remove each one as it lands. */
-const KNOWN_GAPS = new Set([
-  "blog.tag_too_long",
-  "fetch.credential_undecryptable",
-  "gtfs_validation.credential_undecryptable",
-  "gtfs_validation.file_missing",
-  "gtfs_validation.timeout",
-  "gtfs_validation.validator_failed",
-  "gtfs_validation.validator_unavailable",
-  "planner.feed_id_immutable",
-  "planner.feed_not_gbfs",
-  "planner.feed_not_gtfs",
-  "planner.feed_other_organization",
-  "planner.invalid_feed_id",
-  "planner.invalid_network",
-  "planner.invalid_range",
-  "planner.network_immutable",
-  "planner.rt_url_unsupported",
-  "planner.too_many_buckets",
-]);
+/** Codes with no translation yet; add one only with an issue that tracks it. */
+const KNOWN_GAPS = new Set<string>([]);
 
 /** Keys shaped like `<area>.<reason>` in every nested map of the Polish dictionary. */
 function translatedCodes(): Set<string> {
