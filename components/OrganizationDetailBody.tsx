@@ -82,20 +82,16 @@ export function OrganizationDetailBody({
             {dict.providers}
           </Typography>
           <TableCard>
-            <Table size="small" sx={{ minWidth: 720 }}>
+            <Table size="small">
               <TableHead>
                 <TableRow sx={tableHeadRowSx}>
                   <TableCell>{dict.providers}</TableCell>
-                  <TableCell>{dict.website}</TableCell>
-                  <TableCell>{dict.contact}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {providers.map((p, idx) => (
                   <TableRow key={idx} hover>
                     <TableCell sx={{ fontWeight: 600 }}>{text(p.name)}</TableCell>
-                    <TableCell>{text(p.website)}</TableCell>
-                    <TableCell>{text(p.contact_email)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

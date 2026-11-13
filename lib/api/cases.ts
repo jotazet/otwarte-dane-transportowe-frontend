@@ -25,7 +25,7 @@ export type TransportOrganizationListItem = {
   data_providers?: { id?: number; name?: string | null }[];
 };
 
-export type TransportOrganizationDetail = Omit<TransportOrganizationListItem, "data_providers"> & {
+export type TransportOrganizationDetail = TransportOrganizationListItem & {
   website?: string;
   contact_email?: string;
   phone_number?: string;
@@ -35,12 +35,6 @@ export type TransportOrganizationDetail = Omit<TransportOrganizationListItem, "d
     status_display?: string | null;
     date?: string | null;
     description?: string;
-  }[];
-  data_providers?: {
-    id?: number;
-    name?: string | null;
-    website?: string;
-    contact_email?: string;
   }[];
 };
 
