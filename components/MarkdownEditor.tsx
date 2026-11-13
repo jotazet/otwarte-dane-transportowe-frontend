@@ -7,9 +7,18 @@ import FormHelperText from "@mui/material/FormHelperText";
 import InputLabel from "@mui/material/InputLabel";
 import { useColorScheme } from "@mui/material/styles";
 
+import { MarkdownContent } from "@/components/MarkdownContent";
+
 import "@uiw/react-md-editor/markdown-editor.css";
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+
+// The editor's own preview renders raw HTML from the Markdown (rehype-raw, no sanitising),
+// and a post is opened here by people other than its author. The preview is the renderer
+// of the published post instead: no raw HTML, and it shows what readers will see.
+const editorComponents = {
+  preview: (source: string) => <MarkdownContent content={source} />,
+};
 
 export function MarkdownEditor({
   id,
@@ -51,6 +60,7 @@ export function MarkdownEditor({
           value={value}
           onChange={(next) => onChange(next ?? "")}
           preview="live"
+          components={editorComponents}
           height={360}
           visibleDragbar={false}
           // md-editor puts its own `id` on the wrapper div; the textarea needs it for the label.
