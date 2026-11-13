@@ -5,8 +5,6 @@ export type JwtPayload = Record<string, unknown> & {
   groups?: string[];
   roles?: string[];
   role?: string;
-  is_staff?: boolean;
-  is_superuser?: boolean;
 };
 
 function base64UrlDecode(input: string) {
