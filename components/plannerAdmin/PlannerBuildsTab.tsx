@@ -51,14 +51,12 @@ import { DefinitionRows } from "@/components/layout/DefinitionRows";
 import { fill } from "@/lib/i18n/fill";
 
 /**
- * Only the served graph and the newest other one are kept, so only that one can come back.
- * A rollback build reuses an older graph and has none of its own.
+ * The backend keeps the served graph and the newest other succeeded build's graph, rollbacks
+ * included (a rollback's graph is its target's), so only that build can come back
+ * (`_remove_unused_graphs` in the backend's `planner/pipeline.py`). `builds` is newest first.
  */
 export function restorableBuildId(builds: GraphBuild[]): number | null {
-  return (
-    builds.find((b) => b.status === "succeeded" && !b.is_active && b.rollback_of === null)?.id ??
-    null
-  );
+  return builds.find((b) => b.status === "succeeded" && !b.is_active)?.id ?? null;
 }
 
 export function PlannerBuildsTab({ ctx }: { ctx: PlannerAdminContext }) {
