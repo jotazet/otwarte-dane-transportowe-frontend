@@ -1,4 +1,4 @@
-# 0006. Show untranslated backend text to Admins only, behind a toggle
+# 0007. Show untranslated backend text to Admins only, behind a toggle
 
 - **Status:** Accepted
 - **Date:** 2026-11-13

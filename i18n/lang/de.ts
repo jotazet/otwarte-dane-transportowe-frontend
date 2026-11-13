@@ -327,14 +327,6 @@ export const dictDe: Dictionary = {
     invalid: "Fehler gefunden",
     error: "Nicht durchgeführt",
   },
-  submissionValidationErrorCodes: {
-    "gtfs_validation.file_missing": "Die Feed-Datei ist auf dem ODT-Server nicht verfügbar.",
-    "gtfs_validation.validator_unavailable": "Der Validator konnte nicht gestartet werden.",
-    "gtfs_validation.validator_failed": "Der Validator wurde ohne Ergebnis beendet.",
-    "gtfs_validation.timeout": "Die Validierung hat das Zeitlimit überschritten.",
-    "gtfs_validation.credential_undecryptable":
-      "Der ODT-Server kann die gespeicherten Zugangsdaten der Quelle nicht lesen und hat den Feed daher nicht heruntergeladen.",
-  },
   submissionValidationErrorHint:
     "Die Validierung konnte wegen eines Problems bei ODT nicht durchgeführt werden. Das ODT-Team führt sie erneut aus.",
   submissionFetchAutoPausedHint:
@@ -409,9 +401,6 @@ export const dictDe: Dictionary = {
       "Die erste Kopie der Daten des Endpoints „{endpoint}“ konnte nicht auf dem ODT-Server gespeichert werden. Versuchen Sie es später erneut.",
   },
   realtimeRejectionReasonUnknown: "Die Einreichung wurde bei der automatischen Prüfung abgelehnt.",
-  gtfsValidationErrorTitle: "Die GTFS-Validierung konnte nicht durchgeführt werden",
-  gtfsValidationErrorNote:
-    "Die Ursache liegt bei ODT, nicht im Feed. Die Einreichung behält ihre Stufe, und das ODT-Team führt die Validierung erneut durch.",
   gtfsValidationNotice: "GTFS-Validator: {code}, Vorkommen: {count}",
   gtfsValidationRejectedGeneric:
     "Der Feed hat die automatische GTFS-Validierung nicht bestanden oder konnte für die Validierung nicht heruntergeladen werden. Prüfen Sie die URL und den Inhalt der Datei.",

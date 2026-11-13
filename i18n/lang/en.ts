@@ -311,14 +311,6 @@ export const dictEn: Dictionary = {
     invalid: "Errors found",
     error: "Not run",
   },
-  submissionValidationErrorCodes: {
-    "gtfs_validation.file_missing": "The feed file is not available on ODT's server.",
-    "gtfs_validation.validator_unavailable": "The validator could not be started.",
-    "gtfs_validation.validator_failed": "The validator stopped without a result.",
-    "gtfs_validation.timeout": "Validation exceeded the time limit.",
-    "gtfs_validation.credential_undecryptable":
-      "ODT's server cannot read the stored source credentials, so it did not download the feed.",
-  },
   submissionValidationErrorHint:
     "Validation could not run because of a problem on ODT's side. The ODT team will run it again.",
   submissionFetchAutoPausedHint:
@@ -389,9 +381,6 @@ export const dictEn: Dictionary = {
       'Could not store the first copy of data from endpoint "{endpoint}" on the ODT server. Try again later.',
   },
   realtimeRejectionReasonUnknown: "The submission was rejected during automatic verification.",
-  gtfsValidationErrorTitle: "GTFS validation could not be run",
-  gtfsValidationErrorNote:
-    "The cause is on ODT's side, not in the feed. The submission keeps its stage, and the ODT team will run the validation again.",
   gtfsValidationNotice: "GTFS validator: {code}, occurrences: {count}",
   gtfsValidationRejectedGeneric:
     "The feed failed automatic GTFS validation or could not be downloaded for validation. Check the URL and the file contents.",

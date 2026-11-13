@@ -312,14 +312,6 @@ export const dictPl = {
     invalid: "Wykryto błędy",
     error: "Nie przeprowadzono",
   },
-  submissionValidationErrorCodes: {
-    "gtfs_validation.file_missing": "Plik feedu jest niedostępny na serwerze ODT.",
-    "gtfs_validation.validator_unavailable": "Nie udało się uruchomić walidatora.",
-    "gtfs_validation.validator_failed": "Walidator zakończył pracę bez wyniku.",
-    "gtfs_validation.timeout": "Walidacja przekroczyła limit czasu.",
-    "gtfs_validation.credential_undecryptable":
-      "Serwer ODT nie może odczytać zapisanych danych autoryzacji źródła, dlatego nie pobrał feedu.",
-  },
   submissionValidationErrorHint:
     "Walidacja nie została przeprowadzona z powodu problemu po stronie ODT. Zespół ODT uruchomi ją ponownie.",
   submissionFetchAutoPausedHint:
@@ -390,9 +382,6 @@ export const dictPl = {
       "Nie udało się zapisać pierwszej kopii danych z endpointu „{endpoint}” na serwerze ODT. Spróbuj ponownie później.",
   },
   realtimeRejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
-  gtfsValidationErrorTitle: "Nie udało się przeprowadzić walidacji GTFS",
-  gtfsValidationErrorNote:
-    "Przyczyna leży po stronie ODT, nie feedu. Zgłoszenie zachowuje swój etap, a zespół ODT powtórzy walidację.",
   gtfsValidationNotice: "Walidator GTFS: {code}, liczba wystąpień: {count}",
   gtfsValidationRejectedGeneric:
     "Feed nie przeszedł automatycznej walidacji GTFS lub nie udało się go pobrać do walidacji. Sprawdź adres URL i zawartość pliku.",

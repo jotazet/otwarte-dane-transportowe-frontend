@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -54,7 +53,7 @@ import {
 } from "@/lib/data/hideOriginalAuth";
 import { downloadBlob } from "@/lib/download";
 import { fill } from "@/lib/i18n/fill";
-import { errorCodeLabel, formatApiError } from "@/lib/formatApiError";
+import { formatApiError } from "@/lib/formatApiError";
 import { gtfsRejectionReasons } from "@/lib/gtfsRejection";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { submissionStageLabel } from "@/lib/submissionStage";
@@ -218,10 +217,6 @@ export function FeedSubmissionDetail({
         dict,
       )
     : undefined;
-  const validationError =
-    row.static_entry?.validation_status === "error"
-      ? (errorCodeLabel(row.static_entry.validation_message, dict) ?? null)
-      : undefined;
   const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
 
   const sourceCtx = {
@@ -418,14 +413,6 @@ export function FeedSubmissionDetail({
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
         dict={dict}
       />
-
-      {validationError !== undefined ? (
-        <Alert severity="warning">
-          <AlertTitle>{dict.gtfsValidationErrorTitle}</AlertTitle>
-          {validationError ? `${validationError} ` : null}
-          {dict.gtfsValidationErrorNote}
-        </Alert>
-      ) : null}
 
       <Card>
         <CardContent>

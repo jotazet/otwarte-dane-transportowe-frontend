@@ -20,7 +20,7 @@ import { submissionsPaths } from "@/lib/api/submissions";
 import type { FetchHealthFields, PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { fill } from "@/lib/i18n/fill";
-import { formatApiError } from "@/lib/formatApiError";
+import { errorCodeLabel, formatApiError } from "@/lib/formatApiError";
 import { formatDateTime } from "@/lib/format";
 import { tableHeadRowSx } from "@/lib/ui/tableSx";
 
@@ -113,11 +113,8 @@ export function StaticFeedStatusPanel({
     };
   }, [apiJson, dict, showFetch, submissionId]);
 
-  const validationCodes: Record<string, string> = dict.submissionValidationErrorCodes;
   const validationCodeMessage =
-    validationStatus === "error" && validationMessage
-      ? validationCodes[validationMessage.trim()]
-      : undefined;
+    validationStatus === "error" ? errorCodeLabel(validationMessage?.trim(), dict) : undefined;
   const status = fetchHealth?.fetch_status;
   const latestError = errors[0];
 

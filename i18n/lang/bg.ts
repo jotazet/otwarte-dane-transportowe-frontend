@@ -315,14 +315,6 @@ export const dictBg: Dictionary = {
     invalid: "Открити са грешки",
     error: "Не е извършено",
   },
-  submissionValidationErrorCodes: {
-    "gtfs_validation.file_missing": "Файлът на фийда не е наличен на сървъра на ODT.",
-    "gtfs_validation.validator_unavailable": "Валидаторът не можа да бъде стартиран.",
-    "gtfs_validation.validator_failed": "Валидаторът спря без резултат.",
-    "gtfs_validation.timeout": "Валидирането надвиши лимита от време.",
-    "gtfs_validation.credential_undecryptable":
-      "Сървърът на ODT не може да прочете запазените данни за оторизация на източника, затова не изтегли фийда.",
-  },
   submissionValidationErrorHint:
     "Валидирането не можа да се извърши поради проблем от страна на ODT. Екипът на ODT ще го стартира отново.",
   submissionFetchAutoPausedHint:
@@ -393,9 +385,6 @@ export const dictBg: Dictionary = {
       "Първото копие на данните от ендпойнта „{endpoint}“ не можа да бъде записано на сървъра на ODT. Опитайте отново по-късно.",
   },
   realtimeRejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
-  gtfsValidationErrorTitle: "GTFS валидирането не можа да бъде извършено",
-  gtfsValidationErrorNote:
-    "Причината е от страна на ODT, а не във фийда. Заявката запазва етапа си, а екипът на ODT ще извърши валидирането отново.",
   gtfsValidationNotice: "GTFS валидатор: {code}, брой случаи: {count}",
   gtfsValidationRejectedGeneric:
     "Фийдът не премина автоматичното GTFS валидиране или не можа да бъде изтеглен за валидиране. Проверете URL адреса и съдържанието на файла.",
