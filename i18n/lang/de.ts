@@ -245,6 +245,17 @@ export const dictDe: Dictionary = {
       "Sie haben das Tageslimit von 10 Reaktionen erreicht. Versuchen Sie es morgen erneut.",
     "blog.too_many_tags": "Ein Beitrag kann höchstens 5 Tags haben.",
     "blog.image_too_large": "Das Bild überschreitet die maximale Größe.",
+    "blog.tag_too_long": "Ein Tag darf höchstens 16 Zeichen haben.",
+    "fetch.credential_undecryptable":
+      "Der ODT-Server kann die gespeicherten Zugangsdaten der Quelle nicht entschlüsseln und hat den Feed daher nicht abgerufen. Das Problem liegt bei ODT: Das ODT-Team muss die Konfiguration der Verschlüsselungsschlüssel korrigieren.",
+    "gtfs_validation.file_missing": "Die Feed-Datei ist auf dem ODT-Server nicht verfügbar.",
+    "gtfs_validation.validator_unavailable": "Der GTFS-Validator konnte nicht gestartet werden.",
+    "gtfs_validation.validator_failed":
+      "Der GTFS-Validator wurde abgebrochen oder hat keinen Bericht geliefert.",
+    "gtfs_validation.timeout":
+      "Die Validierung wurde nicht innerhalb der Zeitbegrenzung abgeschlossen.",
+    "gtfs_validation.credential_undecryptable":
+      "Der ODT-Server kann die gespeicherten Zugangsdaten der Quelle nicht entschlüsseln und hat den Feed daher nicht für die Validierung abgerufen.",
   },
   addFeed: "Feed hinzufügen",
   myFeeds: "Meine Feeds",
@@ -370,7 +381,8 @@ export const dictDe: Dictionary = {
   rejected: "Abgelehnt",
   published: "Veröffentlicht",
   rejectionCause: "Ablehnungsgrund",
-  rejectionCauseHint: "Optional - bei Ablehnung der Einreichung angeben.",
+  rejectionCauseHint:
+    "Pflichtfeld. Beschreiben Sie, was korrigiert werden muss – die einreichende Person sieht diesen Text.",
   realtimeRejectionReasons: {
     "realtime.static_submission_missing":
       "Der Realtime-Feed ist mit keiner statischen Einreichung verknüpft. Wählen Sie für GTFS-RT und SIRI eine veröffentlichte statische Einreichung aus.",
@@ -397,6 +409,12 @@ export const dictDe: Dictionary = {
       "Die erste Kopie der Daten des Endpoints „{endpoint}“ konnte nicht auf dem ODT-Server gespeichert werden. Versuchen Sie es später erneut.",
   },
   realtimeRejectionReasonUnknown: "Die Einreichung wurde bei der automatischen Prüfung abgelehnt.",
+  gtfsValidationErrorTitle: "Die GTFS-Validierung konnte nicht durchgeführt werden",
+  gtfsValidationErrorNote:
+    "Die Ursache liegt bei ODT, nicht im Feed. Die Einreichung behält ihre Stufe, und das ODT-Team führt die Validierung erneut durch.",
+  gtfsValidationNotice: "GTFS-Validator: {code}, Vorkommen: {count}",
+  gtfsValidationRejectedGeneric:
+    "Der Feed hat die automatische GTFS-Validierung nicht bestanden oder konnte für die Validierung nicht heruntergeladen werden. Prüfen Sie die URL und den Inhalt der Datei.",
   applyStage: "Stufe anwenden",
   rejectSubmission: "Ablehnen",
   reviewSubmission: "Einreichung prüfen",
@@ -548,10 +566,15 @@ export const dictDe: Dictionary = {
   fetchErrorsDays: "Zeitraum (Tage)",
   fetchErrorType: "Fehlertyp",
   fetchErrorSource: "Quelle",
-  fetchErrorMessage: "Meldung",
+  fetchErrorMessage: "Details",
   fetchErrorDate: "Datum",
   fetchErrorsEmpty: "Keine Abruffehler im gewählten Zeitraum.",
   fetchErrorsTotal: "Fehler gesamt: {n}",
+  fetchErrorsEndpointType: "Endpoint-Typ",
+  fetchErrorHttpStatus: "HTTP-Antwortcode: {status}",
+  fetchPauseAfterFailures: "Fehlgeschlagene Abrufe in Folge: {n}",
+  technicalDetailsShow: "Technische Details anzeigen",
+  technicalDetailsHide: "Technische Details ausblenden",
   sourceStatic: "Statisch",
   sourceRealtime: "Realtime",
   fetchStatusLabels: {
@@ -565,6 +588,7 @@ export const dictDe: Dictionary = {
     connection_error: "Verbindungsfehler",
     http_error: "HTTP-Fehler",
     invalid_content: "Ungültiger Inhalt",
+    auth_error: "Fehler bei Zugangsdaten",
   },
   metaFeedOpsTitle: "Feed-Verwaltung – Proxy-Abruf",
   metaFeedOpsDescription:
@@ -864,6 +888,20 @@ export const dictDe: Dictionary = {
       "Der Feed hat keine Fahrten im Zeitfenster des Graphen (von gestern bis zwei Monate im Voraus).",
     "planner.rt_url_blocked":
       "Die URL führt in ein privates Netz, daher fragt der Planer sie nicht ab.",
+    "planner.rt_url_unsupported":
+      "Die URL enthält die Zeichen ${, die OTP als Variable liest, daher fragt der Planer sie nicht ab.",
+    "planner.feed_other_organization": "Wählen Sie einen Feed derselben Organisation.",
+    "planner.feed_not_gtfs": "Wählen Sie eine GTFS-Einreichung.",
+    "planner.feed_not_gbfs": "Wählen Sie eine GBFS-Einreichung.",
+    "planner.invalid_feed_id":
+      "Die ID muss 2 bis 32 Zeichen haben: Kleinbuchstaben, Ziffern und Bindestriche. Sie darf nicht mit einem Bindestrich beginnen.",
+    "planner.feed_id_immutable": "Die Feed-ID kann nicht geändert werden.",
+    "planner.invalid_network":
+      "Ungültiger Wert. Geben Sie eine IPv4- oder IPv6-Adresse oder ein Netz an, als Netz-ID 2 bis 32 Zeichen: Kleinbuchstaben, Ziffern und Bindestriche.",
+    "planner.network_immutable": "Die Netz-ID kann nicht geändert werden.",
+    "planner.invalid_range": "Der Beginn des Zeitraums muss vor seinem Ende liegen.",
+    "planner.too_many_buckets":
+      "Der Zeitraum ist für das gewählte Intervall zu lang. Wählen Sie einen kürzeren Zeitraum oder ein längeres Intervall.",
     "planner.rental_source_not_published": "Die GBFS-Einreichung ist nicht mehr veröffentlicht.",
     "planner.rental_source_without_gbfs": "Die Einreichung hat keinen Endpoint gbfs.json.",
     "planner.rental_source_requires_auth":

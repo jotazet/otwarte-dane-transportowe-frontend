@@ -10,11 +10,11 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 
 import { ListPagination } from "@/components/ListPagination";
+import { fetchPauseReasonText, LastFetchError } from "@/components/feedOps/FetchHealthText";
 import { FetchStatusChip } from "@/components/feedOps/FetchStatusChip";
 import { PauseFetchDialog } from "@/components/feedOps/PauseFetchDialog";
 import { FilteredTableEmpty } from "@/components/layout/FilteredTableEmpty";
@@ -32,6 +32,8 @@ import {
 } from "@/lib/api/feedOps";
 import type { FetchStatus, PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { hasAdminAccess } from "@/lib/auth/permissions";
+import { usePermissions } from "@/lib/auth/usePermissions";
 import { formatApiError } from "@/lib/formatApiError";
 import { formatDateTime, text } from "@/lib/format";
 import { submissionDetailPath } from "@/lib/nav/routes";
@@ -39,10 +41,6 @@ import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 
 const STATUS_ORDER: FetchStatus[] = ["active", "delayed", "auto_paused", "manual_paused"];
 const PAUSED_STATUSES: FetchStatus[] = ["manual_paused", "auto_paused"];
-
-function truncate(value: string, max = 80): string {
-  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
-}
 
 export function ProxyFeedsTable({
   locale,
@@ -60,6 +58,8 @@ export function ProxyFeedsTable({
   onReload: () => void;
 }) {
   const { apiJson } = useAuth();
+  const { user } = usePermissions();
+  const isAdmin = user != null && hasAdminAccess(user);
   const [page, setPage] = React.useState(1);
   const [rows, setRows] = React.useState<ProxyFeedListItem[]>([]);
   const [count, setCount] = React.useState(0);
@@ -253,17 +253,9 @@ export function ProxyFeedsTable({
                   </TableCell>
                   <TableCell>{formatDateTime(row.next_fetch_after, locale)}</TableCell>
                   <TableCell sx={{ maxWidth: 240 }}>
-                    {row.last_fetch_error_message ? (
-                      <Tooltip title={row.last_fetch_error_message}>
-                        <Typography variant="body2" noWrap>
-                          {truncate(row.last_fetch_error_message)}
-                        </Typography>
-                      </Tooltip>
-                    ) : (
-                      "-"
-                    )}
+                    <LastFetchError health={row} locale={locale} isAdmin={isAdmin} dict={dict} />
                   </TableCell>
-                  <TableCell>{text(row.fetch_pause_reason)}</TableCell>
+                  <TableCell>{fetchPauseReasonText(row, dict)}</TableCell>
                   <TableCell align="right">
                     {isPaused ? (
                       <Button

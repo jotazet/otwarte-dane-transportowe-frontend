@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -39,7 +40,11 @@ import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel"
 import { submissionsPaths } from "@/lib/api/submissions";
 import type { FetchHealthFields, SubmissionHistoryEvent } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
+import {
+  canViewSubmissionInContext,
+  hasAdminAccess,
+  hasHelperAccess,
+} from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
 import { authTypeOptions } from "@/lib/data/authTypes";
 import {
@@ -49,7 +54,8 @@ import {
 } from "@/lib/data/hideOriginalAuth";
 import { downloadBlob } from "@/lib/download";
 import { fill } from "@/lib/i18n/fill";
-import { formatApiError } from "@/lib/formatApiError";
+import { errorCodeLabel, formatApiError } from "@/lib/formatApiError";
+import { gtfsRejectionReasons } from "@/lib/gtfsRejection";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { submissionStageLabel } from "@/lib/submissionStage";
 
@@ -64,6 +70,7 @@ type StaticEntry = FetchHealthFields & {
   hide_original?: boolean;
   auth_type?: string;
   validation_status?: StaticValidationStatus;
+  /** For `error`, a `gtfs_validation.*` code (backend docs/api/feeds.md). */
   validation_message?: string;
 };
 
@@ -201,6 +208,20 @@ export function FeedSubmissionDetail({
     user.userId != null && row.submitted_by != null && user.userId === row.submitted_by;
   const isHelper = hasHelperAccess(user);
   const isDjangoAdmin = user.isDjangoAdmin;
+  const isAdmin = hasAdminAccess(user);
+  // An automatic rejection (no actor) stores the GTFS validator's text, not a code.
+  const latestEvent = row.history?.[0];
+  const rejectionReasons = row.is_rejected
+    ? gtfsRejectionReasons(
+        row.rejection_cause,
+        latestEvent?.event_type === "rejected" && !latestEvent.actor,
+        dict,
+      )
+    : undefined;
+  const validationError =
+    row.static_entry?.validation_status === "error"
+      ? (errorCodeLabel(row.static_entry.validation_message, dict) ?? null)
+      : undefined;
   const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
 
   const sourceCtx = {
@@ -391,10 +412,20 @@ export function FeedSubmissionDetail({
         stageLabel={submissionStageLabel("static", row.current_stage, row.is_rejected, dict)}
         isRejected={row.is_rejected}
         rejectionCause={row.rejection_cause}
+        rejectionReasons={rejectionReasons}
+        rawCause={isAdmin ? row.rejection_cause : undefined}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
         dict={dict}
       />
+
+      {validationError !== undefined ? (
+        <Alert severity="warning">
+          <AlertTitle>{dict.gtfsValidationErrorTitle}</AlertTitle>
+          {validationError ? `${validationError} ` : null}
+          {dict.gtfsValidationErrorNote}
+        </Alert>
+      ) : null}
 
       <Card>
         <CardContent>
@@ -727,7 +758,13 @@ export function FeedSubmissionDetail({
 
       {row.history?.length ? (
         <FormSection title={dict.historyTitle}>
-          <HistoryTimeline events={row.history} locale={locale} dict={dict} />
+          <HistoryTimeline
+            events={row.history}
+            locale={locale}
+            automaticCauseReasons={(cause) => gtfsRejectionReasons(cause, true, dict) ?? []}
+            showRawCause={isAdmin}
+            dict={dict}
+          />
         </FormSection>
       ) : null}
       {confirmDialog}

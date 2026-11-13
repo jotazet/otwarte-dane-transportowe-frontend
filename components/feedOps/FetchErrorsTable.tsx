@@ -11,13 +11,13 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 
 import { ListPagination } from "@/components/ListPagination";
 import { FilteredTableEmpty } from "@/components/layout/FilteredTableEmpty";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
+import { TechnicalDetails } from "@/components/layout/TechnicalDetails";
 import { TableCard } from "@/components/TableCard";
 import type { Dictionary } from "@/i18n/getDictionary";
 import {
@@ -31,19 +31,26 @@ import {
 } from "@/lib/api/feedOps";
 import type { PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { formatApiError } from "@/lib/formatApiError";
+import { hasAdminAccess } from "@/lib/auth/permissions";
+import { usePermissions } from "@/lib/auth/usePermissions";
+import { errorCodeLabel, formatApiError } from "@/lib/formatApiError";
 import { formatDateTime, text } from "@/lib/format";
+import { fill } from "@/lib/i18n/fill";
 import { submissionDetailPath } from "@/lib/nav/routes";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 
-const ERROR_TYPES = ["timeout", "connection_error", "http_error", "invalid_content"] as const;
-
-function truncate(value: string, max = 100): string {
-  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
-}
+const ERROR_TYPES = [
+  "timeout",
+  "connection_error",
+  "http_error",
+  "invalid_content",
+  "auth_error",
+] as const;
 
 export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dictionary }) {
   const { apiJson } = useAuth();
+  const { user } = usePermissions();
+  const isAdmin = user != null && hasAdminAccess(user);
   const [days, setDays] = React.useState(7);
   const [errorType, setErrorType] = React.useState("");
   const [source, setSource] = React.useState<FetchErrorSource | "">("");
@@ -96,6 +103,24 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
   function errorTypeLabel(value: string | null | undefined): string {
     if (!value) return "-";
     return dict.fetchErrorTypeLabels[value as keyof typeof dict.fetchErrorTypeLabels] ?? value;
+  }
+
+  /** The translated message (a stored code) or the HTTP status; raw backend text only for Admins. */
+  function detailsCell(row: FeedFetchError) {
+    const known = errorCodeLabel(row.message, dict);
+    const summary =
+      known ??
+      (row.http_status_code != null
+        ? fill(dict.fetchErrorHttpStatus, { status: row.http_status_code })
+        : null);
+    return (
+      <>
+        {summary ?? (isAdmin && row.message ? null : "-")}
+        {isAdmin && row.message && !known ? (
+          <TechnicalDetails text={row.message} dict={dict} />
+        ) : null}
+      </>
+    );
   }
 
   function feedCell(row: FeedFetchError) {
@@ -212,17 +237,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
                     <TableCell>{sourceLabel(row.source)}</TableCell>
                     <TableCell>{errorTypeLabel(row.error_type)}</TableCell>
                     <TableCell>{feedCell(row)}</TableCell>
-                    <TableCell sx={{ maxWidth: 320 }}>
-                      {row.message ? (
-                        <Tooltip title={row.message}>
-                          <Typography variant="body2" noWrap>
-                            {truncate(row.message)}
-                          </Typography>
-                        </Tooltip>
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
+                    <TableCell sx={{ maxWidth: 320 }}>{detailsCell(row)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

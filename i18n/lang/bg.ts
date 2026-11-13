@@ -235,6 +235,15 @@ export const dictBg: Dictionary = {
     "blog.reaction_daily_limit": "Достигнахте дневния лимит от 10 реакции. Опитайте отново утре.",
     "blog.too_many_tags": "Публикацията може да има най-много 5 тага.",
     "blog.image_too_large": "Изображението надвишава максималния размер.",
+    "blog.tag_too_long": "Тагът може да има най-много 16 знака.",
+    "fetch.credential_undecryptable":
+      "Сървърът на ODT не може да дешифрира запазените данни за оторизация на източника, затова не е изтеглил фийда. Проблемът е от страна на ODT: екипът на ODT трябва да коригира конфигурацията на ключовете за шифроване.",
+    "gtfs_validation.file_missing": "Файлът на фийда не е наличен на сървъра на ODT.",
+    "gtfs_validation.validator_unavailable": "GTFS валидаторът не можа да бъде стартиран.",
+    "gtfs_validation.validator_failed": "GTFS валидаторът спря или не върна доклад.",
+    "gtfs_validation.timeout": "Валидирането не приключи в определеното време.",
+    "gtfs_validation.credential_undecryptable":
+      "Сървърът на ODT не може да дешифрира запазените данни за оторизация на източника, затова не е изтеглил фийда за валидиране.",
   },
   addFeed: "Добави фийд",
   myFeeds: "Моите фийдове",
@@ -358,7 +367,8 @@ export const dictBg: Dictionary = {
   rejected: "Отхвърлено",
   published: "Публикувано",
   rejectionCause: "Причина за отхвърляне",
-  rejectionCauseHint: "По избор - посочи при отхвърляне на заявката.",
+  rejectionCauseHint:
+    "Задължително. Опишете какво трябва да се коригира – подателят ще види този текст.",
   realtimeRejectionReasons: {
     "realtime.static_submission_missing":
       "Фийдът в реално време не е свързан със статична заявка. За GTFS-RT и SIRI изберете публикувана статична заявка.",
@@ -383,6 +393,12 @@ export const dictBg: Dictionary = {
       "Първото копие на данните от ендпойнта „{endpoint}“ не можа да бъде записано на сървъра на ODT. Опитайте отново по-късно.",
   },
   realtimeRejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
+  gtfsValidationErrorTitle: "GTFS валидирането не можа да бъде извършено",
+  gtfsValidationErrorNote:
+    "Причината е от страна на ODT, а не във фийда. Заявката запазва етапа си, а екипът на ODT ще извърши валидирането отново.",
+  gtfsValidationNotice: "GTFS валидатор: {code}, брой случаи: {count}",
+  gtfsValidationRejectedGeneric:
+    "Фийдът не премина автоматичното GTFS валидиране или не можа да бъде изтеглен за валидиране. Проверете URL адреса и съдържанието на файла.",
   applyStage: "Приложи етап",
   rejectSubmission: "Отхвърли",
   reviewSubmission: "Проверка на заявката",
@@ -535,10 +551,15 @@ export const dictBg: Dictionary = {
   fetchErrorsDays: "Период (дни)",
   fetchErrorType: "Тип грешка",
   fetchErrorSource: "Източник",
-  fetchErrorMessage: "Съобщение",
+  fetchErrorMessage: "Подробности",
   fetchErrorDate: "Дата",
   fetchErrorsEmpty: "Няма грешки при изтегляне в избрания период.",
   fetchErrorsTotal: "Общо грешки: {n}",
+  fetchErrorsEndpointType: "Тип ендпойнт",
+  fetchErrorHttpStatus: "HTTP код на отговора: {status}",
+  fetchPauseAfterFailures: "Последователни неуспешни изтегляния: {n}",
+  technicalDetailsShow: "Покажи техническите подробности",
+  technicalDetailsHide: "Скрий техническите подробности",
   sourceStatic: "Статичен",
   sourceRealtime: "Реално време",
   fetchStatusLabels: {
@@ -552,6 +573,7 @@ export const dictBg: Dictionary = {
     connection_error: "Грешка при връзката",
     http_error: "HTTP грешка",
     invalid_content: "Невалидно съдържание",
+    auth_error: "Грешка в данните за оторизация",
   },
   metaFeedOpsTitle: "Управление на фийдовете – прокси изтегляне",
   metaFeedOpsDescription:
@@ -847,6 +869,20 @@ export const dictBg: Dictionary = {
       "Фийдът няма курсове в периода на графа (от вчера до два месеца напред).",
     "planner.rt_url_blocked":
       "Адресът води към частна мрежа, затова планерът не изтегля данни от него.",
+    "planner.rt_url_unsupported":
+      "Адресът съдържа знаците ${, които OTP чете като променлива, затова планерът не изтегля данни от него.",
+    "planner.feed_other_organization": "Изберете фийд на същата организация.",
+    "planner.feed_not_gtfs": "Изберете GTFS заявка.",
+    "planner.feed_not_gbfs": "Изберете GBFS заявка.",
+    "planner.invalid_feed_id":
+      "Идентификаторът трябва да има от 2 до 32 знака: малки букви, цифри и тирета. Не може да започва с тире.",
+    "planner.feed_id_immutable": "Идентификаторът на фийда не може да бъде променян.",
+    "planner.invalid_network":
+      "Невалидна стойност. Въведете IPv4 или IPv6 адрес или мрежа, а като идентификатор на мрежа – от 2 до 32 знака: малки букви, цифри и тирета.",
+    "planner.network_immutable": "Идентификаторът на мрежата не може да бъде променян.",
+    "planner.invalid_range": "Началото на периода трябва да е преди неговия край.",
+    "planner.too_many_buckets":
+      "Периодът е твърде дълъг за избрания интервал. Изберете по-кратък период или по-дълъг интервал.",
     "planner.rental_source_not_published": "Заявката за GBFS вече не е публикувана.",
     "planner.rental_source_without_gbfs": "Заявката няма ендпойнт gbfs.json.",
     "planner.rental_source_requires_auth":

@@ -1,5 +1,6 @@
 "use client";
 
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
@@ -9,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import type { Dictionary } from "@/i18n/getDictionary";
 import { fetchMyReactions, reactToPost } from "@/lib/api/blog";
+import { formatApiError } from "@/lib/formatApiError";
 import { blogReactionOrder, reactionCountLabel, reactionMdIcons } from "@/lib/reactionIcons";
 
 export function ReactionPanel({
@@ -18,11 +20,25 @@ export function ReactionPanel({
 }: {
   postId: number;
   initialSummary: Record<string, number> | null | undefined;
-  dict: Pick<Dictionary, "reactions" | "blogReactionLabels" | "blogReactionCountLabel">;
+  dict: Pick<
+    Dictionary,
+    | "reactions"
+    | "blogReactionLabels"
+    | "blogReactionCountLabel"
+    | "apiErrorCodes"
+    | "apiErrorConnection"
+    | "apiErrorInvalidData"
+    | "apiErrorLoginRequired"
+    | "apiErrorForbidden"
+    | "apiErrorNotFound"
+    | "apiErrorRateLimited"
+    | "apiErrorGeneric"
+  >;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   // Which reaction is MINE has to be read in the browser: this page is
   // rendered server-side and the API identifies visitors by IP, so an SSR
   // value would describe the frontend server — the same for every visitor.
@@ -52,12 +68,15 @@ export function ReactionPanel({
   async function setReaction(next: string | null) {
     const previous = yourReaction;
     setSaving(true);
+    setError(null);
     setYourReaction(next); // optimistic
     try {
       await reactToPost(postId, next);
       startTransition(() => router.refresh()); // refresh the global counts
-    } catch {
-      setYourReaction(previous); // e.g. daily limit reached (429)
+    } catch (e) {
+      // e.g. the daily limit (429 blog.reaction_daily_limit) or the throttle.
+      setYourReaction(previous);
+      setError(formatApiError(e, dict));
     } finally {
       setSaving(false);
     }
@@ -103,6 +122,11 @@ export function ReactionPanel({
           );
         })}
       </Stack>
+      {error ? (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      ) : null}
     </Box>
   );
 }
