@@ -19,6 +19,7 @@ import type { FeedFetchError } from "@/lib/api/feedOps";
 import { submissionsPaths } from "@/lib/api/submissions";
 import type { FetchHealthFields, PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { fill } from "@/lib/i18n/fill";
 import { formatApiError } from "@/lib/formatApiError";
 import { formatDateTime } from "@/lib/format";
 import { tableHeadRowSx } from "@/lib/ui/tableSx";
@@ -55,7 +56,7 @@ function StatusRow({ label, children }: { label: string; children: React.ReactNo
 
 function fetchErrorLabel(error: FeedFetchError, dict: Dictionary): string {
   if (error.error_type === "http_error" && error.http_status_code != null) {
-    return dict.submissionFetchHttpError.replace("{status}", String(error.http_status_code));
+    return fill(dict.submissionFetchHttpError, { status: error.http_status_code });
   }
   if (!error.error_type) return "-";
   const labels: Record<string, string> = dict.fetchErrorTypeLabels;
@@ -201,7 +202,7 @@ export function StaticFeedStatusPanel({
             ) : null}
             {errorCount > errors.length ? (
               <Typography variant="body2" color="text.secondary">
-                {dict.fetchErrorsTotal.replace("{n}", String(errorCount))}
+                {fill(dict.fetchErrorsTotal, { n: errorCount })}
               </Typography>
             ) : null}
           </>

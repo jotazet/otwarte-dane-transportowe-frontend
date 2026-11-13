@@ -48,6 +48,7 @@ import {
   resolveHideOriginal,
 } from "@/lib/data/hideOriginalAuth";
 import { downloadBlob } from "@/lib/download";
+import { fill } from "@/lib/i18n/fill";
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { submissionStageLabel } from "@/lib/submissionStage";
@@ -523,7 +524,7 @@ export function FeedSubmissionDetail({
                 <Stack spacing={1}>
                   {isFileEntry && currentFileName ? (
                     <Typography variant="body2">
-                      {dict.staticCurrentFile.replace("{name}", currentFileName)}
+                      {fill(dict.staticCurrentFile, { name: currentFileName })}
                     </Typography>
                   ) : null}
                   {sourcePerms.canEditFullSource ? (
