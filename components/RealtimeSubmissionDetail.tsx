@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormSection } from "@/components/layout/FormSection";
-import { HistoryTimeline, type HistoryTimelineEvent } from "@/components/layout/HistoryTimeline";
+import { HistoryTimeline } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
@@ -26,7 +26,7 @@ import {
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
-import type { FetchHealthFields, RejectionReason } from "@/lib/api/types";
+import type { FetchHealthFields, RejectionReason, SubmissionHistoryEvent } from "@/lib/api/types";
 import { downloadBlob, feedDownloadFileName } from "@/lib/download";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -75,7 +75,7 @@ type RtDetail = {
   endpoints?: RtEndpoint[];
   submitted_by?: number;
   submitted_by_username?: string | null;
-  history?: HistoryTimelineEvent[];
+  history?: SubmissionHistoryEvent[];
 };
 
 function endpointDrafts(d: RtDetail): RtEndpointDraft[] {
@@ -339,7 +339,7 @@ export function RealtimeSubmissionDetail({
     sourcePerms.canEditLimitedMeta &&
     !sourcePerms.canEditFullSource &&
     !sourcePerms.canAdminSourceOnStage2Plus;
-  const rejectionReasons = formatRejectionReasons(row.rejection_reasons ?? [], dict);
+  const rejectionReasons = formatRejectionReasons(row.rejection_reasons ?? [], dict, locale);
   const stageLabel = submissionStageLabel("realtime", row.current_stage, row.is_rejected, dict);
 
   return (

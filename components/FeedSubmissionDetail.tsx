@@ -37,7 +37,7 @@ import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDet
 import type { Dictionary } from "@/i18n/getDictionary";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
-import type { FetchHealthFields, SubmissionHistoryEvent } from "@/lib/api/types";
+import type { FetchHealthFields, RejectionReason, SubmissionHistoryEvent } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   canViewSubmissionInContext,
@@ -55,6 +55,7 @@ import { downloadBlob, feedDownloadFileName } from "@/lib/download";
 import { fill } from "@/lib/i18n/fill";
 import { formatApiError } from "@/lib/formatApiError";
 import { gtfsRejectionReasons } from "@/lib/gtfsRejection";
+import { formatRejectionReasons } from "@/lib/rejectionReasons";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { submissionStageLabel } from "@/lib/submissionStage";
 
@@ -69,7 +70,7 @@ type StaticEntry = FetchHealthFields & {
   hide_original?: boolean;
   auth_type?: string;
   validation_status?: StaticValidationStatus;
-  /** For `error`, a `gtfs_validation.*` code (backend docs/api/feeds.md). */
+  /** A `gtfs_validation.*` code for `error` and `invalid` (backend docs/api/feeds.md). */
   validation_message?: string;
 };
 
@@ -82,6 +83,7 @@ type FeedDetail = {
   current_stage: number;
   is_rejected: boolean;
   rejection_cause?: string | null;
+  rejection_reasons?: RejectionReason[] | null;
   static_entry?: StaticEntry | null;
   realtime_submissions?: LinkedRealtimeSubmission[];
   submitted_by?: number;
@@ -208,15 +210,19 @@ export function FeedSubmissionDetail({
   const isHelper = hasHelperAccess(user);
   const isDjangoAdmin = user.isDjangoAdmin;
   const isAdmin = hasAdminAccess(user);
-  // An automatic rejection (no actor) stores the GTFS validator's text, not a code.
+  // An automatic rejection carries coded reasons; one recorded before the codes (no actor)
+  // kept the GTFS validator's text in `rejection_cause` (backend docs/api/feeds.md).
   const latestEvent = row.history?.[0];
-  const rejectionReasons = row.is_rejected
-    ? gtfsRejectionReasons(
-        row.rejection_cause,
-        latestEvent?.event_type === "rejected" && !latestEvent.actor,
-        dict,
-      )
-    : undefined;
+  const rejectionReasons = !row.is_rejected
+    ? undefined
+    : row.rejection_reasons?.length
+      ? formatRejectionReasons(row.rejection_reasons, dict, locale)
+      : gtfsRejectionReasons(
+          row.rejection_cause,
+          latestEvent?.event_type === "rejected" && !latestEvent.actor,
+          dict,
+          locale,
+        );
   const isFileEntry = !!row.static_entry?.file && !row.static_entry?.url;
 
   const sourceCtx = {
@@ -763,7 +769,7 @@ export function FeedSubmissionDetail({
           <HistoryTimeline
             events={row.history}
             locale={locale}
-            automaticCauseReasons={(cause) => gtfsRejectionReasons(cause, true, dict) ?? []}
+            automaticCauseReasons={(cause) => gtfsRejectionReasons(cause, true, dict, locale) ?? []}
             showRawCause={isAdmin}
             dict={dict}
           />

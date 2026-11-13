@@ -20,8 +20,8 @@ the owner's submission detail.
 Show it on the static submission detail (`StaticFeedStatusPanel`):
 
 - the GTFS validation state for `data_type=gtfs` (other types have no automatic validation), with a
-  translated message for the `error` codes; the `invalid` text is the rejection cause and is already
-  in the stage banner;
+  translated message for the `error` codes; the reason for `invalid` (`rejection_reasons`, or the
+  rejection cause of older rejections) is already in the stage banner;
 - for the owner of a published proxied feed, a read-only fetch status (status, last success, last
   error with its type, next attempt, a hint for paused feeds) and the errors of the last 30 days from
   `feed-submissions/{id}/fetch-errors/`, as date and translated error type.

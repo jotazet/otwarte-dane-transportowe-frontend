@@ -170,6 +170,10 @@ export const dictPl = {
   apiErrorRateLimited: "Przekroczono limit zapytań do serwera. Spróbuj ponownie za chwilę.",
   apiErrorGeneric: "Nie udało się wykonać operacji. Spróbuj ponownie za chwilę.",
   apiErrorCodes: {
+    "cases.data_provider_name_taken":
+      "Dostawca danych o tej nazwie już istnieje. Podaj inną nazwę.",
+    "cases.organization_exists":
+      "Organizacja o tej nazwie już istnieje w tym regionie. Podaj inną nazwę lub region.",
     "auth.csrf_failed":
       "Nie udało się potwierdzić, że żądanie pochodzi z tej strony. Odśwież stronę i spróbuj ponownie.",
     "auth.invalid_credentials": "Nieprawidłowy login lub hasło.",
@@ -188,6 +192,7 @@ export const dictPl = {
       "Ten feed nie jest pobierany przez serwer ODT, więc nie można wstrzymać jego pobierania.",
     "feeds.stage_changed":
       "Etap zgłoszenia zmienił się w międzyczasie. Odśwież stronę i spróbuj ponownie.",
+    "feeds.invalid_choice": "Ta wartość filtra nie jest obsługiwana.",
     "feeds.invalid_integer": "Wartość filtra musi być liczbą całkowitą.",
     "feeds.invalid_stage": "Etap musi być liczbą od 1 do 4.",
     "feeds.field_locked":
@@ -391,7 +396,22 @@ export const dictPl = {
     "realtime.endpoint_cache_failed":
       "Nie udało się zapisać pierwszej kopii danych z endpointu „{endpoint}” na serwerze ODT. Spróbuj ponownie później.",
   },
-  realtimeRejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
+  rejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
+  gtfsRejectionReasons: {
+    "gtfs_validation.feed_invalid":
+      "Walidator GTFS wykrył błędy w feedzie. Liczba błędów: {errorCount}.",
+    "gtfs_validation.download_http_error":
+      "Adres URL feedu zwrócił błąd HTTP {status}, więc nie udało się pobrać feedu do walidacji. Sprawdź adres URL i dane autoryzacji.",
+    "gtfs_validation.download_too_large": "Plik feedu przekracza dopuszczalny rozmiar {limit}.",
+    "gtfs_validation.download_url_blocked":
+      "Adres URL feedu nie spełnia zasad bezpieczeństwa ODT: nazwa hosta nie istnieje, adres nie jest publiczny albo przekierowanie jest niedozwolone.",
+    "gtfs_validation.download_timeout":
+      "Serwer pod adresem URL feedu nie odpowiedział w wyznaczonym czasie.",
+    "gtfs_validation.download_unreachable":
+      "Nie udało się połączyć z serwerem pod adresem URL feedu. Sprawdź, czy serwer jest dostępny z internetu.",
+    "gtfs_validation.download_failed":
+      "Nie udało się pobrać feedu do walidacji. Sprawdź adres URL feedu.",
+  },
   gtfsValidationNotice: "Walidator GTFS: {code}, liczba wystąpień: {count}",
   gtfsValidationRejectedGeneric:
     "Feed nie przeszedł automatycznej walidacji GTFS lub nie udało się go pobrać do walidacji. Sprawdź adres URL i zawartość pliku.",
