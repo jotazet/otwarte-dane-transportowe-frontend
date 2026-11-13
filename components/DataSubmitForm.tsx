@@ -8,21 +8,23 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
-import { MdAdd, MdDelete } from "react-icons/md";
 
 import { AccessGate } from "@/components/AccessGate";
 import { InlineSelect } from "@/components/InlineSelect";
 import { SourceModeToggle } from "@/components/layout/SourceModeToggle";
 import { PasswordTextField } from "@/components/PasswordTextField";
+import { RealtimeEndpointsEditor } from "@/components/submissions/RealtimeEndpointsEditor";
+import {
+  RealtimeStaticSubmissionSelect,
+  useEligibleStatics,
+} from "@/components/submissions/RealtimeStaticSubmissionSelect";
 import { formatApiError } from "@/lib/formatApiError";
 import { getJson } from "@/lib/api/http";
 import type { TransportOrganizationListItem } from "@/lib/api/cases";
@@ -35,80 +37,24 @@ import {
   resolveHideOriginal,
 } from "@/lib/data/hideOriginalAuth";
 import {
-  isNoSourceUpdate,
-  parseSourceUpdateInterval,
-  SOURCE_UPDATE_INTERVAL_DEFAULT,
-  SOURCE_UPDATE_INTERVAL_MAX,
-  SOURCE_UPDATE_INTERVAL_MIN,
-} from "@/lib/data/intervalChoices";
+  emptyEndpoint,
+  endpointPayload,
+  endpointsForProtocol,
+  parseEndpointInterval,
+  isRealtimeProtocol,
+  REALTIME_PROTOCOLS,
+  requiresStaticSubmission,
+  type RealtimeProtocol,
+  type RtEndpointDraft,
+} from "@/lib/data/realtimeEndpoints";
 import { text } from "@/lib/format";
 
 import { fetchAllPages } from "@/lib/api/types";
 
-type EligibleStaticRow = {
-  id: number;
-  transport_organization: number;
-  data_type: string;
-  name?: string;
-  allowed_realtime_protocols?: string[];
-};
-
-type RtEndpointDraft = {
-  uid: string;
-  endpoint_type: string;
-  url: string;
-  interval: string;
-  is_original: boolean;
-  hide_original: boolean;
-  auth_type: string;
-  auth_value: string;
-};
-
-let endpointUidSeq = 0;
-/** Stabilny klucz React dla usuwalnych wierszy endpointów (nie używać indeksu tablicy). */
-function nextEndpointUid(): string {
-  endpointUidSeq += 1;
-  return `ep-${endpointUidSeq}`;
-}
-
 const DATA_TYPES = ["gtfs", "netex", "other"] as const;
-const PROTOCOLS = ["gtfs_rt", "siri", "gbfs"] as const;
 import { authTypeOptions } from "@/lib/data/authTypes";
 type DataTypeChoice = (typeof DATA_TYPES)[number];
-type ProtocolChoice = (typeof PROTOCOLS)[number];
 type OrgSelect = number | "";
-const ENDPOINT_TYPES_GTFS_RT = ["trip_update", "vehicle_position", "service_alert"] as const;
-const ENDPOINT_TYPES_SIRI = ["sx", "sm", "vm", "et", "gm"] as const;
-const ENDPOINT_TYPES_GBFS = [
-  "gbfs",
-  "gbfs_versions",
-  "system_information",
-  "vehicle_types",
-  "station_information",
-  "station_status",
-  "free_bike_status",
-  "system_hours",
-  "system_alerts",
-] as const;
-
-function emptyEndpoint(protocol: ProtocolChoice): RtEndpointDraft {
-  const options =
-    protocol === "gtfs_rt"
-      ? ENDPOINT_TYPES_GTFS_RT
-      : protocol === "siri"
-        ? ENDPOINT_TYPES_SIRI
-        : ENDPOINT_TYPES_GBFS;
-  return {
-    uid: nextEndpointUid(),
-    endpoint_type: String(options[0]),
-    url: "",
-    interval: String(SOURCE_UPDATE_INTERVAL_DEFAULT),
-    is_original: true,
-    hide_original: false,
-    auth_type: "",
-    auth_value: "",
-  };
-}
 
 export function DataSubmitForm({
   locale,
@@ -169,10 +115,7 @@ export function DataSubmitForm({
       : "",
   );
   const [rtStaticSubId, setRtStaticSubId] = React.useState<number | "">("");
-  const [eligibleStatics, setEligibleStatics] = React.useState<EligibleStaticRow[]>([]);
-  const [eligibleLoading, setEligibleLoading] = React.useState(false);
-  const [eligibleError, setEligibleError] = React.useState<string | null>(null);
-  const [protocol, setProtocol] = React.useState<ProtocolChoice>("gtfs_rt");
+  const [protocol, setProtocol] = React.useState<RealtimeProtocol>("gtfs_rt");
   const [rtName, setRtName] = React.useState("");
   const [rtNote, setRtNote] = React.useState("");
   const [rtLicense, setRtLicense] = React.useState("");
@@ -190,73 +133,14 @@ export function DataSubmitForm({
     })();
   }, [staticSource]);
 
-  React.useEffect(() => {
-    const options =
-      protocol === "gtfs_rt"
-        ? ENDPOINT_TYPES_GTFS_RT
-        : protocol === "siri"
-          ? ENDPOINT_TYPES_SIRI
-          : ENDPOINT_TYPES_GBFS;
-    const defaultEndpointType = String(options[0]);
-    const isValidEndpointType = (value: string) => options.includes(value as never);
-
-    void (async () => {
-      if (protocol === "gbfs") {
-        setRtEndpoints([emptyEndpoint("gbfs")]);
-        setRtStaticSubId("");
-      } else {
-        setRtEndpoints((prev) =>
-          prev.length
-            ? prev.map((e) => ({
-                ...e,
-                endpoint_type: isValidEndpointType(e.endpoint_type)
-                  ? e.endpoint_type
-                  : defaultEndpointType,
-              }))
-            : [emptyEndpoint(protocol)],
-        );
-      }
-    })();
-  }, [protocol]);
-
-  React.useEffect(() => {
-    if (auth.status !== "authenticated") return;
-    let cancelled = false;
-
-    void (async () => {
-      if (protocol === "gbfs" || rtOrgId === "") {
-        setEligibleStatics([]);
-        setEligibleError(null);
-        setEligibleLoading(false);
-        setRtStaticSubId("");
-        return;
-      }
-
-      const suffix = protocol === "gtfs_rt" ? "gtfs" : "netex";
-      setEligibleLoading(true);
-      setEligibleError(null);
-      setRtStaticSubId("");
-      try {
-        const path = `/api/data_manager/realtime-submissions/eligible-static-submissions/${rtOrgId}/${suffix}/`;
-        const list = await fetchAllPages<EligibleStaticRow>((p) => apiJson("GET", p), path);
-        if (!cancelled) {
-          setEligibleStatics(list);
-          if (list.length === 1) setRtStaticSubId(list[0].id);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setEligibleStatics([]);
-          setEligibleError(formatApiError(e, dict));
-        }
-      } finally {
-        if (!cancelled) setEligibleLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [apiJson, auth.status, auth.user?.roles, protocol, rtOrgId, dict]);
+  const eligible = useEligibleStatics(rtOrgId === "" ? null : rtOrgId, protocol, dict);
+  // A choice outside the current list (another organization or protocol) does not count;
+  // a single eligible feed is chosen for the user.
+  const staticSubId = eligible.statics.some((s) => s.id === rtStaticSubId)
+    ? rtStaticSubId
+    : eligible.statics.length === 1
+      ? eligible.statics[0].id
+      : "";
 
   const orgNameById = React.useMemo(() => {
     const m = new Map<number, string>();
@@ -266,13 +150,6 @@ export function DataSubmitForm({
     }
     return m;
   }, [orgs]);
-
-  const endpointTypeOptions =
-    protocol === "gtfs_rt"
-      ? ENDPOINT_TYPES_GTFS_RT
-      : protocol === "siri"
-        ? ENDPOINT_TYPES_SIRI
-        : ENDPOINT_TYPES_GBFS;
 
   const authTypeSelectOptions = authTypeOptions(dict);
 
@@ -287,23 +164,6 @@ export function DataSubmitForm({
     if (!staticAuthType) return { auth_type: "" };
     const o: Record<string, unknown> = { auth_type: staticAuthType };
     if (staticAuthValue.trim()) o.auth_value = staticAuthValue.trim();
-    return o;
-  }
-
-  function endpointPayload(ep: RtEndpointDraft): Record<string, unknown> {
-    const o: Record<string, unknown> = {
-      endpoint_type: ep.endpoint_type,
-      url: ep.url.trim(),
-      interval: parseSourceUpdateInterval(ep.interval) ?? SOURCE_UPDATE_INTERVAL_DEFAULT,
-      is_original: ep.is_original,
-      hide_original: resolveHideOriginal(ep.auth_type, ep.hide_original),
-    };
-    if (ep.auth_type) {
-      o.auth_type = ep.auth_type;
-      if (ep.auth_value.trim()) o.auth_value = ep.auth_value.trim();
-    } else {
-      o.auth_type = "";
-    }
     return o;
   }
 
@@ -390,29 +250,25 @@ export function DataSubmitForm({
       setError(dict.fieldRequired);
       return;
     }
-    if ((protocol === "gtfs_rt" || protocol === "siri") && rtStaticSubId === "") {
+    if (requiresStaticSubmission(protocol) && staticSubId === "") {
       setError(dict.fieldRequired);
       return;
     }
-    if (rtEndpoints.some((ep) => parseSourceUpdateInterval(ep.interval) === null)) {
+    if (rtEndpoints.some((ep) => parseEndpointInterval(ep) === null)) {
       setError(dict.sourceUpdateIntervalRange);
       return;
     }
     setPending(true);
     try {
-      const staticId = protocol === "gbfs" || rtStaticSubId === "" ? null : rtStaticSubId;
-
       const body: Record<string, unknown> = {
         transport_organization: rtOrgId,
         protocol,
         name: rtName.trim(),
         note: rtNote.trim(),
         license: rtLicense.trim(),
-        endpoints: rtEndpoints.map((ep) => endpointPayload(ep)),
+        endpoints: rtEndpoints.map(endpointPayload),
       };
-      if (protocol !== "gbfs" && staticId !== null && Number.isFinite(staticId)) {
-        body.static_submission = staticId;
-      }
+      if (staticSubId !== "") body.static_submission = staticSubId;
       const created = await apiJson<{ id: number }>(
         "POST",
         "/api/data_manager/realtime-submissions/",
@@ -690,38 +546,21 @@ export function DataSubmitForm({
                   disabled={pending}
                   label={dict.protocol}
                   value={protocol}
-                  onChange={(v) => setProtocol(v as ProtocolChoice)}
-                  options={PROTOCOLS.map((p) => ({ value: p, label: p }))}
+                  onChange={(v) => {
+                    if (!isRealtimeProtocol(v)) return;
+                    setProtocol(v);
+                    setRtEndpoints((rows) => endpointsForProtocol(rows, v));
+                  }}
+                  options={REALTIME_PROTOCOLS.map((p) => ({ value: p, label: p }))}
                 />
-                {protocol !== "gbfs" ? (
-                  <Stack spacing={0.5}>
-                    {eligibleLoading ? (
-                      <Typography variant="body2" color="text.secondary">
-                        {dict.loadingEligibleStatic}
-                      </Typography>
-                    ) : null}
-                    {eligibleError ? <Alert severity="warning">{eligibleError}</Alert> : null}
-                    <InlineSelect
-                      fullWidth
-                      disabled={pending || eligibleLoading || !eligibleStatics.length}
-                      required={protocol === "gtfs_rt" || protocol === "siri"}
-                      label={dict.staticSubmission}
-                      value={rtStaticSubId === "" ? "" : String(rtStaticSubId)}
-                      onChange={(v) => {
-                        setRtStaticSubId(v === "" ? "" : Number(v));
-                      }}
-                      options={[
-                        { value: "", label: "" },
-                        ...eligibleStatics.map((s) => ({
-                          value: String(s.id),
-                          label: `#${s.id} - ${s.name ? text(s.name) : dict.unnamed} - ${s.data_type} (${(s.allowed_realtime_protocols ?? []).join(", ")})`,
-                        })),
-                      ]}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {dict.staticSubmissionSelectHint}
-                    </Typography>
-                  </Stack>
+                {requiresStaticSubmission(protocol) ? (
+                  <RealtimeStaticSubmissionSelect
+                    dict={dict}
+                    {...eligible}
+                    value={staticSubId}
+                    onChange={setRtStaticSubId}
+                    disabled={pending}
+                  />
                 ) : null}
                 <TextField
                   label={dict.name}
@@ -745,178 +584,14 @@ export function DataSubmitForm({
                 />
 
                 <Typography variant="subtitle2">{dict.endpoints}</Typography>
-                {rtEndpoints.map((ep, idx) => (
-                  <Stack
-                    key={ep.uid}
-                    spacing={1}
-                    sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}
-                  >
-                    <Stack
-                      direction={{ xs: "column", md: "row" }}
-                      spacing={1}
-                      sx={{ alignItems: { md: "center" } }}
-                    >
-                      <InlineSelect
-                        label={dict.feedTypes}
-                        value={ep.endpoint_type}
-                        onChange={(v) => {
-                          setRtEndpoints((rows) =>
-                            rows.map((r, i) => (i === idx ? { ...r, endpoint_type: v } : r)),
-                          );
-                        }}
-                        disabled={pending}
-                        sx={{ minWidth: 220 }}
-                        options={endpointTypeOptions.map((t) => ({ value: t, label: t }))}
-                      />
-                      <TextField
-                        label={dict.feedUrl}
-                        value={ep.url}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setRtEndpoints((rows) =>
-                            rows.map((r, i) => (i === idx ? { ...r, url: v } : r)),
-                          );
-                        }}
-                        disabled={pending}
-                        sx={{ flex: 1 }}
-                      />
-                      <TextField
-                        label={dict.sourceUpdateInterval}
-                        type="number"
-                        value={ep.interval}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setRtEndpoints((rows) =>
-                            rows.map((r, i) =>
-                              i === idx
-                                ? {
-                                    ...r,
-                                    interval: v,
-                                    hide_original: isNoSourceUpdate(v) ? false : r.hide_original,
-                                  }
-                                : r,
-                            ),
-                          );
-                        }}
-                        disabled={pending}
-                        required
-                        slotProps={{
-                          htmlInput: {
-                            min: SOURCE_UPDATE_INTERVAL_MIN,
-                            max: SOURCE_UPDATE_INTERVAL_MAX,
-                            step: 1,
-                            inputMode: "numeric",
-                          },
-                        }}
-                        sx={{ minWidth: 160 }}
-                      />
-                      {/* The span lets the tooltip work on a disabled button; describeChild keeps
-                          the name on the button instead of an aria-label on the span. */}
-                      <Tooltip title={dict.delete} describeChild>
-                        <Box component="span" sx={{ display: "inline-flex" }}>
-                          <IconButton
-                            aria-label={dict.delete}
-                            color="error"
-                            disabled={pending || rtEndpoints.length <= 1}
-                            onClick={() =>
-                              setRtEndpoints((rows) => rows.filter((_, i) => i !== idx))
-                            }
-                          >
-                            <MdDelete aria-hidden />
-                          </IconButton>
-                        </Box>
-                      </Tooltip>
-                    </Stack>
-                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                      <InlineSelect
-                        label={dict.authType}
-                        value={ep.auth_type}
-                        onChange={(v) => {
-                          setRtEndpoints((rows) =>
-                            rows.map((r, i) =>
-                              i === idx
-                                ? { ...r, auth_type: v, hide_original: hideOriginalOnAuthChange(v) }
-                                : r,
-                            ),
-                          );
-                        }}
-                        disabled={pending}
-                        sx={{ minWidth: 200 }}
-                        options={authTypeSelectOptions}
-                      />
-                      {ep.auth_type ? (
-                        <PasswordTextField
-                          label={dict.authValue}
-                          value={ep.auth_value}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setRtEndpoints((rows) =>
-                              rows.map((r, i) => (i === idx ? { ...r, auth_value: v } : r)),
-                            );
-                          }}
-                          disabled={pending}
-                          helperText={dict.authValueHint}
-                          sx={{ flex: 1 }}
-                          autoComplete="new-password"
-                          showPasswordLabel={dict.showPassword}
-                          hidePasswordLabel={dict.hidePassword}
-                        />
-                      ) : null}
-                    </Stack>
-                    <Stack direction="row" spacing={2}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={ep.is_original}
-                            onChange={(e) =>
-                              setRtEndpoints((rows) =>
-                                rows.map((r, i) =>
-                                  i === idx ? { ...r, is_original: e.target.checked } : r,
-                                ),
-                              )
-                            }
-                            disabled={pending}
-                          />
-                        }
-                        label={dict.original}
-                      />
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={resolveHideOriginal(ep.auth_type, ep.hide_original)}
-                            onChange={(e) =>
-                              setRtEndpoints((rows) =>
-                                rows.map((r, i) =>
-                                  i === idx ? { ...r, hide_original: e.target.checked } : r,
-                                ),
-                              )
-                            }
-                            disabled={
-                              pending ||
-                              isHideOriginalLockedByAuth(ep.auth_type) ||
-                              isNoSourceUpdate(ep.interval)
-                            }
-                          />
-                        }
-                        label={dict.hideOriginal}
-                      />
-                    </Stack>
-                  </Stack>
-                ))}
-                <Button
-                  type="button"
-                  variant="outlined"
-                  startIcon={<MdAdd aria-hidden />}
+                <RealtimeEndpointsEditor
+                  dict={dict}
+                  protocol={protocol}
+                  endpoints={rtEndpoints}
+                  onChange={setRtEndpoints}
+                  authValueHint={dict.authValueHint}
                   disabled={pending}
-                  onClick={() =>
-                    setRtEndpoints((rows) => [
-                      ...rows,
-                      { ...emptyEndpoint(protocol), endpoint_type: String(endpointTypeOptions[0]) },
-                    ])
-                  }
-                >
-                  {dict.addEndpoint}
-                </Button>
+                />
 
                 <Button type="submit" variant="contained" disabled={pending}>
                   {dict.submit}
