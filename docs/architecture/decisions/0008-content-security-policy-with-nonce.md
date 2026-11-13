@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-11-13
+- **Updated:** 2026-11-13: the policy is enforced (see [Enforcement](#enforcement)).
 
 ## Context
 
@@ -28,15 +29,27 @@ It costs nothing here: the root layout reads `headers()` for the locale and `app
 | `base-uri`, `form-action` | `'self'` | |
 | `object-src` | `'none'` | |
 
-The policy is report-only: browsers log violations in the console and block nothing. There is no `report-to` endpoint yet.
+The policy was first sent report-only, so browsers logged violations and blocked nothing, and is now enforced (see [Enforcement](#enforcement)). There is no `report-to` endpoint yet.
 
 ## Consequences
 
-- Blog images from other hosts (`![](https://example.org/x.png)` in Markdown) would be blocked once the policy is enforced. In report-only mode they still load and show up as violations. Before enforcing, the ODT team decides whether to move those images to the API's media or to allow chosen hosts.
-- Anything the reverse proxy or CDN injects into the HTML (for example Cloudflare's analytics beacon, email obfuscation or Rocket Loader) also shows up as a violation and has to be turned off or allowed.
+- Blog images from other hosts (`![](https://example.org/x.png)` in Markdown) are blocked; images in posts have to come from the API's media.
+- Anything the reverse proxy or CDN injects into the HTML (for example Cloudflare's analytics beacon, Email Address Obfuscation or Rocket Loader) is blocked, so those features stay off.
 - The nonce is serialised into the page for Emotion on the client, as MUI documents. It protects against injected markup, not against a script that already runs.
 - Paths the proxy skips (files with an extension, `/_next`, `/api`, `/internal-media`) get no policy; they are not HTML pages.
-- Follow-ups in issue #20: collect violations (a `report-to` endpoint, likely on the backend), then switch the header to `Content-Security-Policy`; move the refresh token into an `HttpOnly` cookie set by the API.
+- Follow-ups in issue #20: collect violations (a `report-to` endpoint, likely on the backend); move the refresh token into an `HttpOnly` cookie set by the API.
+
+## Enforcement
+
+`proxy.ts` now sends the same policy as `Content-Security-Policy`, on the response and on the request. Next reads the nonce from the request's `Content-Security-Policy` header first and falls back to the report-only one (`get-script-nonce-from-header.js`), so its scripts keep the nonce.
+
+What was settled before enforcing:
+
+- **External blog images:** none of the published posts in production embeds an image from another host; the existing ones come from `/internal-media/`.
+- **Scripts without a nonce:** in production the only one was Cloudflare's Email Address Obfuscation (`/cdn-cgi/scripts/…/email-decode.min.js`, on `/pl/developers`). The policy is not loosened for it. **Prerequisite of deploying this change:** turn Email Address Obfuscation off for the site's domain in Cloudflare (Scrape Shield). Otherwise the browser blocks the script and the e-mail addresses it would decode stay hidden.
+- **Production build check:** `npm run build` and `next start` with `NEXT_PUBLIC_API_BASE_URL=https://api.odt.org.pl`, then in a browser: the home page, the catalogue, a feed detail, the blog and two posts, cases, the data provider list, developers, info and login, by full page loads and by client-side navigation. No CSP violation was logged. Emotion's `<style>` elements and MUI's color scheme script carry the nonce; switching to dark mode and reloading keeps the dark scheme, and blog images from `/internal-media/` load. A test inline `<style>` added without a nonce was blocked, so the policy is in force.
+
+**Rollback:** if the policy breaks a page in production, change both header names in `proxy.ts` back to `Content-Security-Policy-Report-Only` and redeploy. Browsers then only log the violations.
 
 ## Alternatives considered
 

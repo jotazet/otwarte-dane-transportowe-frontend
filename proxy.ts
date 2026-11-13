@@ -8,8 +8,8 @@ import { isLoginRequiredPath } from "@/lib/nav/protectedRoutes";
 const PUBLIC_FILE = /\.(.*)$/;
 
 /**
- * Content-Security-Policy of a page (ADR 0008). Sent as Report-Only until the reported
- * violations have been checked. Next reads the nonce from it and puts it on its own scripts.
+ * Content-Security-Policy of a page (ADR 0008). Next reads the nonce from the request header
+ * and puts it on its own scripts.
  */
 function contentSecurityPolicy(nonce: string): string {
   const isDev = process.env.NODE_ENV === "development";
@@ -73,9 +73,9 @@ export function proxy(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-odt-locale", localeInPath as Locale);
   requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("Content-Security-Policy-Report-Only", csp);
+  requestHeaders.set("Content-Security-Policy", csp);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
-  response.headers.set("Content-Security-Policy-Report-Only", csp);
+  response.headers.set("Content-Security-Policy", csp);
   return response;
 }
 
