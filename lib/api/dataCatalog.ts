@@ -17,6 +17,10 @@ export type FeedEndpoint = {
   interval?: number | string | null;
   is_original?: boolean | null;
   feed_url?: string | null;
+  /** When ODT last downloaded the endpoint (proxied endpoints only). */
+  cached_at?: string | null;
+  /** GTFS-RT entity types ODT has seen in the endpoint's bodies; [] for SIRI and GBFS. */
+  entity_types?: string[];
 };
 
 export type FeedDetail = {
@@ -28,6 +32,10 @@ export type FeedDetail = {
   /** UTC times of day ("HH:MM:SS"); null when ODT does not proxy the feed. */
   download_time_1?: string | null;
   download_time_2?: string | null;
+  /** Static feeds only: when ODT downloaded the current copy (proxied feeds only). */
+  cached_at?: string | null;
+  /** Realtime feeds only. */
+  published_at?: string | null;
   endpoints?: FeedEndpoint[];
 };
 

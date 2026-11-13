@@ -116,6 +116,9 @@ export const dictBg: Dictionary = {
   original: "Оригинален",
   interval: "Интервал",
   feedDownloadTimes: "Часове на изтегляне (UTC)",
+  feedCachedAt: "Копие на ODT от",
+  feedEntityTypes: "Типове обекти: {types}",
+  feedRealtimePublishedAt: "Фийдът в реално време е публикуван: {date}",
   sourceUpdateInterval: "Актуализация на източниците",
   sourceUpdateIntervalRange:
     "Актуализация на източниците: въведи цяло число от 5 до 120 в секунди.",

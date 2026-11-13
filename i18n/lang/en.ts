@@ -115,6 +115,9 @@ export const dictEn: Dictionary = {
   original: "Original",
   interval: "Interval",
   feedDownloadTimes: "Download times (UTC)",
+  feedCachedAt: "ODT copy from",
+  feedEntityTypes: "Entity types: {types}",
+  feedRealtimePublishedAt: "Realtime feed published: {date}",
   sourceUpdateInterval: "Source update interval",
   sourceUpdateIntervalRange:
     "Source update interval: enter a whole number from 5 to 120 in seconds.",
