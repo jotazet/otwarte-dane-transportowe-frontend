@@ -1,46 +1,64 @@
 #!/bin/sh
-# Deploys the checked-out release: the image is built with the new .env (NEXT_PUBLIC_* are
-# baked in at build time) while the old container keeps serving, then the new .env is
-# installed, the container recreated, and it must turn healthy. Any failure stops it there.
-# odt-deploy-frontend runs it after checking out the tag (docs/deployment.md, section 6);
-# it also works by hand from the checkout:
+# Deploys a release from the deployment directory: the .env from the host file, the
+# release's image (which changes nothing running), then the container recreated, and it
+# must turn healthy. Any failure stops it there. odt-deploy-frontend runs it after copying
+# the release's Compose file and scripts into the deployment directory (docs/deployment.md,
+# section 6); it also works by hand from there, as odt:
 #
-#   sh scripts/deploy/release.sh <tag> <new .env>
+#   sh scripts/deploy/release.sh vX.Y.Z /etc/odt/frontend-host.env
 set -eu
 
 tag="$1"
-env_new="$2"
+host_env="$2"
+RELEASES_KEEP=3
+WAIT_TIMEOUT=180
+# The values of docker-compose.yml the host may set. Every other name is refused, Compose's
+# own COMPOSE_* included (they could load other Compose files or rename the project).
+HOST_KEYS='FRONTEND_BIND|FRONTEND_PORT|FRONTEND_MEM_LIMIT|API_HOSTNAME'
+VALUE='[A-Za-z0-9.:/_-]*'
 
 cd "$(dirname "$0")/../.."
 log() { echo "release: $*"; }
+# Only this file: a docker-compose.override.yml in the directory is never merged in.
+compose() { docker compose -f docker-compose.yml "$@"; }
 
-# A planner graph build or feed test of the backend (containers labelled odt.planner) holds
-# up to 8 GB of RAM and swap: a Next.js build beside it risks the OOM killer. Nothing has
-# changed yet, so release again later.
-if [ -n "$(docker ps -q --filter label=odt.planner)" ]; then
-    log "a planner graph build is running; release again when it has finished" >&2
+# The version is the tag of the image CI pushed for it (ghcr.io/...:vX.Y.Z).
+if ! printf '%s\n' "$tag" | grep -Eqx 'v[0-9]+\.[0-9]+\.[0-9]+'; then
+    log "expected a release tag vX.Y.Z, got '$tag'" >&2
     exit 1
 fi
 
-# The image running now stays as :previous for a quick manual rollback (section 6); taken
-# from the container, not :latest, which a failed earlier attempt may have rebuilt already.
-running="$(docker compose images -q frontend 2>/dev/null || true)"
-[ -z "$running" ] || docker image tag "$running" odt-frontend:previous
-# --env-file: the build args come from the new .env. --pull: the newest node:20-alpine.
-docker compose --env-file "$env_new" build --pull frontend
+# Every line is blank, a comment, or NAME=value with a known name and a value of URL, host
+# and port characters only (no quotes, $, spaces or #), so Compose reads it back exactly.
+refused="$(grep -Ev '^[[:space:]]*(#|$)' "$host_env" | grep -Evx "($HOST_KEYS)=$VALUE" \
+    | cut -d= -f1 | tr '\n' ' ' || true)"
+if [ -n "$refused" ]; then
+    log "$host_env may set only $HOST_KEYS, to letters, digits and . : / _ -;" \
+        "refused: $refused" >&2
+    exit 1
+fi
+
+env_new="$(mktemp)"
+trap 'rm -f "$env_new"' EXIT
+grep -Ex "($HOST_KEYS)=$VALUE" "$host_env" > "$env_new" || true
+# Compose takes the image tag from ODT_VERSION (docker-compose.yml).
+printf 'ODT_VERSION=%s\n' "$tag" >> "$env_new"
+compose --env-file "$env_new" pull --quiet frontend
 
 install -m 600 "$env_new" .env
-# --wait: until the healthcheck in docker-compose.yml passes.
-if ! docker compose up -d --wait --wait-timeout 180 frontend; then
-    log "the site did not turn healthy" >&2
-    docker compose ps >&2
-    docker compose logs --tail 50 frontend >&2
+# --wait: until the healthcheck in docker-compose.yml passes. --no-build: this host never
+# builds; it runs the image CI pushed.
+if ! compose up -d --no-build --wait --wait-timeout "$WAIT_TIMEOUT" frontend; then
+    log "the site did not turn healthy within ${WAIT_TIMEOUT}s" >&2
+    compose ps -a >&2
+    compose logs --tail 50 frontend >&2
     exit 1
 fi
 log "$tag is live"
 
-# Only this project's replaced images: the host runs other projects too.
-docker image prune -f --filter label=org.opencontainers.image.title=odt-frontend > /dev/null
-# Build cache older than a week, of every project on the host (as the backend's release
-# does): only a cache, so another project at most builds slower. The release is live.
-docker builder prune -f --filter until=168h > /dev/null || log "could not prune the build cache"
+# The images of the newest $RELEASES_KEEP releases stay for a rollback (section 6); the
+# registry keeps every one.
+repository=ghcr.io/jotazet/odt-frontend
+docker image ls "$repository" --format '{{.Tag}}' | grep -Ex 'v[0-9]+\.[0-9]+\.[0-9]+' \
+    | sort -V | head -n "-$RELEASES_KEEP" | sed "s|^|$repository:|" \
+    | xargs -r docker image rm > /dev/null || log "could not remove old release images"
