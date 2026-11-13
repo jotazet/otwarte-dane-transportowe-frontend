@@ -15,7 +15,10 @@ describe("parseOrganizationQueryParam", () => {
     expect(parseOrganizationQueryParam("abc")).toBeUndefined();
   });
 
-  it.each([" ", "1.5", "-3", "0x10"])("ignores %j, which is not an id", (value) => {
-    expect(parseOrganizationQueryParam(value)).toBeUndefined();
-  });
+  it.each([" ", " 7 ", "0", "1.5", "-3", "1e3", "0x10"])(
+    "ignores %j, which is not an id",
+    (value) => {
+      expect(parseOrganizationQueryParam(value)).toBeUndefined();
+    },
+  );
 });
