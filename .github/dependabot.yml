@@ -1,0 +1,34 @@
+# Monthly pull requests for what this repository pins: the actions (pinned by commit), the
+# npm lock file and the Dockerfile's base image. Each version waits a week after its
+# release. Security updates do not wait for the schedule. The same policy as the backend's.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      # Everything that is not a major version: one pull request, one CI run a month.
+      npm-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      # The Node major is also set in ci.yml; a new one moves both by hand.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
