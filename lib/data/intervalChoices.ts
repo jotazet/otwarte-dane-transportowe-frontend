@@ -11,15 +11,16 @@ export function isNoSourceUpdate(interval: string | number): boolean {
 
 /**
  * Parses an interval in the usual range. `stored` is the value already saved on the
- * endpoint: it stays valid above the usual maximum, so such a submission can be saved.
+ * endpoint: it stays valid outside the usual range, so such a submission can be saved.
  */
 export function parseSourceUpdateInterval(value: string, stored?: number): number | null {
   const trimmed = value.trim();
   if (trimmed === "") return null;
   const n = Number(trimmed);
   if (!Number.isFinite(n) || !Number.isInteger(n)) return null;
-  if (n < SOURCE_UPDATE_INTERVAL_MIN) return null;
-  if (n > SOURCE_UPDATE_INTERVAL_MAX && n !== stored) return null;
+  // The stored value stays valid, also 0 (no periodic update) on older records.
+  if (n === stored) return n;
+  if (n < SOURCE_UPDATE_INTERVAL_MIN || n > SOURCE_UPDATE_INTERVAL_MAX) return null;
   return n;
 }
 
