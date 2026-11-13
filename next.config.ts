@@ -6,6 +6,9 @@ const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 );
 
 const securityHeaders = [
+  // Browsers ignore it over plain HTTP, so local development is unaffected. No
+  // includeSubDomains: other hosts of the domain are not this application's to decide.
+  { key: "Strict-Transport-Security", value: "max-age=63072000" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -17,6 +20,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // No "X-Powered-By: Next.js" on every response.
+  poweredByHeader: false,
   // Next 16 blocks dev resources (incl. the HMR websocket) for origins other
   // than "localhost". Opening the app via http://127.0.0.1:3000 made HMR fail
   // in a retry loop and left pages stuck on loading states.

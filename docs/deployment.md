@@ -53,6 +53,8 @@ example.org {
 
 Server-side rendering forwards that IP to the API, so the backend rate-limits each visitor separately. With `API_HOSTNAME` these calls reach the API's reverse proxy on this machine instead of the CDN, which would replace the IP; that proxy must accept `X-Forwarded-For` from the Docker networks. Its configuration and the deployment order are in [section 13 of the backend's `docs/deployment.md`](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/deployment.md#client-ip-cdn-and-the-frontend); background in [ADR 0011](https://github.com/jotazet/OtwarteDaneTransportowe-backend/blob/main/docs/architecture/decisions/0011-client-ip-behind-cloudflare-and-ssr.md).
 
+The application sets its own security headers on every response (`securityHeaders` in `next.config.ts`), including `Strict-Transport-Security` for two years without `includeSubDomains`: serve the site's domain over HTTPS only. The reverse proxy does not need to add them.
+
 ## 5. Updates
 
 ```bash
