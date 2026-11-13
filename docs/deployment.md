@@ -24,6 +24,8 @@ Fill in `.env`:
 docker compose up -d --build
 ```
 
+The image (`Dockerfile`, Node 24 LTS pinned by digest) holds only Next.js's standalone server (`output: "standalone"`), its static files and `public/`, and runs `node server.js` as the user `node`. Compose runs it with a read-only file system (the server writes only its cache, a `tmpfs`), no capabilities, `no-new-privileges`, a memory limit (`FRONTEND_MEM_LIMIT`, default `768m`), a process limit and rotated logs.
+
 ## 3. Verification
 
 ```bash

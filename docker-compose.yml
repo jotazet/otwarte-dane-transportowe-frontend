@@ -15,6 +15,27 @@ services:
       # not through the CDN, so the visitor's IP it forwards is kept. A .invalid name
       # never resolves, so leaving API_HOSTNAME unset changes nothing.
       - "${API_HOSTNAME:-unset.invalid}:host-gateway"
+    # The server writes only its cache (fetch and image results); the code stays read-only.
+    # The node user of the image is 1000:1000.
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache:uid=1000,gid=1000,mode=0700,size=256m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # A ceiling, not a reservation: a runaway render is killed here instead of draining the
+    # host it shares with the backend and OpenTripPlanner. The cache tmpfs counts towards it.
+    mem_limit: ${FRONTEND_MEM_LIMIT:-768m}
+    pids_limit: 256
+    # Docker's json-file driver never rotates by default; as the backend's services.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+        compress: "true"
     # A rendered page, not a static file; a release waits for it (scripts/deploy/release.sh).
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/pl"]

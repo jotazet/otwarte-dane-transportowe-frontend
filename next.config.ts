@@ -22,6 +22,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // No "X-Powered-By: Next.js" on every response.
   poweredByHeader: false,
+  // The Docker image runs .next/standalone (server.js and only the traced dependencies)
+  // instead of `next start` with the whole node_modules (Dockerfile).
+  output: "standalone",
   // Next 16 blocks dev resources (incl. the HMR websocket) for origins other
   // than "localhost". Opening the app via http://127.0.0.1:3000 made HMR fail
   // in a retry loop and left pages stuck on loading states.
