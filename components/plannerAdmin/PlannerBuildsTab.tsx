@@ -183,6 +183,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
     draft.enabled !== saved.enabled ||
     draft.time_utc !== saved.time_utc ||
     [...draft.weekdays].sort().join() !== [...saved.weekdays].sort().join();
+  // The backend refuses an empty list even while the schedule is off.
   const noDays = draft.weekdays.length === 0;
   const local = polishTimes(draft.time_utc, locale);
   const next = nextScheduledBuild(saved);
@@ -231,7 +232,8 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
               value={draft.weekdays}
               onChange={(_, weekdays: number[]) => setDraft((d) => ({ ...d, weekdays }))}
               aria-labelledby="planner-schedule-days"
-              disabled={!draft.enabled}
+              // Left enabled while empty, so a schedule switched off can still be saved.
+              disabled={!draft.enabled && !noDays}
               sx={{ flexWrap: "wrap" }}
             >
               {WEEKDAYS.map((d) => (
@@ -245,7 +247,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
-            {draft.enabled && noDays ? (
+            {noDays ? (
               <Typography variant="caption" color="error" component="p" sx={{ mt: 0.5 }}>
                 {dict.plannerAdminScheduleNoDays}
               </Typography>
@@ -266,7 +268,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
         <Stack direction="row" sx={{ mt: 2, gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
           <Button
             variant="contained"
-            disabled={!dirty || saving || (draft.enabled && noDays)}
+            disabled={!dirty || saving || noDays}
             onClick={() => void submit()}
           >
             {dict.plannerAdminScheduleSave}
