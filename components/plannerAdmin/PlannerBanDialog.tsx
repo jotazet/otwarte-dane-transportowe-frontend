@@ -15,27 +15,33 @@ import TextField from "@mui/material/TextField";
 import type { PlannerAdminContext } from "@/components/plannerAdmin/PlannerAdminHub";
 import { plannerErrorMessage } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
-import { plannerAdminPaths } from "@/lib/api/plannerAdmin";
+import { isBanActive, plannerAdminPaths, type IpBan } from "@/lib/api/plannerAdmin";
+import { formatDateTime } from "@/lib/format";
 import { isIpNetwork } from "@/lib/ipNetwork";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { fill } from "@/lib/i18n/fill";
 
 const EXPIRY_HOURS = { "24h": 24, "7d": 24 * 7, "30d": 24 * 30, never: null } as const;
-type Expiry = keyof typeof EXPIRY_HOURS;
+type Expiry = keyof typeof EXPIRY_HOURS | "keep";
 
-/** Adds an IP ban; `network` is prefilled (an address, or the /64 of an IPv6 client). */
+/**
+ * Adds an IP ban, with `network` prefilled (an address, or the /64 of an IPv6 client), or edits
+ * `ban`. An expired ban opens with a new expiry, so saving renews it.
+ */
 export function PlannerBanDialog({
   ctx,
   network,
+  ban = null,
   onClose,
   onBanned,
 }: {
   ctx: PlannerAdminContext;
   network: string | null;
+  ban?: IpBan | null;
   onClose: () => void;
   onBanned: () => void;
 }) {
-  const { dict } = ctx;
+  const { dict, locale } = ctx;
   const [value, setValue] = React.useState("");
   const [reason, setReason] = React.useState("");
   const [expiry, setExpiry] = React.useState<Expiry>("7d");
@@ -45,9 +51,9 @@ export function PlannerBanDialog({
   const invalid = !isIpNetwork(value);
 
   const reset = () => {
-    setValue(network ?? "");
-    setReason("");
-    setExpiry("7d");
+    setValue(ban?.network ?? network ?? "");
+    setReason(ban?.reason ?? "");
+    setExpiry(ban && isBanActive(ban) ? "keep" : "7d");
     setTouched(false);
     setError(null);
   };
@@ -58,21 +64,29 @@ export function PlannerBanDialog({
     if (invalid) return;
     setSending(true);
     setError(null);
-    const hours = EXPIRY_HOURS[expiry];
+    const body: Record<string, string | null> = { network: value.trim(), reason: reason.trim() };
+    if (expiry !== "keep") {
+      const hours = EXPIRY_HOURS[expiry];
+      body.expires_at =
+        hours === null ? null : new Date(Date.now() + hours * 3_600_000).toISOString();
+    }
     try {
-      await ctx.apiJson("POST", plannerAdminPaths.ipBans, {
-        network: value.trim(),
-        reason: reason.trim(),
-        expires_at: hours === null ? null : new Date(Date.now() + hours * 3_600_000).toISOString(),
-      });
-      ctx.notify(fill(dict.plannerAdminBanAdded, { network: value.trim() }));
+      if (ban) {
+        await ctx.apiJson("PATCH", plannerAdminPaths.ipBan(ban.id), body);
+        ctx.notify(fill(dict.plannerAdminBanSaved, { network: value.trim() }));
+      } else {
+        await ctx.apiJson("POST", plannerAdminPaths.ipBans, body);
+        ctx.notify(fill(dict.plannerAdminBanAdded, { network: value.trim() }));
+      }
       onBanned();
       onClose();
     } catch (err) {
       // A 400 is the network field (invalid or already banned), sent without a code.
       setError(
         err instanceof ApiError && err.status === 400
-          ? dict.plannerAdminBanFailed
+          ? ban
+            ? dict.plannerAdminBanSaveFailed
+            : dict.plannerAdminBanFailed
           : plannerErrorMessage(err, dict),
       );
     } finally {
@@ -82,14 +96,14 @@ export function PlannerBanDialog({
 
   return (
     <Dialog
-      open={network !== null}
+      open={network !== null || ban !== null}
       onClose={onClose}
       maxWidth="xs"
       fullWidth
       slotProps={{ transition: { onEnter: reset } }}
     >
       <form onSubmit={(e) => void submit(e)} noValidate>
-        <DialogTitle>{dict.plannerAdminBanTitle}</DialogTitle>
+        <DialogTitle>{ban ? dict.plannerAdminBanEditTitle : dict.plannerAdminBanTitle}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -117,7 +131,16 @@ export function PlannerBanDialog({
               value={expiry}
               onChange={(e) => setExpiry(e.target.value as Expiry)}
             >
-              {(Object.keys(EXPIRY_HOURS) as Expiry[]).map((k) => (
+              {ban && isBanActive(ban) ? (
+                <MenuItem value="keep">
+                  {fill(dict.plannerAdminBanExpiryKeep, {
+                    date: ban.expires_at
+                      ? formatDateTime(ban.expires_at, locale)
+                      : dict.plannerAdminBanNoExpiry,
+                  })}
+                </MenuItem>
+              ) : null}
+              {(Object.keys(EXPIRY_HOURS) as (keyof typeof EXPIRY_HOURS)[]).map((k) => (
                 <MenuItem key={k} value={k}>
                   {dict.plannerAdminBanExpiryLabels[k]}
                 </MenuItem>
@@ -132,7 +155,7 @@ export function PlannerBanDialog({
         <DialogActions>
           <Button onClick={onClose}>{dict.cancel}</Button>
           <Button type="submit" variant="contained" color="error" disabled={sending}>
-            {dict.plannerAdminIpBanAddress}
+            {ban ? dict.plannerAdminBanSave : dict.plannerAdminIpBanAddress}
           </Button>
         </DialogActions>
       </form>
