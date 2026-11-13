@@ -303,6 +303,36 @@ export const dictDe: Dictionary = {
   staticSourceFile: "Datei hochladen",
   chooseFile: "Datei wählen",
   noFileSelected: "Keine Datei ausgewählt",
+  staticSourceResubmitHint:
+    "Nach dem Speichern von Änderungen an der Quelle kehrt die Einreichung zur Datenprüfung zurück.",
+  staticSourceFileRequired: "Wählen Sie eine Datei zum Hochladen.",
+  staticCurrentFile: "Aktuelle Datei: {name}",
+  staticChooseNewFile: "Neue Datei wählen",
+  submissionFeedStatusSection: "Feed-Status",
+  submissionGtfsValidation: "GTFS-Validierung",
+  submissionValidationStatusLabels: {
+    pending: "Läuft",
+    valid: "Keine Fehler",
+    invalid: "Fehler gefunden",
+    error: "Nicht durchgeführt",
+  },
+  submissionValidationErrorCodes: {
+    "gtfs_validation.file_missing": "Die Feed-Datei ist auf dem ODT-Server nicht verfügbar.",
+    "gtfs_validation.validator_unavailable": "Der Validator konnte nicht gestartet werden.",
+    "gtfs_validation.validator_failed": "Der Validator wurde ohne Ergebnis beendet.",
+    "gtfs_validation.timeout": "Die Validierung hat das Zeitlimit überschritten.",
+    "gtfs_validation.credential_undecryptable":
+      "Der ODT-Server kann die gespeicherten Zugangsdaten der Quelle nicht lesen und hat den Feed daher nicht heruntergeladen.",
+  },
+  submissionValidationErrorHint:
+    "Die Validierung konnte wegen eines Problems bei ODT nicht durchgeführt werden. Das ODT-Team führt sie erneut aus.",
+  submissionFetchAutoPausedHint:
+    "Der Abruf wurde nach wiederholten Fehlschlägen automatisch pausiert. Der ODT-Server versucht es einmal täglich erneut und kehrt nach einem erfolgreichen Abruf zum normalen Zeitplan zurück.",
+  submissionFetchManualPausedHint: "Der Abruf wurde vom ODT-Team pausiert.",
+  submissionFetchErrorsRecent: "Abruffehler der letzten 30 Tage",
+  submissionFetchErrorsEmpty: "In den letzten 30 Tagen sind keine Abruffehler aufgetreten.",
+  submissionFetchHttpError: "HTTP-Fehler {status}",
+  submissionLinkedRealtimeSection: "Verknüpfte Realtime-Einreichungen",
   unnamed: "ohne Namen",
   tabStaticSubmission: "Statische Einreichung",
   tabRealtimeSubmission: "Realtime-Einreichung",

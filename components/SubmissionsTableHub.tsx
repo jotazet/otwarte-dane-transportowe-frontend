@@ -38,10 +38,19 @@ type UnifiedRow =
   | ({ kind: "static"; typeLabel: string } & FeedSubmissionListItem)
   | ({ kind: "realtime"; typeLabel: string } & RealtimeSubmissionListItem);
 
+/**
+ * Published means the submission is in the public catalogue now: stage 4 and not
+ * rejected. `published_at` is only the date of the latest completion and stays set
+ * after a reviewer moves the submission back to an earlier stage.
+ */
+function isPublished(row: UnifiedRow): boolean {
+  return row.current_stage === 4 && !row.is_rejected;
+}
+
 function sortQueueRows(a: UnifiedRow, b: UnifiedRow): number {
   const tier = (r: UnifiedRow) => {
     if (r.is_rejected) return 3;
-    if (r.published_at) return 4;
+    if (isPublished(r)) return 4;
     if (r.current_stage === 3) return 1;
     return 2;
   };
@@ -56,7 +65,7 @@ function sortQueueRows(a: UnifiedRow, b: UnifiedRow): number {
 
 function rowStatus(row: UnifiedRow, dict: Dictionary, listContext: SubmissionListContext): string {
   if (row.is_rejected) return dict.rejected;
-  if (row.published_at) return dict.published;
+  if (isPublished(row)) return dict.published;
   if (listContext === "queue" && row.current_stage === 3) return dict.pendingApproval;
   return dict.inProgress;
 }
@@ -71,7 +80,7 @@ function StatusChip({
   listContext: SubmissionListContext;
 }) {
   if (row.is_rejected) return <Chip size="small" color="error" label={dict.rejected} />;
-  if (row.published_at) return <Chip size="small" color="success" label={dict.published} />;
+  if (isPublished(row)) return <Chip size="small" color="success" label={dict.published} />;
   if (listContext === "queue" && row.current_stage === 3) {
     return <Chip size="small" color="warning" label={dict.pendingApproval} />;
   }

@@ -17,6 +17,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
 import { PasswordTextField } from "@/components/PasswordTextField";
+import { SourceModeToggle, type SourceMode } from "@/components/layout/SourceModeToggle";
 import { InlineSelect } from "@/components/InlineSelect";
 import { FormActions } from "@/components/layout/FormActions";
 import { FormSection } from "@/components/layout/FormSection";
@@ -24,6 +25,14 @@ import { HistoryTimeline } from "@/components/layout/HistoryTimeline";
 import { StageBanner } from "@/components/layout/StageBanner";
 import { useConfirm } from "@/components/layout/useConfirm";
 import { HelperReviewPanel } from "@/components/submissions/HelperReviewPanel";
+import {
+  LinkedRealtimeSubmissions,
+  type LinkedRealtimeSubmission,
+} from "@/components/submissions/LinkedRealtimeSubmissions";
+import {
+  StaticFeedStatusPanel,
+  type StaticValidationStatus,
+} from "@/components/submissions/StaticFeedStatusPanel";
 import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDetailAuthGate";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
@@ -39,6 +48,7 @@ import {
   resolveHideOriginal,
 } from "@/lib/data/hideOriginalAuth";
 import { downloadBlob } from "@/lib/download";
+import { fill } from "@/lib/i18n/fill";
 import { formatApiError } from "@/lib/formatApiError";
 import { submissionListPath, type SubmissionListContext } from "@/lib/nav/routes";
 import { submissionStageLabel } from "@/lib/submissionStage";
@@ -53,6 +63,8 @@ type StaticEntry = FetchHealthFields & {
   is_original?: boolean;
   hide_original?: boolean;
   auth_type?: string;
+  validation_status?: StaticValidationStatus;
+  validation_message?: string;
 };
 
 type FeedDetail = {
@@ -65,6 +77,7 @@ type FeedDetail = {
   is_rejected: boolean;
   rejection_cause?: string | null;
   static_entry?: StaticEntry | null;
+  realtime_submissions?: LinkedRealtimeSubmission[];
   submitted_by?: number;
   submitted_by_username?: string | null;
   history?: SubmissionHistoryEvent[];
@@ -100,6 +113,9 @@ export function FeedSubmissionDetail({
   const [hideOrig, setHideOrig] = React.useState(false);
   const [authType, setAuthType] = React.useState("");
   const [authValue, setAuthValue] = React.useState("");
+  const [sourceMode, setSourceMode] = React.useState<SourceMode>("url");
+  const [newFile, setNewFile] = React.useState<File | null>(null);
+  const [saving, setSaving] = React.useState(false);
   const [stage, setStage] = React.useState("");
   const [rejectCause, setRejectCause] = React.useState("");
 
@@ -120,6 +136,8 @@ export function FeedSubmissionDetail({
     setHideOrig(!!se?.hide_original);
     setAuthType(se?.auth_type ?? "");
     setAuthValue("");
+    setSourceMode(se?.file && !se?.url ? "file" : "url");
+    setNewFile(null);
     setStage(String(d.current_stage));
     setRejectCause("");
   }, []);
@@ -202,7 +220,30 @@ export function FeedSubmissionDetail({
   const showAdminSourceTab =
     isDjangoAdmin && row.current_stage >= 2 && row.current_stage <= 4 && !row.is_rejected;
 
+  // Only GTFS has automatic validation; for other types the status stays "pending".
+  const validationStatus =
+    row.data_type === "gtfs" ? (row.static_entry?.validation_status ?? null) : null;
+  // Reviewers get the full FeedFetchHealthPanel above; the owner a read-only view.
+  const ownerFetchHealth =
+    isOwner && !showHelperPanel && row.current_stage >= 4 && row.static_entry?.fetch_status != null
+      ? row.static_entry
+      : null;
+
   const authTypeSelectOptions = authTypeOptions(dict);
+  // Only an owner or Admin at stage 1 (incl. after a rejection) may switch between URL and file.
+  const urlMode = sourcePerms.canEditFullSource ? sourceMode === "url" : !isFileEntry;
+  const currentFileName = row.static_entry?.file?.split("/").pop() ?? "";
+
+  function changeSourceMode(mode: SourceMode) {
+    setSourceMode(mode);
+    setError(null);
+    // A file source cannot be proxied or carry credentials; going back to a URL
+    // restores the saved settings.
+    const se = row?.static_entry;
+    setAuthType(mode === "file" ? "" : (se?.auth_type ?? ""));
+    setAuthValue("");
+    setHideOrig(mode === "file" ? false : !!se?.hide_original);
+  }
 
   async function saveSubmissionMeta() {
     if (!row || !canEditMeta) return;
@@ -222,7 +263,34 @@ export function FeedSubmissionDetail({
   async function saveStatic() {
     if (!row) return;
     setError(null);
+    if (sourcePerms.canEditFullSource) {
+      if (urlMode && !url.trim()) {
+        setError(dict.fieldRequired);
+        return;
+      }
+      if (!urlMode && !isFileEntry && !newFile) {
+        setError(dict.staticSourceFileRequired);
+        return;
+      }
+    }
+    setSaving(true);
     try {
+      if (sourcePerms.canEditFullSource && !urlMode && newFile) {
+        // A new file goes as multipart. The URL-only fields are cleared in the same
+        // request, so the backend never sees a URL and a file at once.
+        const form = new FormData();
+        form.set("static_entry.file", newFile);
+        form.set("static_entry.url", "");
+        form.set("static_entry.download_time_1", "");
+        form.set("static_entry.download_time_2", "");
+        form.set("static_entry.hide_original", "false");
+        form.set("static_entry.auth_type", "");
+        form.set("static_entry.is_original", isOrig ? "true" : "false");
+        form.set("static_entry.license", license.trim());
+        await auth.apiForm("PATCH", submissionsPaths.feedDetail(row.id), form);
+        await load();
+        return;
+      }
       const static_entry: Record<string, unknown> = {};
       if (
         sourcePerms.canEditLimitedMeta ||
@@ -230,8 +298,8 @@ export function FeedSubmissionDetail({
         sourcePerms.canAdminSourceOnStage2Plus
       ) {
         static_entry.license = license.trim();
-        // Godziny pobierania dotyczą tylko feedów z URL — backend odrzuca je dla wpisów plikowych.
-        if (!isFileEntry && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
+        // Download times apply to URL sources only; the backend refuses them for a file.
+        if (urlMode && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
           static_entry.download_time_1 = dt1.trim() || "02:00:00";
           static_entry.download_time_2 = dt2Enabled && dt2.trim() ? dt2.trim() : null;
         }
@@ -239,6 +307,8 @@ export function FeedSubmissionDetail({
       if (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
         const u = url.trim();
         if (u) static_entry.url = u;
+        // Switching a file entry to a URL clears the file in the same request.
+        if (u && isFileEntry && urlMode) static_entry.file = null;
         static_entry.is_original = isOrig;
         static_entry.hide_original = resolveHideOriginal(authType, hideOrig);
         if (authType) {
@@ -252,6 +322,8 @@ export function FeedSubmissionDetail({
       await load();
     } catch (e) {
       setError(formatApiError(e, dict));
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -375,6 +447,17 @@ export function FeedSubmissionDetail({
         />
       ) : null}
 
+      {validationStatus || ownerFetchHealth ? (
+        <StaticFeedStatusPanel
+          locale={locale}
+          dict={dict}
+          submissionId={row.id}
+          validationStatus={validationStatus}
+          validationMessage={row.static_entry?.validation_message}
+          fetchHealth={ownerFetchHealth}
+        />
+      ) : null}
+
       {canEditMeta ? (
         <FormSection title={dict.submissionNameAndNoteSection}>
           <Stack spacing={2}>
@@ -413,16 +496,61 @@ export function FeedSubmissionDetail({
 
           {(tab === 0 || !showAdminSourceTab) && (
             <Stack spacing={2}>
-              <TextField
-                label={dict.feedUrl}
-                fullWidth
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                disabled={sourceFieldsDisabled || limitedOnly}
-                helperText={dict.feedUrlHint}
-              />
-              {/* Godziny pobierania dotyczą tylko feedów z URL — dla wpisów plikowych backend ich zabrania. */}
-              {!isFileEntry ? (
+              {sourcePerms.canEditFullSource ? (
+                <>
+                  <Typography variant="body2" color="text.secondary">
+                    {dict.staticSourceResubmitHint}
+                  </Typography>
+                  <SourceModeToggle
+                    label={dict.staticSource}
+                    value={sourceMode}
+                    onChange={changeSourceMode}
+                    urlLabel={dict.staticSourceUrl}
+                    fileLabel={dict.staticSourceFile}
+                    disabled={saving}
+                  />
+                </>
+              ) : null}
+              {urlMode ? (
+                <TextField
+                  label={dict.feedUrl}
+                  fullWidth
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  disabled={sourceFieldsDisabled || limitedOnly}
+                  helperText={dict.feedUrlHint}
+                />
+              ) : (
+                <Stack spacing={1}>
+                  {isFileEntry && currentFileName ? (
+                    <Typography variant="body2">
+                      {fill(dict.staticCurrentFile, { name: currentFileName })}
+                    </Typography>
+                  ) : null}
+                  {sourcePerms.canEditFullSource ? (
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={2}
+                      sx={{ alignItems: { sm: "center" } }}
+                    >
+                      <Button variant="outlined" component="label" disabled={saving}>
+                        {isFileEntry ? dict.staticChooseNewFile : dict.chooseFile}
+                        <input
+                          type="file"
+                          hidden
+                          accept=".zip,application/zip"
+                          onChange={(e) => setNewFile(e.currentTarget.files?.[0] ?? null)}
+                        />
+                      </Button>
+                      <Typography variant="body2" color="text.secondary">
+                        {newFile ? newFile.name : dict.noFileSelected}
+                      </Typography>
+                    </Stack>
+                  ) : null}
+                </Stack>
+              )}
+              {/* Download times apply to URL sources only; the backend refuses them for a file. */}
+              {urlMode ? (
                 <>
                   <TextField
                     label={dict.downloadTime1Utc}
@@ -477,18 +605,20 @@ export function FeedSubmissionDetail({
                 fullWidth
                 disabled={sourceFieldsDisabled && !limitedOnly}
               />
-              <InlineSelect
-                fullWidth
-                label={dict.authType}
-                value={authType}
-                onChange={(v) => {
-                  setAuthType(v);
-                  setHideOrig(hideOriginalOnAuthChange(v));
-                }}
-                options={authTypeSelectOptions}
-                disabled={sourceFieldsDisabled || limitedOnly}
-              />
-              {authType ? (
+              {urlMode ? (
+                <InlineSelect
+                  fullWidth
+                  label={dict.authType}
+                  value={authType}
+                  onChange={(v) => {
+                    setAuthType(v);
+                    setHideOrig(hideOriginalOnAuthChange(v));
+                  }}
+                  options={authTypeSelectOptions}
+                  disabled={sourceFieldsDisabled || limitedOnly}
+                />
+              ) : null}
+              {urlMode && authType ? (
                 <PasswordTextField
                   label={dict.authValue}
                   value={authValue}
@@ -501,7 +631,7 @@ export function FeedSubmissionDetail({
                   hidePasswordLabel={dict.hidePassword}
                 />
               ) : null}
-              <Stack direction="row" spacing={2}>
+              <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -512,24 +642,28 @@ export function FeedSubmissionDetail({
                   }
                   label={dict.original}
                 />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={resolveHideOriginal(authType, hideOrig)}
-                      onChange={(e) => setHideOrig(e.target.checked)}
-                      disabled={
-                        sourceFieldsDisabled || limitedOnly || isHideOriginalLockedByAuth(authType)
-                      }
-                    />
-                  }
-                  label={dict.hideOriginal}
-                />
+                {urlMode ? (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={resolveHideOriginal(authType, hideOrig)}
+                        onChange={(e) => setHideOrig(e.target.checked)}
+                        disabled={
+                          sourceFieldsDisabled ||
+                          limitedOnly ||
+                          isHideOriginalLockedByAuth(authType)
+                        }
+                      />
+                    }
+                    label={dict.hideOriginal}
+                  />
+                ) : null}
               </Stack>
               {(sourcePerms.canEditSource ||
                 sourcePerms.canEditLimitedMeta ||
                 sourcePerms.canAdminSourceOnStage2Plus) && (
                 <FormActions>
-                  <Button variant="contained" onClick={() => void saveStatic()}>
+                  <Button variant="contained" disabled={saving} onClick={() => void saveStatic()}>
                     {dict.save}
                   </Button>
                   {row.static_entry?.id ? (
@@ -580,6 +714,15 @@ export function FeedSubmissionDetail({
             </Stack>
           )}
         </FormSection>
+      ) : null}
+
+      {row.realtime_submissions?.length ? (
+        <LinkedRealtimeSubmissions
+          locale={locale}
+          dict={dict}
+          listContext={listContext}
+          items={row.realtime_submissions}
+        />
       ) : null}
 
       {row.history?.length ? (

@@ -289,6 +289,36 @@ export const dictEn: Dictionary = {
   staticSourceFile: "Upload file",
   chooseFile: "Choose file",
   noFileSelected: "No file selected",
+  staticSourceResubmitHint:
+    "After you save changes to the source, the submission returns to data verification.",
+  staticSourceFileRequired: "Choose a file to upload.",
+  staticCurrentFile: "Current file: {name}",
+  staticChooseNewFile: "Choose new file",
+  submissionFeedStatusSection: "Feed status",
+  submissionGtfsValidation: "GTFS validation",
+  submissionValidationStatusLabels: {
+    pending: "In progress",
+    valid: "No errors",
+    invalid: "Errors found",
+    error: "Not run",
+  },
+  submissionValidationErrorCodes: {
+    "gtfs_validation.file_missing": "The feed file is not available on ODT's server.",
+    "gtfs_validation.validator_unavailable": "The validator could not be started.",
+    "gtfs_validation.validator_failed": "The validator stopped without a result.",
+    "gtfs_validation.timeout": "Validation exceeded the time limit.",
+    "gtfs_validation.credential_undecryptable":
+      "ODT's server cannot read the stored source credentials, so it did not download the feed.",
+  },
+  submissionValidationErrorHint:
+    "Validation could not run because of a problem on ODT's side. The ODT team will run it again.",
+  submissionFetchAutoPausedHint:
+    "Fetching was paused automatically after repeated failures. ODT's server retries once a day and returns to the normal schedule after a successful fetch.",
+  submissionFetchManualPausedHint: "Fetching was paused by the ODT team.",
+  submissionFetchErrorsRecent: "Fetch errors in the last 30 days",
+  submissionFetchErrorsEmpty: "No fetch errors in the last 30 days.",
+  submissionFetchHttpError: "HTTP error {status}",
+  submissionLinkedRealtimeSection: "Linked realtime submissions",
   unnamed: "unnamed",
   tabStaticSubmission: "Static submission",
   tabRealtimeSubmission: "Realtime submission",
