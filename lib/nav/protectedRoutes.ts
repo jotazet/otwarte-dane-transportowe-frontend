@@ -15,6 +15,7 @@ export function isLoginRequiredPath(rest: string): boolean {
   if (path === "/cases/organizations/new") return true;
   if (/^\/cases\/organizations\/\d+\/edit$/.test(path)) return true;
   if (/^\/cases\/organizations\/\d+\/statuses\//.test(path)) return true;
-  if (path === "/cases/data-providers" || path.startsWith("/cases/data-providers/")) return true;
+  // The provider list is public; creating and editing a provider are not.
+  if (path.startsWith("/cases/data-providers/")) return true;
   return false;
 }

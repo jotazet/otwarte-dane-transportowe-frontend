@@ -614,6 +614,9 @@ export const dictDe: Dictionary = {
   metaCasesTitle: "Status der Verkehrsdatenbeschaffung in Polen",
   metaCasesDescription:
     "Prüfe den Status der Beschaffung offener GTFS- und NeTEx-Daten für Verkehrsorganisationen in Polen - öffentliche und private.",
+  metaProvidersTitle: "Verkehrsdatenanbieter in Polen",
+  metaProvidersDescription:
+    "Personen und Institutionen, von denen offene Verkehrsdaten in Polen bezogen werden – Websites und Kontaktadressen.",
   metaFeedDetailTitle: "{name} – Feeds ({formats})",
   metaFeedDetailDescription:
     "Feeds ({formats}) von {name}: Download-Links und Angaben zur Aktualisierung. Offene Daten des öffentlichen Verkehrs in Polen.",

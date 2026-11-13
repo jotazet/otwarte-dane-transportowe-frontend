@@ -595,6 +595,9 @@ export const dictEn: Dictionary = {
   metaCasesTitle: "Transport data acquisition statuses in Poland",
   metaCasesDescription:
     "Check open GTFS and NeTEx data acquisition statuses for transport organizations in Poland - public and private.",
+  metaProvidersTitle: "Transport data providers in Poland",
+  metaProvidersDescription:
+    "People and institutions that provide open transport data in Poland – websites and contact addresses.",
   metaFeedDetailTitle: "{name} – {formats} feeds",
   metaFeedDetailDescription:
     "{formats} feeds from {name}: download links and update information. Open public transport data from Poland.",

@@ -59,7 +59,13 @@ export function PageHeader({
               <Stack
                 direction="row"
                 spacing={1}
-                sx={{ alignItems: "center", justifyContent: "flex-end", flexShrink: 0 }}
+                useFlexGap
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  flexShrink: 0,
+                  flexWrap: "wrap",
+                }}
               >
                 {actions}
               </Stack>

@@ -19,7 +19,7 @@ describe("isLoginRequiredPath", () => {
     "/cases/organizations/new",
     "/cases/organizations/3/edit",
     "/cases/organizations/3/statuses/new",
-    "/cases/data-providers",
+    "/cases/data-providers/new",
     "/cases/data-providers/9",
   ])("requires login for %s", (path) => {
     expect(isLoginRequiredPath(path)).toBe(true);
@@ -45,6 +45,7 @@ describe("isLoginRequiredPath", () => {
     "/cases/organizations",
     "/cases/organizations/3",
     "/cases/organizations/abc/edit",
+    "/cases/data-providers",
     "/info",
     "/accounting",
   ])("leaves %s public", (path) => {

@@ -8,42 +8,40 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import NextLink from "next/link";
 
-import { AccessGate } from "@/components/AccessGate";
 import { TableCard } from "@/components/TableCard";
 import type { DataProviderRecord } from "@/lib/api/cases";
 import type { Dictionary } from "@/i18n/getDictionary";
+import { usePermissions } from "@/lib/auth/usePermissions";
 import { text } from "@/lib/format";
 import { tableHeadRowSx, tableZebraRowSx } from "@/lib/ui/tableSx";
 
+/** Public list; only Helpers and Admins get the link to a provider's edit page. */
 export function DataProvidersTable({
   locale,
   dict,
   providers,
 }: {
   locale: string;
-  dict: Dictionary;
+  dict: Pick<Dictionary, "providerName" | "website" | "contact">;
   providers: DataProviderRecord[];
 }) {
+  const { hasRole } = usePermissions();
+  const canEdit = hasRole(["Helper", "Admin"]);
   return (
-    <AccessGate
-      roles={["Helper", "Admin"]}
-      mode="empty"
-      locale={locale}
-      dict={{ requiresLogin: dict.requiresLogin, login: dict.login, forbidden: dict.forbidden }}
-    >
-      <TableCard>
-        <Table size="small" sx={{ minWidth: 640 }}>
-          <TableHead>
-            <TableRow sx={tableHeadRowSx}>
-              <TableCell>{dict.providerName}</TableCell>
-              <TableCell>{dict.website}</TableCell>
-              <TableCell>{dict.contact}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {providers.map((p) => (
-              <TableRow key={p.id} hover sx={tableZebraRowSx}>
-                <TableCell sx={{ fontWeight: 600 }}>
+    <TableCard>
+      <Table size="small" sx={{ minWidth: 640 }}>
+        <TableHead>
+          <TableRow sx={tableHeadRowSx}>
+            <TableCell>{dict.providerName}</TableCell>
+            <TableCell>{dict.website}</TableCell>
+            <TableCell>{dict.contact}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {providers.map((p) => (
+            <TableRow key={p.id} hover sx={tableZebraRowSx}>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {canEdit ? (
                   <Link
                     component={NextLink}
                     href={`/${locale}/cases/data-providers/${p.id}`}
@@ -53,14 +51,16 @@ export function DataProvidersTable({
                   >
                     {text(p.name)}
                   </Link>
-                </TableCell>
-                <TableCell>{text(p.website)}</TableCell>
-                <TableCell>{text(p.contact_email)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableCard>
-    </AccessGate>
+                ) : (
+                  text(p.name)
+                )}
+              </TableCell>
+              <TableCell>{text(p.website)}</TableCell>
+              <TableCell>{text(p.contact_email)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableCard>
   );
 }

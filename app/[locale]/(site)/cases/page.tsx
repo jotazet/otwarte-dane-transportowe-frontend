@@ -1,6 +1,7 @@
+import Button from "@mui/material/Button";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MdRuleFolder } from "react-icons/md";
+import { MdGroups, MdRuleFolder } from "react-icons/md";
 
 import { CasesTable } from "@/app/[locale]/(site)/cases/CasesTable";
 import { CreateActionButton } from "@/components/CreateActionButton";
@@ -50,11 +51,20 @@ export default async function CasesPage({ params }: { params: Promise<{ locale: 
         subtitle={dict.casesSubtitle}
         icon={<MdRuleFolder size={28} aria-hidden />}
         actions={
-          <CreateActionButton
-            roles={["Helper"]}
-            href={paths(locale).casesOrgNew}
-            label={dict.addOrganization}
-          />
+          <>
+            <Button
+              href={paths(locale).casesProviders}
+              variant="outlined"
+              startIcon={<MdGroups size={20} aria-hidden />}
+            >
+              {dict.providers}
+            </Button>
+            <CreateActionButton
+              roles={["Helper"]}
+              href={paths(locale).casesOrgNew}
+              label={dict.addOrganization}
+            />
+          </>
         }
       />
       {organizations === null ? (
