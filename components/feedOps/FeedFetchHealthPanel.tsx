@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+import { fetchPauseReasonText, LastFetchError } from "@/components/feedOps/FetchHealthText";
 import { FetchStatusChip } from "@/components/feedOps/FetchStatusChip";
 import { PauseFetchDialog } from "@/components/feedOps/PauseFetchDialog";
 import { FormSection } from "@/components/layout/FormSection";
@@ -13,8 +14,10 @@ import type { Dictionary } from "@/i18n/getDictionary";
 import { feedOpsPaths } from "@/lib/api/feedOps";
 import type { FetchHealthFields, FetchStatus } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { hasAdminAccess } from "@/lib/auth/permissions";
+import { usePermissions } from "@/lib/auth/usePermissions";
 import { formatApiError } from "@/lib/formatApiError";
-import { formatDateTime, text } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 
 const PAUSED_STATUSES: FetchStatus[] = ["manual_paused", "auto_paused"];
 
@@ -24,7 +27,9 @@ function MetricRow({ label, value }: { label: string; value: React.ReactNode }) 
       <Typography variant="body2" color="text.secondary" sx={{ minWidth: 200 }}>
         {label}
       </Typography>
-      <Typography variant="body2">{value}</Typography>
+      <Typography variant="body2" component="div">
+        {value}
+      </Typography>
     </Stack>
   );
 }
@@ -47,6 +52,8 @@ export function FeedFetchHealthPanel({
   onChanged: () => void;
 }) {
   const { apiJson } = useAuth();
+  const { user } = usePermissions();
+  const isAdmin = user != null && hasAdminAccess(user);
   const [busy, setBusy] = React.useState(false);
   const [actionError, setActionError] = React.useState<string | null>(null);
   const [pauseOpen, setPauseOpen] = React.useState(false);
@@ -115,9 +122,12 @@ export function FeedFetchHealthPanel({
           label={dict.fetchLastSuccess}
           value={formatDateTime(health.last_fetch_success_at, locale)}
         />
-        <MetricRow label={dict.fetchLastError} value={text(health.last_fetch_error_message)} />
+        <MetricRow
+          label={dict.fetchLastError}
+          value={<LastFetchError health={health} locale={locale} isAdmin={isAdmin} dict={dict} />}
+        />
         {health.fetch_pause_reason ? (
-          <MetricRow label={dict.fetchPauseReason} value={text(health.fetch_pause_reason)} />
+          <MetricRow label={dict.fetchPauseReason} value={fetchPauseReasonText(health, dict)} />
         ) : null}
       </Stack>
 

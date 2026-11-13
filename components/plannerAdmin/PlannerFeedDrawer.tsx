@@ -24,6 +24,7 @@ import {
 } from "@/components/plannerAdmin/shared";
 import {
   fetchFeedCandidates,
+  fetchRentalCandidates,
   plannerAdminPaths,
   type FailurePolicy,
   type PlannerFeed,
@@ -294,9 +295,21 @@ function RentalDetails({
   source: PlannerRentalSource;
   onRemoved: () => void;
 }) {
-  const { dict } = ctx;
+  const { apiJson, dict } = ctx;
   const result = source.active_result;
   const path = plannerAdminPaths.rentalSource(source.id);
+  // As for feeds: a re-submission of the same organization, not one another source uses.
+  const loadCandidates = React.useCallback(() => fetchRentalCandidates(apiJson), [apiJson]);
+  const candidates = useApiLoad(loadCandidates).data ?? [];
+  const submissions = withCurrent(
+    candidates.filter(
+      (c) =>
+        c.organization.id === source.organization.id &&
+        (c.rental_source === null || c.rental_source === source.id),
+    ),
+    source.submission,
+    source.submission_name,
+  );
   return (
     <>
       <DrawerSection title={dict.plannerAdminInServedGraph}>
@@ -317,7 +330,21 @@ function RentalDetails({
           ]}
         />
       </DrawerSection>
-      <DrawerSection>
+      <DrawerSection title={dict.plannerAdminSettingsTitle}>
+        <TextField
+          select
+          size="small"
+          label={dict.plannerAdminSubmission}
+          value={source.submission}
+          helperText={dict.plannerAdminSubmissionHint}
+          onChange={(e) => void saveRental(ctx, source.id, { submission: Number(e.target.value) })}
+        >
+          {submissions.map((c) => (
+            <MenuItem key={c.id} value={c.id}>
+              {c.name}
+            </MenuItem>
+          ))}
+        </TextField>
         <FormControlLabel
           labelPlacement="start"
           sx={{ mx: 0, justifyContent: "space-between" }}
