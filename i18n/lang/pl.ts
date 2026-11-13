@@ -290,6 +290,11 @@ export const dictPl = {
   staticSourceFile: "Prześlij plik",
   chooseFile: "Wybierz plik",
   noFileSelected: "Nie wybrano pliku",
+  staticSourceResubmitHint:
+    "Po zapisaniu zmian źródła zgłoszenie wróci do etapu weryfikacji danych.",
+  staticSourceFileRequired: "Wybierz plik do przesłania.",
+  staticCurrentFile: "Obecny plik: {name}",
+  staticChooseNewFile: "Wybierz nowy plik",
   unnamed: "bez nazwy",
   tabStaticSubmission: "Feed statyczny",
   tabRealtimeSubmission: "Feed realtime",

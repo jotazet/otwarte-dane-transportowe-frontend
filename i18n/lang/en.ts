@@ -289,6 +289,11 @@ export const dictEn: Dictionary = {
   staticSourceFile: "Upload file",
   chooseFile: "Choose file",
   noFileSelected: "No file selected",
+  staticSourceResubmitHint:
+    "After you save changes to the source, the submission returns to data verification.",
+  staticSourceFileRequired: "Choose a file to upload.",
+  staticCurrentFile: "Current file: {name}",
+  staticChooseNewFile: "Choose new file",
   unnamed: "unnamed",
   tabStaticSubmission: "Static submission",
   tabRealtimeSubmission: "Realtime submission",

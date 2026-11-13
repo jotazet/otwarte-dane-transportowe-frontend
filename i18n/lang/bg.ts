@@ -293,6 +293,11 @@ export const dictBg: Dictionary = {
   staticSourceFile: "Качи файл",
   chooseFile: "Избери файл",
   noFileSelected: "Не е избран файл",
+  staticSourceResubmitHint:
+    "След запазване на промените в източника заявката се връща към проверка на данните.",
+  staticSourceFileRequired: "Изберете файл за качване.",
+  staticCurrentFile: "Текущ файл: {name}",
+  staticChooseNewFile: "Избери нов файл",
   unnamed: "без име",
   tabStaticSubmission: "Статичен фийд",
   tabRealtimeSubmission: "Фийд в реално време",

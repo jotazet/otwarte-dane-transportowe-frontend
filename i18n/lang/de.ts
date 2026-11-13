@@ -303,6 +303,11 @@ export const dictDe: Dictionary = {
   staticSourceFile: "Datei hochladen",
   chooseFile: "Datei wählen",
   noFileSelected: "Keine Datei ausgewählt",
+  staticSourceResubmitHint:
+    "Nach dem Speichern von Änderungen an der Quelle kehrt die Einreichung zur Datenprüfung zurück.",
+  staticSourceFileRequired: "Wählen Sie eine Datei zum Hochladen.",
+  staticCurrentFile: "Aktuelle Datei: {name}",
+  staticChooseNewFile: "Neue Datei wählen",
   unnamed: "ohne Namen",
   tabStaticSubmission: "Statische Einreichung",
   tabRealtimeSubmission: "Realtime-Einreichung",
