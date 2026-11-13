@@ -42,7 +42,7 @@ function niceMax(max: number): number {
 }
 
 function bucketLabel(bucket: string, interval: StatsInterval, locale: string): string {
-  return interval === "hour" ? formatDateTime(bucket, locale) : formatDayMonth(bucket, locale);
+  return interval === "day" ? formatDayMonth(bucket, locale) : formatDateTime(bucket, locale);
 }
 
 export function ChartLegend({
