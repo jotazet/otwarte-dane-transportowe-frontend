@@ -519,8 +519,6 @@ export const dictEn: Dictionary = {
   passwordMismatch: "Passwords do not match.",
   emailChanged: "Email address updated.",
   passwordChanged: "Password updated.",
-  passwordChangedSignInAgain:
-    "Password updated, but the session could not be renewed. Sign in again with the new password.",
   userCreated: "User created.",
   userSaved: "Changes saved.",
   searchUsers: "Search by username or email",

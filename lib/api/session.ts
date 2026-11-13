@@ -8,14 +8,18 @@ import { apiBaseUrl } from "@/lib/config";
 export const SESSION_LOGIN = "/api/auth/session/";
 export const SESSION_REFRESH = "/api/auth/session/refresh/";
 export const SESSION_LOGOUT = "/api/auth/session/logout/";
+/** Changes the password of the user in the access token and sets a new cookie. */
+export const SESSION_CHANGE_PASSWORD = "/api/auth/session/change-password/";
 
 /**
  * A POST to a session endpoint. Only these send credentials: the cookie's path covers them
  * alone, and the API allows credentials nowhere else. The header is the backend's CSRF check.
+ * `access` goes out as a Bearer token, for the endpoints that act on the signed-in user.
  */
-export async function postSession<T>(path: string, body?: unknown): Promise<T> {
+export async function postSession<T>(path: string, body?: unknown, access?: string): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json", "X-ODT-CSRF": "1" };
   if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (access) headers.Authorization = `Bearer ${access}`;
   const res = await fetchWithTimeout(`${apiBaseUrl()}${path}`, {
     method: "POST",
     credentials: "include",
