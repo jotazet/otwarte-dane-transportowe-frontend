@@ -74,22 +74,14 @@ function nextEndpointUid(): string {
 const DATA_TYPES = ["gtfs", "netex", "other"] as const;
 const PROTOCOLS = ["gtfs_rt", "siri", "gbfs"] as const;
 import { authTypeOptions } from "@/lib/data/authTypes";
+import {
+  ENDPOINT_TYPES_GBFS,
+  ENDPOINT_TYPES_GTFS_RT,
+  ENDPOINT_TYPES_SIRI,
+} from "@/lib/data/endpointTypes";
 type DataTypeChoice = (typeof DATA_TYPES)[number];
 type ProtocolChoice = (typeof PROTOCOLS)[number];
 type OrgSelect = number | "";
-const ENDPOINT_TYPES_GTFS_RT = ["trip_update", "vehicle_position", "service_alert"] as const;
-const ENDPOINT_TYPES_SIRI = ["sx", "sm", "vm", "et", "gm"] as const;
-const ENDPOINT_TYPES_GBFS = [
-  "gbfs",
-  "gbfs_versions",
-  "system_information",
-  "vehicle_types",
-  "station_information",
-  "station_status",
-  "free_bike_status",
-  "system_hours",
-  "system_alerts",
-] as const;
 
 function emptyEndpoint(protocol: ProtocolChoice): RtEndpointDraft {
   const options =

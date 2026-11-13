@@ -3,6 +3,7 @@
 import * as React from "react";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
+import ListSubheader from "@mui/material/ListSubheader";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
@@ -31,6 +32,8 @@ import {
 } from "@/lib/api/feedOps";
 import type { PaginatedResponse } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { ENDPOINT_TYPES_BY_PROTOCOL } from "@/lib/data/endpointTypes";
+import { formatName } from "@/lib/feedFormats";
 import { hasAdminAccess } from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
 import { errorCodeLabel, formatApiError } from "@/lib/formatApiError";
@@ -54,6 +57,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
   const [days, setDays] = React.useState(7);
   const [errorType, setErrorType] = React.useState("");
   const [source, setSource] = React.useState<FetchErrorSource | "">("");
+  const [endpointType, setEndpointType] = React.useState("");
   const [page, setPage] = React.useState(1);
 
   const [rows, setRows] = React.useState<FeedFetchError[]>([]);
@@ -65,7 +69,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
     setLoading(true);
     setError(null);
     try {
-      const query = buildFetchErrorsQuery({ days, page, errorType, source });
+      const query = buildFetchErrorsQuery({ days, page, errorType, source, endpointType });
       const data = await apiJson<PaginatedResponse<FeedFetchError> | FeedFetchError[]>(
         "GET",
         `${feedOpsPaths.fetchErrors}${query}`,
@@ -84,7 +88,7 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
     } finally {
       setLoading(false);
     }
-  }, [apiJson, days, page, errorType, source, dict]);
+  }, [apiJson, days, page, errorType, source, endpointType, dict]);
 
   React.useEffect(() => {
     void (async () => {
@@ -205,6 +209,27 @@ export function FetchErrorsTable({ locale, dict }: { locale: string; dict: Dicti
           <MenuItem value="">{dict.all}</MenuItem>
           <MenuItem value="static">{dict.sourceStatic}</MenuItem>
           <MenuItem value="realtime">{dict.sourceRealtime}</MenuItem>
+        </TextField>
+        <TextField
+          select
+          size="small"
+          label={dict.fetchErrorsEndpointType}
+          value={endpointType}
+          onChange={(e) => {
+            setPage(1);
+            setEndpointType(e.target.value);
+          }}
+          sx={{ minWidth: 200 }}
+        >
+          <MenuItem value="">{dict.all}</MenuItem>
+          {Object.entries(ENDPOINT_TYPES_BY_PROTOCOL).flatMap(([protocol, types]) => [
+            <ListSubheader key={`protocol-${protocol}`}>{formatName(protocol)}</ListSubheader>,
+            ...types.map((t) => (
+              <MenuItem key={t} value={t}>
+                {t}
+              </MenuItem>
+            )),
+          ])}
         </TextField>
       </Stack>
 

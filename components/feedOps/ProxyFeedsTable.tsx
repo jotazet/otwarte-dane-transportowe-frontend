@@ -23,14 +23,13 @@ import { TableCard } from "@/components/TableCard";
 import { TableFilterHeaderCell } from "@/components/layout/TableFilterHeaderCell";
 import type { Dictionary } from "@/i18n/getDictionary";
 import {
-  buildProxyFeedsQuery,
-  feedOpsPaths,
+  fetchAllProxyFeeds,
   pauseFetchPath,
   PROXY_FEEDS_PAGE_SIZE,
   proxyFeedTypeLabel,
   type ProxyFeedListItem,
 } from "@/lib/api/feedOps";
-import type { FetchStatus, PaginatedResponse } from "@/lib/api/types";
+import type { FetchStatus } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasAdminAccess } from "@/lib/auth/permissions";
 import { usePermissions } from "@/lib/auth/usePermissions";
@@ -62,7 +61,6 @@ export function ProxyFeedsTable({
   const isAdmin = user != null && hasAdminAccess(user);
   const [page, setPage] = React.useState(1);
   const [rows, setRows] = React.useState<ProxyFeedListItem[]>([]);
-  const [count, setCount] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -73,24 +71,20 @@ export function ProxyFeedsTable({
   const [actionError, setActionError] = React.useState<string | null>(null);
   const [pauseTarget, setPauseTarget] = React.useState<ProxyFeedListItem | null>(null);
 
+  // proxy-feeds/ has no filter parameters (issue #35): load every page and filter here, so the
+  // filters, their options and the overview's counts all cover the same rows.
   const load = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiJson<PaginatedResponse<ProxyFeedListItem>>(
-        "GET",
-        `${feedOpsPaths.proxyFeeds}${buildProxyFeedsQuery({ page })}`,
-      );
-      setRows(data.results ?? []);
-      setCount(data.count ?? 0);
+      setRows(await fetchAllProxyFeeds(apiJson));
     } catch (e) {
       setError(formatApiError(e, dict));
       setRows([]);
-      setCount(0);
     } finally {
       setLoading(false);
     }
-  }, [apiJson, page, dict]);
+  }, [apiJson, dict]);
 
   React.useEffect(() => {
     void (async () => {
@@ -136,7 +130,20 @@ export function ProxyFeedsTable({
     });
   }, [rows, orgFilter, regionFilter, sourceFilter, statusFilter, sourceLabel]);
 
-  const totalPages = Math.max(1, Math.ceil(count / PROXY_FEEDS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PROXY_FEEDS_PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = filtered.slice(
+    (currentPage - 1) * PROXY_FEEDS_PAGE_SIZE,
+    currentPage * PROXY_FEEDS_PAGE_SIZE,
+  );
+
+  /** A filter setter that also goes back to the first page. */
+  function filterSetter<T>(set: (value: T) => void) {
+    return (value: T) => {
+      setPage(1);
+      set(value);
+    };
+  }
 
   async function runAction(row: ProxyFeedListItem, action: "pause" | "resume", reason?: string) {
     const rowKey = `${row.source}-${row.id}`;
@@ -159,7 +166,7 @@ export function ProxyFeedsTable({
 
   if (loading) return <LoadingBlock label={dict.loading} />;
 
-  const hasAnyData = count > 0;
+  const hasAnyData = rows.length > 0;
 
   return (
     <Stack spacing={2}>
@@ -178,7 +185,7 @@ export function ProxyFeedsTable({
                 label={dict.region}
                 minWidth={120}
                 filterValue={regionFilter}
-                onFilterChange={setRegionFilter}
+                onFilterChange={filterSetter(setRegionFilter)}
                 options={regionOptions}
                 emptyLabel={dict.all}
               />
@@ -186,7 +193,7 @@ export function ProxyFeedsTable({
                 label={dict.organizations}
                 minWidth={140}
                 filterValue={orgFilter}
-                onFilterChange={setOrgFilter}
+                onFilterChange={filterSetter(setOrgFilter)}
                 options={orgOptions}
                 emptyLabel={dict.all}
               />
@@ -194,7 +201,7 @@ export function ProxyFeedsTable({
                 label={dict.fetchErrorSource}
                 minWidth={120}
                 filterValue={sourceFilter}
-                onFilterChange={setSourceFilter}
+                onFilterChange={filterSetter(setSourceFilter)}
                 options={sourceOptions}
                 emptyLabel={dict.all}
               />
@@ -204,6 +211,7 @@ export function ProxyFeedsTable({
                 minWidth={150}
                 filterValue={statusFilter ? dict.fetchStatusLabels[statusFilter] : ""}
                 onFilterChange={(label) => {
+                  setPage(1);
                   const match = STATUS_ORDER.find((s) => dict.fetchStatusLabels[s] === label);
                   onStatusFilterChange(match ?? "");
                 }}
@@ -218,7 +226,7 @@ export function ProxyFeedsTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {filtered.map((row) => {
+            {pageRows.map((row) => {
               const rowKey = `${row.source}-${row.id}`;
               const status = row.fetch_status ?? null;
               const isPaused = status != null && PAUSED_STATUSES.includes(status);
@@ -296,7 +304,7 @@ export function ProxyFeedsTable({
       ) : null}
 
       <ListPagination
-        page={page}
+        page={currentPage}
         totalPages={totalPages}
         onPageChange={setPage}
         labels={{ prev: dict.paginationPrev, next: dict.paginationNext, page: dict.paginationPage }}
