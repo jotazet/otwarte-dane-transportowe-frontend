@@ -6,8 +6,9 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
-type ConfirmOptions = { confirmLabel?: string; danger?: boolean };
+type ConfirmOptions = { title?: string; confirmLabel?: string; danger?: boolean };
 
 /**
  * Promise-owy dialog potwierdzenia oparty na MUI — zamiennik natywnego `window.confirm()`.
@@ -20,17 +21,20 @@ type ConfirmOptions = { confirmLabel?: string; danger?: boolean };
 export function useConfirm(labels: { confirm: string; cancel: string }) {
   const [state, setState] = React.useState<{
     open: boolean;
+    title?: string;
     message: string;
     confirmLabel: string;
     danger: boolean;
   }>({ open: false, message: "", confirmLabel: labels.confirm, danger: true });
 
+  const titleId = React.useId();
   const resolverRef = React.useRef<((value: boolean) => void) | null>(null);
 
   const confirm = React.useCallback(
     (message: string, opts?: ConfirmOptions) => {
       setState({
         open: true,
+        title: opts?.title,
         message,
         confirmLabel: opts?.confirmLabel ?? labels.confirm,
         danger: opts?.danger ?? true,
@@ -49,7 +53,14 @@ export function useConfirm(labels: { confirm: string; cancel: string }) {
   }, []);
 
   const confirmDialog = (
-    <Dialog open={state.open} onClose={() => settle(false)} maxWidth="xs" fullWidth>
+    <Dialog
+      open={state.open}
+      onClose={() => settle(false)}
+      maxWidth="xs"
+      fullWidth
+      aria-labelledby={state.title ? titleId : undefined}
+    >
+      {state.title ? <DialogTitle id={titleId}>{state.title}</DialogTitle> : null}
       <DialogContent>
         <DialogContentText>{state.message}</DialogContentText>
       </DialogContent>

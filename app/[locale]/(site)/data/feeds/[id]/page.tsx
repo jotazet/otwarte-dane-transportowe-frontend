@@ -11,7 +11,7 @@ import { fetchFeedCatalogOrganization, type FeedDetail } from "@/lib/api/dataCat
 import { loadOr404 } from "@/lib/api/loadOr404";
 import { parseNumericId } from "@/lib/nav/ids";
 import { dataFeedDetail } from "@/lib/nav/breadcrumbTrails";
-import { formatTimeOfDay, text } from "@/lib/format";
+import { formatDateTime, formatTimeOfDay, text } from "@/lib/format";
 import { allFeedFormats } from "@/lib/feedFormats";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { feedDatasetsLd } from "@/lib/seo/structuredData";
@@ -84,6 +84,8 @@ export default async function FeedCatalogDetailPage({
           original: staticFeed.is_original ?? null,
           interval: "-",
           downloadTimes: downloadTimesText(staticFeed),
+          cachedAt: staticFeed.cached_at ? formatDateTime(staticFeed.cached_at, locale) : null,
+          entityTypes: null,
           license: text(staticFeed.license),
           url: text(staticFeed.download_url),
         });
@@ -96,12 +98,20 @@ export default async function FeedCatalogDetailPage({
           original: ep.is_original ?? null,
           interval: intervalText(ep.interval),
           downloadTimes: null,
+          cachedAt: ep.cached_at ? formatDateTime(ep.cached_at, locale) : null,
+          entityTypes: ep.entity_types?.length ? ep.entity_types.join(", ") : null,
           license: text(realtimeFeed?.license),
           url: text(ep.feed_url),
         });
       }
 
-      return { name: text(feed.name), rows };
+      return {
+        name: text(feed.name),
+        realtimePublishedAt: realtimeFeed?.published_at
+          ? formatDateTime(realtimeFeed.published_at, locale)
+          : null,
+        rows,
+      };
     })
     .filter((g) => g.rows.length);
 

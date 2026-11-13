@@ -20,12 +20,18 @@ export type FeedDetailRow = {
   interval: string;
   /** Download times of a proxied static feed, shown in their own column. */
   downloadTimes: string | null;
+  /** When ODT downloaded its current copy, formatted; null when ODT does not proxy it. */
+  cachedAt: string | null;
+  /** GTFS-RT entity types seen in the endpoint, comma-separated. */
+  entityTypes: string | null;
   license: string;
   url: string;
 };
 
 export type FeedDetailGroup = {
   name: string;
+  /** Publication date of the realtime feed, formatted. */
+  realtimePublishedAt: string | null;
   rows: FeedDetailRow[];
 };
 
@@ -45,11 +51,17 @@ export function FeedCatalogDetailBody({
           </Typography>
           {groups.map((group, groupIndex) => {
             const showDownloadTimes = group.rows.some((row) => row.downloadTimes);
+            const showCachedAt = group.rows.some((row) => row.cachedAt);
             return (
               <Stack key={`${group.name}-${groupIndex}`} spacing={1.5}>
                 <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700 }}>
                   {group.name}
                 </Typography>
+                {group.realtimePublishedAt ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {dict.feedRealtimePublishedAt.replace("{date}", group.realtimePublishedAt)}
+                  </Typography>
+                ) : null}
                 <TableCard>
                   <Table size="small" sx={{ minWidth: 860 }}>
                     <TableHead>
@@ -60,6 +72,9 @@ export function FeedCatalogDetailBody({
                         {showDownloadTimes ? (
                           <TableCell sx={{ width: 180 }}>{dict.feedDownloadTimes}</TableCell>
                         ) : null}
+                        {showCachedAt ? (
+                          <TableCell sx={{ width: 180 }}>{dict.feedCachedAt}</TableCell>
+                        ) : null}
                         <TableCell sx={{ width: 200 }}>{dict.license}</TableCell>
                         <TableCell sx={{ width: 120 }}>{dict.actions}</TableCell>
                       </TableRow>
@@ -67,7 +82,16 @@ export function FeedCatalogDetailBody({
                     <TableBody>
                       {group.rows.map((row, idx) => (
                         <TableRow key={idx} hover>
-                          <TableCell sx={{ fontWeight: 600 }}>{row.type}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {row.type}
+                            </Typography>
+                            {row.entityTypes ? (
+                              <Typography variant="caption" color="text.secondary">
+                                {dict.feedEntityTypes.replace("{types}", row.entityTypes)}
+                              </Typography>
+                            ) : null}
+                          </TableCell>
                           <TableCell>
                             <OriginalCell value={row.original} dict={dict} />
                           </TableCell>
@@ -75,6 +99,7 @@ export function FeedCatalogDetailBody({
                           {showDownloadTimes ? (
                             <TableCell>{row.downloadTimes ?? "-"}</TableCell>
                           ) : null}
+                          {showCachedAt ? <TableCell>{row.cachedAt ?? "-"}</TableCell> : null}
                           <TableCell>{row.license}</TableCell>
                           <TableCell>
                             <DownloadActions

@@ -22,6 +22,12 @@ import { formatApiError } from "@/lib/formatApiError";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { usePermissions } from "@/lib/auth/usePermissions";
 
+// Limits of the backend's Post model and MAX_IMAGE_FILE_SIZE_BYTES (default 10 MB).
+const MAX_TITLE_LENGTH = 24;
+const MAX_TAGS = 5;
+const MAX_TAG_LENGTH = 16;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
 export function BlogPostForm({
   locale,
   dict,
@@ -52,8 +58,6 @@ export function BlogPostForm({
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
-  const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
-
   function onImageFileChange(file: File | null) {
     if (!file) {
       setImageFile(null);
@@ -65,7 +69,7 @@ export function BlogPostForm({
       return;
     }
     if (file.size > MAX_IMAGE_BYTES) {
-      setError(dict.fileTooLarge);
+      setError(dict.blogImageTooLarge);
       setImageFile(null);
       return;
     }
@@ -73,21 +77,29 @@ export function BlogPostForm({
     setImageFile(file);
   }
 
-  function parseTags(): string[] {
-    const raw = tagsStr
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    return [...new Set(raw)].slice(0, 5).map((t) => t.slice(0, 16));
-  }
+  const tags = [
+    ...new Set(
+      tagsStr
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ];
+  const longTags = tags.filter((t) => t.length > MAX_TAG_LENGTH);
+  const tagsError =
+    tags.length > MAX_TAGS
+      ? dict.apiErrorCodes["blog.too_many_tags"]
+      : longTags.length
+        ? dict.blogTagTooLong.replace("{tags}", longTags.join(", "))
+        : null;
+  const trimmedTitle = title.trim();
+  const titleTooLong = trimmedTitle.length > MAX_TITLE_LENGTH;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setPending(true);
     try {
-      const tags = parseTags();
-      const trimmedTitle = title.trim().slice(0, 24);
       let id: number;
 
       if (imageFile) {
@@ -101,6 +113,11 @@ export function BlogPostForm({
           id = created.id;
         } else {
           await apiForm("PATCH", `/api/blog/posts/${postId}/`, form);
+          // A multipart body cannot carry an empty list: leaving `tags` out keeps
+          // them, so removing the last tag needs a JSON request.
+          if (!tags.length && initialTags?.length) {
+            await apiJson("PATCH", `/api/blog/posts/${postId}/`, { tags: [] });
+          }
           id = postId;
         }
       } else {
@@ -160,15 +177,20 @@ export function BlogPostForm({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  slotProps={{ htmlInput: { maxLength: 24 } }}
-                  helperText={`${title.length}/24`}
+                  error={titleTooLong}
+                  helperText={
+                    titleTooLong
+                      ? dict.blogTitleTooLong.replace("{count}", String(trimmedTitle.length))
+                      : `${trimmedTitle.length}/${MAX_TITLE_LENGTH}`
+                  }
                   disabled={pending}
                 />
                 <TextField
                   label={dict.tags}
                   value={tagsStr}
                   onChange={(e) => setTagsStr(e.target.value)}
-                  helperText={dict.blogTagsHint}
+                  error={tagsError != null}
+                  helperText={tagsError ?? dict.blogTagsHint}
                   disabled={pending}
                 />
                 <Button
@@ -215,7 +237,9 @@ export function BlogPostForm({
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={pending || !title.trim() || !content}
+                    disabled={
+                      pending || !trimmedTitle || titleTooLong || tagsError != null || !content
+                    }
                   >
                     {dict.save}
                   </Button>

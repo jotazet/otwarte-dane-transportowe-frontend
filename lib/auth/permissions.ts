@@ -191,3 +191,8 @@ export function canViewSubmissionInContext(
 export function canDeleteFeedSubmission(user: Pick<AuthUserClaims, "isDjangoAdmin">) {
   return user.isDjangoAdmin;
 }
+
+/** Backend (2026-11-12): deleting a transport organization, with all its submissions, is Admin only. */
+export function canDeleteTransportOrganization(user: Pick<AuthUserClaims, "isDjangoAdmin">) {
+  return user.isDjangoAdmin;
+}
