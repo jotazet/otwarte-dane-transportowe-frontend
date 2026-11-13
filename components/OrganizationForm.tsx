@@ -15,6 +15,7 @@ import type { Dictionary } from "@/i18n/getDictionary";
 import { casesPaths } from "@/lib/api/cases";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { formatApiError } from "@/lib/formatApiError";
+import { CASES_MAX_LENGTH } from "@/lib/cases/maxLength";
 import { isValidEmail, isValidUrl } from "@/lib/validation";
 import { paths } from "@/lib/nav/routes";
 
@@ -120,6 +121,7 @@ export function OrganizationForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.organizationName } }}
             disabled={pending}
           />
           <TextField
@@ -127,12 +129,14 @@ export function OrganizationForm({
             value={region}
             onChange={(e) => setRegion(e.target.value)}
             required
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.region } }}
             disabled={pending}
           />
           <TextField
             label={dict.website}
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.website } }}
             disabled={pending}
           />
           <TextField
@@ -140,12 +144,14 @@ export function OrganizationForm({
             type="email"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.email } }}
             disabled={pending}
           />
           <TextField
             label={dict.phone}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: CASES_MAX_LENGTH.phone } }}
             disabled={pending}
           />
           <FormControlLabel

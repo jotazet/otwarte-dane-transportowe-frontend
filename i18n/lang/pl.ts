@@ -232,6 +232,15 @@ export const dictPl = {
     "blog.reaction_daily_limit": "Osiągnięto dzienny limit 10 reakcji. Spróbuj ponownie jutro.",
     "blog.too_many_tags": "Wpis może mieć najwyżej 5 tagów.",
     "blog.image_too_large": "Obraz przekracza dopuszczalny rozmiar.",
+    "blog.tag_too_long": "Tag może mieć najwyżej 16 znaków.",
+    "fetch.credential_undecryptable":
+      "Serwer ODT nie może odszyfrować zapisanych danych autoryzacji źródła, dlatego nie pobrał feedu. Problem leży po stronie ODT: zespół ODT musi poprawić konfigurację kluczy szyfrowania.",
+    "gtfs_validation.file_missing": "Plik feedu nie jest dostępny na serwerze ODT.",
+    "gtfs_validation.validator_unavailable": "Nie udało się uruchomić walidatora GTFS.",
+    "gtfs_validation.validator_failed": "Walidator GTFS przerwał pracę lub nie zwrócił raportu.",
+    "gtfs_validation.timeout": "Walidacja nie zakończyła się w wyznaczonym czasie.",
+    "gtfs_validation.credential_undecryptable":
+      "Serwer ODT nie może odszyfrować zapisanych danych autoryzacji źródła, dlatego nie pobrał feedu do walidacji.",
   },
   addFeed: "Dodaj feed",
   myFeeds: "Moje feedy",
@@ -303,14 +312,6 @@ export const dictPl = {
     invalid: "Wykryto błędy",
     error: "Nie przeprowadzono",
   },
-  submissionValidationErrorCodes: {
-    "gtfs_validation.file_missing": "Plik feedu jest niedostępny na serwerze ODT.",
-    "gtfs_validation.validator_unavailable": "Nie udało się uruchomić walidatora.",
-    "gtfs_validation.validator_failed": "Walidator zakończył pracę bez wyniku.",
-    "gtfs_validation.timeout": "Walidacja przekroczyła limit czasu.",
-    "gtfs_validation.credential_undecryptable":
-      "Serwer ODT nie może odczytać zapisanych danych autoryzacji źródła, dlatego nie pobrał feedu.",
-  },
   submissionValidationErrorHint:
     "Walidacja nie została przeprowadzona z powodu problemu po stronie ODT. Zespół ODT uruchomi ją ponownie.",
   submissionFetchAutoPausedHint:
@@ -356,7 +357,7 @@ export const dictPl = {
   rejected: "Odrzucone",
   published: "Opublikowane",
   rejectionCause: "Przyczyna odrzucenia",
-  rejectionCauseHint: "Opcjonalnie - podaj przy odrzuceniu zgłoszenia.",
+  rejectionCauseHint: "Wymagane. Opisz, co trzeba poprawić – zgłaszający zobaczy ten tekst.",
   realtimeRejectionReasons: {
     "realtime.static_submission_missing":
       "Feed realtime nie jest powiązany ze zgłoszeniem statycznym. Dla GTFS-RT i SIRI wybierz opublikowane zgłoszenie statyczne.",
@@ -381,6 +382,9 @@ export const dictPl = {
       "Nie udało się zapisać pierwszej kopii danych z endpointu „{endpoint}” na serwerze ODT. Spróbuj ponownie później.",
   },
   realtimeRejectionReasonUnknown: "Zgłoszenie zostało odrzucone podczas automatycznej weryfikacji.",
+  gtfsValidationNotice: "Walidator GTFS: {code}, liczba wystąpień: {count}",
+  gtfsValidationRejectedGeneric:
+    "Feed nie przeszedł automatycznej walidacji GTFS lub nie udało się go pobrać do walidacji. Sprawdź adres URL i zawartość pliku.",
   applyStage: "Zastosuj etap",
   rejectSubmission: "Odrzuć",
   reviewSubmission: "Weryfikacja zgłoszenia",
@@ -536,10 +540,15 @@ export const dictPl = {
   fetchErrorsDays: "Zakres (dni)",
   fetchErrorType: "Typ błędu",
   fetchErrorSource: "Źródło",
-  fetchErrorMessage: "Komunikat",
+  fetchErrorMessage: "Szczegóły",
   fetchErrorDate: "Data",
   fetchErrorsEmpty: "Brak błędów pobierania w wybranym zakresie.",
   fetchErrorsTotal: "Łącznie błędów: {n}",
+  fetchErrorsEndpointType: "Typ endpointu",
+  fetchErrorHttpStatus: "Kod odpowiedzi HTTP: {status}",
+  fetchPauseAfterFailures: "Nieudane pobrania z rzędu: {n}",
+  technicalDetailsShow: "Pokaż szczegóły techniczne",
+  technicalDetailsHide: "Ukryj szczegóły techniczne",
   sourceStatic: "Statyczny",
   sourceRealtime: "Realtime",
   fetchStatusLabels: {
@@ -553,6 +562,7 @@ export const dictPl = {
     connection_error: "Błąd połączenia",
     http_error: "Błąd HTTP",
     invalid_content: "Nieprawidłowa treść",
+    auth_error: "Błąd danych autoryzacji",
   },
   metaFeedOpsTitle: "Zarządzanie feedami – pobieranie proxy",
   metaFeedOpsDescription:
@@ -843,6 +853,20 @@ export const dictPl = {
     "planner.feed_no_service_in_period":
       "Feed nie ma kursów w oknie grafu (od wczoraj do dwóch miesięcy naprzód).",
     "planner.rt_url_blocked": "Adres prowadzi do sieci prywatnej, więc planer go nie odpytuje.",
+    "planner.rt_url_unsupported":
+      "Adres zawiera znaki ${, które OTP odczytuje jako zmienną, więc planer go nie odpytuje.",
+    "planner.feed_other_organization": "Wybierz feed tej samej organizacji.",
+    "planner.feed_not_gtfs": "Wybierz zgłoszenie GTFS.",
+    "planner.feed_not_gbfs": "Wybierz zgłoszenie GBFS.",
+    "planner.invalid_feed_id":
+      "Identyfikator musi mieć od 2 do 32 znaków: małe litery, cyfry i łączniki. Nie może zaczynać się łącznikiem.",
+    "planner.feed_id_immutable": "Identyfikatora feedu nie można zmienić.",
+    "planner.invalid_network":
+      "Nieprawidłowa wartość. Podaj adres lub sieć IPv4 albo IPv6, a jako identyfikator sieci od 2 do 32 znaków: małe litery, cyfry i łączniki.",
+    "planner.network_immutable": "Identyfikatora sieci nie można zmienić.",
+    "planner.invalid_range": "Początek zakresu musi być wcześniejszy niż jego koniec.",
+    "planner.too_many_buckets":
+      "Zakres jest zbyt długi dla wybranego interwału. Wybierz krótszy zakres lub dłuższy interwał.",
     "planner.rental_source_not_published": "Zgłoszenie GBFS nie jest już opublikowane.",
     "planner.rental_source_without_gbfs": "Zgłoszenie nie ma endpointu gbfs.json.",
     "planner.rental_source_requires_auth":

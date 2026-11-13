@@ -1,3 +1,4 @@
+import { ENDPOINT_TYPES_BY_PROTOCOL } from "@/lib/data/endpointTypes";
 import { resolveHideOriginal } from "@/lib/data/hideOriginalAuth";
 import {
   parseSourceUpdateInterval,
@@ -7,29 +8,12 @@ import {
 export const REALTIME_PROTOCOLS = ["gtfs_rt", "siri", "gbfs"] as const;
 export type RealtimeProtocol = (typeof REALTIME_PROTOCOLS)[number];
 
-/** The fixed endpoint types per protocol (backend `RealtimeSubmission.allowed_endpoint_types`). */
-const ENDPOINT_TYPES: Record<RealtimeProtocol, readonly string[]> = {
-  gtfs_rt: ["trip_update", "vehicle_position", "service_alert"],
-  siri: ["sx", "sm", "vm", "et", "gm"],
-  gbfs: [
-    "gbfs",
-    "gbfs_versions",
-    "system_information",
-    "vehicle_types",
-    "station_information",
-    "station_status",
-    "free_bike_status",
-    "system_hours",
-    "system_alerts",
-  ],
-};
-
 export function isRealtimeProtocol(value: string): value is RealtimeProtocol {
   return (REALTIME_PROTOCOLS as readonly string[]).includes(value);
 }
 
 export function endpointTypesFor(protocol: RealtimeProtocol): readonly string[] {
-  return ENDPOINT_TYPES[protocol];
+  return ENDPOINT_TYPES_BY_PROTOCOL[protocol];
 }
 
 /** GTFS-RT and SIRI belong to a static feed (GTFS and NeTEx); GBFS has none. */
