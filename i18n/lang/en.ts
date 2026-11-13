@@ -170,6 +170,11 @@ export const dictEn: Dictionary = {
   apiErrorRateLimited: "Too many requests to the server. Try again in a moment.",
   apiErrorGeneric: "The operation could not be completed. Try again in a moment.",
   apiErrorCodes: {
+    "auth.csrf_failed":
+      "Could not confirm that the request came from this site. Reload the page and try again.",
+    "auth.invalid_credentials": "Invalid username or password.",
+    "auth.refresh_cookie_missing": "No active session. Sign in.",
+    "auth.refresh_cookie_invalid": "Your session has expired or has been ended. Sign in again.",
     "feeds.feed_id_required": "The download address does not include a feed number.",
     "feeds.submissions_forbidden":
       "The list of submissions is available only to data providers and the ODT team.",
@@ -514,6 +519,8 @@ export const dictEn: Dictionary = {
   passwordMismatch: "Passwords do not match.",
   emailChanged: "Email address updated.",
   passwordChanged: "Password updated.",
+  passwordChangedSignInAgain:
+    "Password updated, but the session could not be renewed. Sign in again with the new password.",
   userCreated: "User created.",
   userSaved: "Changes saved.",
   searchUsers: "Search by username or email",

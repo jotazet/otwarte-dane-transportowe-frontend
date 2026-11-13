@@ -172,6 +172,11 @@ export const dictBg: Dictionary = {
   apiErrorRateLimited: "Твърде много заявки към сървъра. Опитайте отново след малко.",
   apiErrorGeneric: "Операцията не можа да бъде изпълнена. Опитайте отново след малко.",
   apiErrorCodes: {
+    "auth.csrf_failed":
+      "Не можа да се потвърди, че заявката идва от този сайт. Презаредете страницата и опитайте отново.",
+    "auth.invalid_credentials": "Невалидно потребителско име или парола.",
+    "auth.refresh_cookie_missing": "Няма активна сесия. Влезте в системата.",
+    "auth.refresh_cookie_invalid": "Сесията е изтекла или е прекратена. Влезте отново.",
     "feeds.feed_id_required": "Адресът за изтегляне не съдържа номер на фийд.",
     "feeds.submissions_forbidden":
       "Списъкът със заявки е достъпен само за доставчици на данни и екипа на ODT.",
@@ -518,6 +523,8 @@ export const dictBg: Dictionary = {
   passwordMismatch: "Паролите не съвпадат.",
   emailChanged: "Имейл адресът беше променен.",
   passwordChanged: "Паролата беше променена.",
+  passwordChangedSignInAgain:
+    "Паролата беше променена, но сесията не можа да бъде подновена. Влезте отново с новата парола.",
   userCreated: "Потребителят е създаден.",
   userSaved: "Промените са запазени.",
   searchUsers: "Търси по потребителско име или имейл",

@@ -1,4 +1,8 @@
 [
+  "auth.csrf_failed",
+  "auth.invalid_credentials",
+  "auth.refresh_cookie_invalid",
+  "auth.refresh_cookie_missing",
   "blog.client_ip_unknown",
   "blog.image_too_large",
   "blog.post_id_required",

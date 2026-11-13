@@ -1,47 +1,78 @@
-import type { Tokens } from "@/lib/auth/AuthContext";
+import { ApiError } from "@/lib/api/http";
+
+/** The Web Lock that runs refreshes and logouts one at a time across the site's tabs. */
+const REFRESH_LOCK = "odt-refresh";
+
+/**
+ * Runs `fn` while holding the cross-tab refresh lock. Without the Web Locks API (old browsers,
+ * insecure contexts) it runs at once; the retry in `createTokenRefresher` covers the race.
+ */
+export async function withRefreshLock<T>(fn: () => Promise<T>): Promise<T> {
+  if (typeof navigator === "undefined" || !navigator.locks) return fn();
+  return await navigator.locks.request(REFRESH_LOCK, fn);
+}
 
 type TokenRefresherDeps = {
-  /** The token pair in storage, which another tab may have changed. */
-  readStored: () => Tokens | null;
-  /** POST /api/auth/token/refresh/; rejects when the backend refuses the token. */
-  request: (refresh: string) => Promise<{ access: string; refresh?: string }>;
-  /** Stores a working pair and signs the user in with it. */
-  apply: (tokens: Tokens) => void;
-  /** Ends the session. */
-  clear: () => void;
+  /** POST /api/auth/session/refresh/; rejects with an `ApiError` when the backend refuses. */
+  request: () => Promise<{ access: string }>;
+  /** Runs one refresh at a time across tabs (`withRefreshLock`). */
+  withLock: <T>(fn: () => Promise<T>) => Promise<T>;
+  /** Keeps the new access token and signs the user in with it. */
+  apply: (access: string) => void;
+  /** Ends the session in this tab, given the refresh's last error. */
+  clear: (err: unknown) => void;
+  /** Changes whenever this tab's session ends or a new one starts (logout, login). */
+  epoch: () => number;
 };
 
 /**
- * Returns the function that refreshes the access token with the stored refresh token. It
- * resolves to the new pair, or to null when the session has ended.
+ * Whether a failed refresh means the session is gone for every tab: no valid cookie (401) or an
+ * origin the API does not allow (`auth.csrf_failed`). A network error, a 429 or a 5xx may pass.
  */
-export function createTokenRefresher(deps: TokenRefresherDeps): () => Promise<Tokens | null> {
-  let inFlight: Promise<Tokens | null> | null = null;
+export function isLastingRefusal(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 401 || err.code === "auth.csrf_failed");
+}
+
+function isStaleCookie(err: unknown): boolean {
+  return err instanceof ApiError && err.code === "auth.refresh_cookie_invalid";
+}
+
+/**
+ * Returns the function that gets a new access token through the refresh cookie (backend ADR
+ * 0017). It resolves to the access token, or to null when there is no session.
+ */
+export function createTokenRefresher(deps: TokenRefresherDeps): () => Promise<string | null> {
+  let inFlight: Promise<string | null> | null = null;
+
+  const attempt = async (): Promise<{ access: string }> => {
+    try {
+      return await deps.request();
+    } catch (err) {
+      // Every refresh rotates the cookie. A request that left with the previous cookie while
+      // another tab was refreshing gets refresh_cookie_invalid, although the browser holds a
+      // valid one by now: try once more with it.
+      if (!isStaleCookie(err)) throw err;
+      return deps.request();
+    }
+  };
 
   return () => {
-    // Requests that find the access token expired at the same time share one
-    // refresh: a second refresh with the same, by then blacklisted, token
-    // would fail and log the user out.
+    // Requests that find the access token expired at the same time share one refresh.
     if (!inFlight) {
       inFlight = (async () => {
-        const stored = deps.readStored();
-        if (!stored?.refresh) return null;
+        const epoch = deps.epoch();
         try {
-          // The backend rotates refresh tokens and blacklists the old one, so
-          // the new one must replace it or the next refresh fails.
-          const res = await deps.request(stored.refresh);
-          const next = { access: res.access, refresh: res.refresh ?? stored.refresh };
-          deps.apply(next);
-          return next;
-        } catch {
-          // Another tab may have rotated the same refresh token a moment
-          // earlier; its new pair is in storage and still valid.
-          const current = deps.readStored();
-          if (current && current.refresh !== stored.refresh) {
-            deps.apply(current);
-            return current;
-          }
-          deps.clear();
+          const { access } = await deps.withLock(attempt);
+          // A logout (or a new login) while the refresh waited: its result belongs to a
+          // session that has ended and must not sign the tab back in.
+          if (deps.epoch() !== epoch) return null;
+          deps.apply(access);
+          return access;
+        } catch (err) {
+          if (deps.epoch() !== epoch) return null;
+          // The backend keeps the cookie after a failed refresh, so a reload can still
+          // restore a session that failed here for a passing reason (network, 429).
+          deps.clear(err);
           return null;
         }
       })().finally(() => {

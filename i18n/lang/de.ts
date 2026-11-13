@@ -175,6 +175,12 @@ export const dictDe: Dictionary = {
   apiErrorRateLimited: "Zu viele Anfragen an den Server. Versuchen Sie es in Kürze erneut.",
   apiErrorGeneric: "Der Vorgang konnte nicht ausgeführt werden. Versuchen Sie es in Kürze erneut.",
   apiErrorCodes: {
+    "auth.csrf_failed":
+      "Es konnte nicht bestätigt werden, dass die Anfrage von dieser Website stammt. Laden Sie die Seite neu und versuchen Sie es erneut.",
+    "auth.invalid_credentials": "Ungültiger Benutzername oder Passwort.",
+    "auth.refresh_cookie_missing": "Keine aktive Sitzung. Melden Sie sich an.",
+    "auth.refresh_cookie_invalid":
+      "Die Sitzung ist abgelaufen oder wurde beendet. Melden Sie sich erneut an.",
     "feeds.feed_id_required": "Die Download-Adresse enthält keine Feed-Nummer.",
     "feeds.submissions_forbidden":
       "Die Liste der Einreichungen ist nur für Datenanbieter und das ODT-Team verfügbar.",
@@ -533,6 +539,8 @@ export const dictDe: Dictionary = {
   passwordMismatch: "Passwörter stimmen nicht überein.",
   emailChanged: "E-Mail-Adresse wurde geändert.",
   passwordChanged: "Passwort wurde geändert.",
+  passwordChangedSignInAgain:
+    "Das Passwort wurde geändert, die Sitzung konnte jedoch nicht erneuert werden. Melden Sie sich mit dem neuen Passwort erneut an.",
   userCreated: "Benutzer erstellt.",
   userSaved: "Änderungen gespeichert.",
   searchUsers: "Nach Benutzername oder E-Mail suchen",

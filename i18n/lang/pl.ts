@@ -170,6 +170,11 @@ export const dictPl = {
   apiErrorRateLimited: "Przekroczono limit zapytań do serwera. Spróbuj ponownie za chwilę.",
   apiErrorGeneric: "Nie udało się wykonać operacji. Spróbuj ponownie za chwilę.",
   apiErrorCodes: {
+    "auth.csrf_failed":
+      "Nie udało się potwierdzić, że żądanie pochodzi z tej strony. Odśwież stronę i spróbuj ponownie.",
+    "auth.invalid_credentials": "Nieprawidłowy login lub hasło.",
+    "auth.refresh_cookie_missing": "Brak aktywnej sesji. Zaloguj się.",
+    "auth.refresh_cookie_invalid": "Sesja wygasła lub została zakończona. Zaloguj się ponownie.",
     "feeds.feed_id_required": "Adres pobierania nie zawiera numeru feedu.",
     "feeds.submissions_forbidden":
       "Lista zgłoszeń jest dostępna tylko dla dostawców danych i zespołu ODT.",
@@ -515,6 +520,8 @@ export const dictPl = {
   passwordMismatch: "Hasła nie są identyczne.",
   emailChanged: "Adres e-mail został zmieniony.",
   passwordChanged: "Hasło zostało zmienione.",
+  passwordChangedSignInAgain:
+    "Hasło zostało zmienione, ale nie udało się wznowić sesji. Zaloguj się ponownie nowym hasłem.",
   userCreated: "Użytkownik utworzony.",
   userSaved: "Zapisano zmiany.",
   searchUsers: "Szukaj po loginie lub e-mailu",

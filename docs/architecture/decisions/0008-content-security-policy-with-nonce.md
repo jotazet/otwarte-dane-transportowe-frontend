@@ -37,7 +37,7 @@ The policy was first sent report-only, so browsers logged violations and blocked
 - Anything the reverse proxy or CDN injects into the HTML (for example Cloudflare's analytics beacon, Email Address Obfuscation or Rocket Loader) is blocked, so those features stay off.
 - The nonce is serialised into the page for Emotion on the client, as MUI documents. It protects against injected markup, not against a script that already runs.
 - Paths the proxy skips (files with an extension, `/_next`, `/api`, `/internal-media`) get no policy; they are not HTML pages.
-- Follow-ups in issue #20: collect violations (a `report-to` endpoint, likely on the backend); move the refresh token into an `HttpOnly` cookie set by the API.
+- Follow-up: collect violations (a `report-to` endpoint, likely on the backend). The refresh token moved into an `HttpOnly` cookie set by the API in [ADR 0011](0011-session-cookie-auth-with-access-token-in-memory.md) (issue #20).
 
 ## Enforcement
 
