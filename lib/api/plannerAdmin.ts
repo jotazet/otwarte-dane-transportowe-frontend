@@ -202,7 +202,8 @@ export type RequestLogEntry = {
   endpoint: string;
   status_code: number;
   latency_ms: number;
-  client_ip: string;
+  /** Null when the request reached the backend without a client address. */
+  client_ip: string | null;
   api_key: number | null;
   api_key_name: string | null;
   user_agent: string;
@@ -226,7 +227,7 @@ export type StatsSummary = StatusClassCounts & {
   max_latency_ms: number | null;
 };
 
-export type StatsInterval = "hour" | "day";
+export type StatsInterval = "minute" | "hour" | "day";
 export type StatsSplit = "status" | "endpoint" | "none";
 
 export type StatsTimeseries = {
@@ -236,6 +237,8 @@ export type StatsTimeseries = {
   split: StatsSplit;
   buckets: string[];
   series: { name: string; requests: number[] }[];
+  /** Per bucket, null when the bucket has no requests. */
+  latency_ms: { avg: (number | null)[]; p95: (number | null)[] };
 };
 
 export type EndpointStats = StatusClassCounts & {
@@ -248,7 +251,8 @@ export type EndpointStats = StatusClassCounts & {
 };
 
 export type IpClientStats = StatusClassCounts & {
-  client_ip: string;
+  /** Null for the requests logged without a client address. */
+  client_ip: string | null;
   requests: number;
   share: number;
   endpoints: number;
@@ -308,6 +312,7 @@ export async function fetchRecentErrors(
   apiJson: ApiJson,
   group: ErrorStatusGroup,
   range: TrafficRange,
+  endpoint = "",
 ): Promise<RequestLogEntry[]> {
   const codes =
     group === "all" ? Object.values(ERROR_STATUS_GROUPS).flat() : ERROR_STATUS_GROUPS[group];
@@ -316,7 +321,7 @@ export async function fetchRecentErrors(
       apiJson<PaginatedResponse<RequestLogEntry>>(
         "GET",
         plannerAdminPaths.requests +
-          rangeQuery(range, { status, page_size: RECENT_ERRORS_PER_CODE }),
+          rangeQuery(range, { status, endpoint, page_size: RECENT_ERRORS_PER_CODE }),
       ),
     ),
   );
