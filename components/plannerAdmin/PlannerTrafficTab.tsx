@@ -40,10 +40,13 @@ import { TrafficSummaryTiles } from "@/components/plannerAdmin/StatTiles";
 import { useApiLoad } from "@/lib/ui/useApiLoad";
 import {
   endpointLabel,
+  fetchDailyHistory,
   fetchRecentErrors,
   plannerAdminPaths,
   rangeInterval,
   rangeQuery,
+  TRAFFIC_TAB_RANGES,
+  type DailyTotals,
   type EndpointStats,
   type ErrorStatusGroup,
   type IpClientStats,
@@ -51,6 +54,7 @@ import {
   type StatsSummary,
   type StatsTimeseries,
   type TrafficRange,
+  type TrafficTabRange,
 } from "@/lib/api/plannerAdmin";
 import type { PaginatedResponse } from "@/lib/api/types";
 import { formatDateTime, formatNumber, formatPercent } from "@/lib/format";
@@ -112,31 +116,46 @@ const pairedTableSx = { flex: 1, minHeight: 0, borderTop: 1, borderColor: "divid
 
 export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
   const { apiJson, dict, locale } = ctx;
-  const [range, setRange] = React.useState<TrafficRange>("24h");
+  const [range, setRange] = React.useState<TrafficTabRange>("24h");
   const [endpoint, setEndpoint] = React.useState("");
   const [split, setSplit] = React.useState<"status" | "endpoint">("status");
   const [asTable, setAsTable] = React.useState(false);
-  const interval = rangeInterval(range);
+  // 90 days come from the daily summaries; the tables read the request log, which keeps 30.
+  const history = range === "90d";
+  const logRange: TrafficRange = history ? "30d" : range;
+  const interval = rangeInterval(logRange);
+  const statusOnly = Boolean(endpoint) || history;
 
   const summary = useApiLoad(
     React.useCallback(
-      () =>
-        apiJson<StatsSummary>(
-          "GET",
-          plannerAdminPaths.statsSummary + rangeQuery(range, { endpoint }),
-        ),
-      [apiJson, range, endpoint],
+      async () =>
+        history
+          ? null
+          : await apiJson<StatsSummary>(
+              "GET",
+              plannerAdminPaths.statsSummary + rangeQuery(logRange, { endpoint }),
+            ),
+      [apiJson, history, logRange, endpoint],
     ),
   );
+  // With 90 days, one request gives both the chart and the tiles.
   const series = useApiLoad(
     React.useCallback(
-      () =>
-        apiJson<StatsTimeseries>(
-          "GET",
-          plannerAdminPaths.statsTimeseries +
-            rangeQuery(range, { interval, endpoint, split: endpoint ? "status" : split }),
-        ),
-      [apiJson, range, interval, endpoint, split],
+      async (): Promise<{ series: StatsTimeseries; totals?: DailyTotals }> =>
+        history
+          ? await fetchDailyHistory(apiJson, endpoint)
+          : {
+              series: await apiJson<StatsTimeseries>(
+                "GET",
+                plannerAdminPaths.statsTimeseries +
+                  rangeQuery(logRange, {
+                    interval,
+                    endpoint,
+                    split: statusOnly ? "status" : split,
+                  }),
+              ),
+            },
+      [apiJson, history, logRange, interval, endpoint, split, statusOnly],
     ),
   );
   const endpoints = useApiLoad(
@@ -144,18 +163,19 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
       () =>
         apiJson<PaginatedResponse<EndpointStats>>(
           "GET",
-          plannerAdminPaths.statsEndpoints + rangeQuery(range, { page_size: 50 }),
+          plannerAdminPaths.statsEndpoints + rangeQuery(logRange, { page_size: 50 }),
         ),
-      [apiJson, range],
+      [apiJson, logRange],
     ),
   );
 
-  const chart = series.data ? chartSeries(series.data, dict) : [];
+  const chart = series.data ? chartSeries(series.data.series, dict) : [];
+  const tiles = history ? series.data?.totals : summary.data;
 
   return (
     <Stack spacing={2}>
       <Stack direction="row" sx={{ gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
-        <RangeToggle value={range} onChange={setRange} dict={dict} />
+        <RangeToggle ranges={TRAFFIC_TAB_RANGES} value={range} onChange={setRange} dict={dict} />
         {endpoint ? (
           <Chip
             color="primary"
@@ -170,11 +190,14 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
           </Typography>
         )}
       </Stack>
-
-      <LoadState loaded={summary} dict={dict} />
-      {summary.data ? (
-        <TrafficSummaryTiles summary={summary.data} dict={dict} locale={locale} />
+      {history ? (
+        <Typography variant="body2" color="text.secondary">
+          {dict.plannerAdminHistoryNote}
+        </Typography>
       ) : null}
+
+      <LoadState loaded={history ? series : summary} dict={dict} />
+      {tiles ? <TrafficSummaryTiles summary={tiles} dict={dict} locale={locale} /> : null}
 
       <Card component="section" aria-labelledby="planner-chart-title">
         <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
@@ -197,8 +220,8 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
               <ToggleButtonGroup
                 size="small"
                 exclusive
-                value={endpoint ? "status" : split}
-                disabled={Boolean(endpoint)}
+                value={statusOnly ? "status" : split}
+                disabled={statusOnly}
                 onChange={(_, v: "status" | "endpoint" | null) => v && setSplit(v)}
                 aria-label={dict.plannerAdminChartSplit}
               >
@@ -217,23 +240,23 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
           {series.data ? (
             <Stack spacing={1.5}>
               <ChartLegend series={chart} />
-              {series.data.buckets.every((_, i) => chart.every((c) => !c.values[i])) ? (
+              {series.data.series.buckets.every((_, i) => chart.every((c) => !c.values[i])) ? (
                 <Typography variant="body2" color="text.secondary">
                   {dict.plannerAdminChartEmpty}
                 </Typography>
               ) : asTable ? (
                 <RequestsTable
-                  buckets={series.data.buckets}
+                  buckets={series.data.series.buckets}
                   series={chart}
-                  interval={series.data.interval}
+                  interval={series.data.series.interval}
                   locale={locale}
                   periodLabel={dict.plannerAdminChartPeriod}
                 />
               ) : (
                 <RequestsChart
-                  buckets={series.data.buckets}
+                  buckets={series.data.series.buckets}
                   series={chart}
-                  interval={series.data.interval}
+                  interval={series.data.series.interval}
                   locale={locale}
                   dict={dict}
                 />
@@ -321,10 +344,10 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
             </TableContainer>
           ) : null}
         </Card>
-        <ClientsCard ctx={ctx} range={range} endpoint={endpoint} />
+        <ClientsCard ctx={ctx} range={logRange} endpoint={endpoint} />
       </Box>
 
-      <ErrorsCard ctx={ctx} range={range} endpoint={endpoint} />
+      <ErrorsCard ctx={ctx} range={logRange} endpoint={endpoint} />
     </Stack>
   );
 }

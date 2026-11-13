@@ -28,6 +28,7 @@ export const plannerAdminPaths = {
   statsEndpoints: `${BASE}/stats/endpoints/`,
   statsTopClients: `${BASE}/stats/top-clients/`,
   statsUserAgents: `${BASE}/stats/user-agents/`,
+  statsDaily: `${BASE}/stats/daily/`,
 } as const;
 
 export type PlannerOrganization = { id: number; name: string; region: string };
@@ -298,6 +299,85 @@ export function rangeQuery(
 
 export function rangeInterval(range: TrafficRange): StatsInterval {
   return range === "24h" ? "hour" : "day";
+}
+
+/** The traffic tab also offers 90 days, read from the daily summaries, which are kept indefinitely. */
+export const TRAFFIC_TAB_RANGES = [...TRAFFIC_RANGES, "90d"] as const;
+export type TrafficTabRange = (typeof TRAFFIC_TAB_RANGES)[number];
+const HISTORY_DAYS = 90;
+
+/** One day of `stats/daily/`: no IP addresses, no p95, no split by endpoint. */
+export type DailyStats = StatusClassCounts & {
+  date: string;
+  requests: number;
+  avg_latency_ms: number;
+  max_latency_ms: number | null;
+};
+
+/**
+ * The last 90 UTC days of `stats/daily/` as a timeseries split by status class, every day
+ * present (the backend leaves out days without requests), with the totals for the tiles.
+ */
+export async function fetchDailyHistory(
+  apiJson: ApiJson,
+  endpoint = "",
+): Promise<{ series: StatsTimeseries; totals: DailyTotals }> {
+  const today = new Date();
+  const days = Array.from({ length: HISTORY_DAYS }, (_, i) =>
+    new Date(
+      Date.UTC(
+        today.getUTCFullYear(),
+        today.getUTCMonth(),
+        today.getUTCDate() - (HISTORY_DAYS - 1 - i),
+      ),
+    )
+      .toISOString()
+      .slice(0, 10),
+  );
+  const q = new URLSearchParams({ date_from: days[0], date_to: days[days.length - 1] });
+  if (endpoint) q.set("endpoint", endpoint);
+  const rows = await fetchAllPages<DailyStats>(
+    (p) => apiJson("GET", p),
+    `${plannerAdminPaths.statsDaily}?${q.toString()}`,
+  );
+  const byDate = new Map(rows.map((r) => [r.date, r]));
+  const classes = ["ok", "client_errors", "rate_limited", "server_errors"] as const;
+  return {
+    series: {
+      since: `${days[0]}T00:00:00Z`,
+      until: today.toISOString(),
+      interval: "day",
+      split: "status",
+      buckets: days.map((d) => `${d}T00:00:00Z`),
+      series: classes.map((name) => ({
+        name,
+        requests: days.map((d) => byDate.get(d)?.[name] ?? 0),
+      })),
+      latency_ms: {
+        avg: days.map((d) => byDate.get(d)?.avg_latency_ms ?? null),
+        p95: days.map(() => null),
+      },
+    },
+    totals: dailyTotals(rows),
+  };
+}
+
+export type DailyTotals = StatusClassCounts & { requests: number; avg_latency_ms: number | null };
+
+function dailyTotals(rows: DailyStats[]): DailyTotals {
+  const sum = (pick: (r: DailyStats) => number) => rows.reduce((t, r) => t + pick(r), 0);
+  const requests = sum((r) => r.requests);
+  return {
+    requests,
+    ok: sum((r) => r.ok),
+    client_errors: sum((r) => r.client_errors),
+    rate_limited: sum((r) => r.rate_limited),
+    server_errors: sum((r) => r.server_errors),
+    // Weighted by requests, as the backend averages each day.
+    avg_latency_ms: requests
+      ? Math.round(sum((r) => r.avg_latency_ms * r.requests) / requests)
+      : null,
+  };
 }
 
 /** Error codes the request log can be filtered by (`status` matches one code exactly). */

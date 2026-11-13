@@ -18,14 +18,13 @@ import type { PlannerAdminDict } from "@/components/plannerAdmin/plannerAdminDic
 import {
   isBanActive,
   plannerAdminPaths,
-  TRAFFIC_RANGES,
   type BuildStatus,
   type FeedOutcome,
   type IpBan,
   type PlannerFeed,
   type PlannerRentalSource,
   type RentalOutcome,
-  type TrafficRange,
+  type TrafficTabRange,
 } from "@/lib/api/plannerAdmin";
 import { formatNumber } from "@/lib/format";
 import { formatApiError } from "@/lib/formatApiError";
@@ -178,14 +177,16 @@ export function LoadState({
   );
 }
 
-/** 24 hours, 7 days or 30 days of the request log. */
-export function RangeToggle({
+/** 24 hours, 7 days or 30 days of the request log; the traffic tab adds 90 days. */
+export function RangeToggle<R extends TrafficTabRange>({
+  ranges,
   value,
   onChange,
   dict,
 }: {
-  value: TrafficRange;
-  onChange: (range: TrafficRange) => void;
+  ranges: readonly R[];
+  value: R;
+  onChange: (range: R) => void;
   dict: PlannerAdminDict;
 }) {
   return (
@@ -193,10 +194,10 @@ export function RangeToggle({
       size="small"
       exclusive
       value={value}
-      onChange={(_, v: TrafficRange | null) => v && onChange(v)}
+      onChange={(_, v: R | null) => v && onChange(v)}
       aria-label={dict.plannerAdminRangeLabel}
     >
-      {TRAFFIC_RANGES.map((r) => (
+      {ranges.map((r) => (
         <ToggleButton key={r} value={r}>
           {dict.plannerAdminRangeLabels[r]}
         </ToggleButton>

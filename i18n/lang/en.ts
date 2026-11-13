@@ -784,6 +784,7 @@ export const dictEn: Dictionary = {
   plannerAdminStatUniqueIps: "IP addresses",
   plannerAdminStatErrors: "Error responses ({share})",
   plannerAdminStatP95: "Response time p95",
+  plannerAdminStatAvg: "Average response time",
   plannerAdminStatRateLimited: "Limit exceeded (429)",
   plannerAdminStatClientErrors: "Client errors (4xx)",
   plannerAdminPendingChanges:
@@ -853,6 +854,8 @@ export const dictEn: Dictionary = {
   plannerAdminSubmission: "Catalogue submission",
   plannerAdminSubmissionHint:
     "Change it when the organization has submitted the feed again. Planner IDs stay the same.",
+  plannerAdminRentalSubmissionHint:
+    "Lists published GBFS feeds the planner does not use yet, including those of other organizations. The planner network stays the same.",
   plannerAdminIncludeInBuild: "Include in graph build",
   plannerAdminRemoveFromPlanner: "Remove from planner",
   plannerAdminRemoveFeedConfirm:
@@ -1018,10 +1021,13 @@ export const dictEn: Dictionary = {
     "24h": "24 hours",
     "7d": "7 days",
     "30d": "30 days",
+    "90d": "90 days",
   },
   plannerAdminEndpointFilter: "Endpoint: {name}",
   plannerAdminClearFilter: "Clear filter",
   plannerAdminEndpointHint: "Click an endpoint to narrow the statistics.",
+  plannerAdminHistoryNote:
+    "The chart and figures for 90 days come from daily summaries, which contain no IP addresses, no p95 and no split by endpoint. The tables below cover the last 30 days, as long as the request log is kept.",
   plannerAdminChartTitleHour: "Requests per hour",
   plannerAdminChartTitleDay: "Requests per day",
   plannerAdminChartSplit: "Breakdown",

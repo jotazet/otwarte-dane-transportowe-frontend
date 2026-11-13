@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 
 import type { PlannerAdminDict } from "@/components/plannerAdmin/plannerAdminDict";
 import { formatMs } from "@/components/plannerAdmin/shared";
-import type { StatsSummary } from "@/lib/api/plannerAdmin";
+import type { DailyTotals, StatsSummary } from "@/lib/api/plannerAdmin";
 import { formatNumber, formatPercent } from "@/lib/format";
 import { fill } from "@/lib/i18n/fill";
 
@@ -54,29 +54,37 @@ export function StatTiles({
   );
 }
 
-/** Requests, unique addresses, errors with their share and p95 latency of a stats summary. */
+/**
+ * Requests, unique addresses, errors with their share and p95 latency of a stats summary. The
+ * daily summaries keep no addresses and no p95, so their tiles show the average latency instead.
+ */
 export function TrafficSummaryTiles({
   summary: s,
   dict,
   locale,
 }: {
-  summary: StatsSummary;
+  summary: StatsSummary | DailyTotals;
   dict: PlannerAdminDict;
   locale: string;
 }) {
   const errors = s.client_errors + s.rate_limited + s.server_errors;
+  const fromLog = "unique_ips" in s;
   return (
     <StatTiles
       items={[
         { label: dict.plannerAdminStatRequests, value: formatNumber(s.requests, locale) },
-        { label: dict.plannerAdminStatUniqueIps, value: formatNumber(s.unique_ips, locale) },
+        ...(fromLog
+          ? [{ label: dict.plannerAdminStatUniqueIps, value: formatNumber(s.unique_ips, locale) }]
+          : []),
         {
           label: fill(dict.plannerAdminStatErrors, {
             share: formatPercent(s.requests ? errors / s.requests : 0, locale, 1),
           }),
           value: formatNumber(errors, locale),
         },
-        { label: dict.plannerAdminStatP95, value: formatMs(s.p95_latency_ms, dict, locale) },
+        fromLog
+          ? { label: dict.plannerAdminStatP95, value: formatMs(s.p95_latency_ms, dict, locale) }
+          : { label: dict.plannerAdminStatAvg, value: formatMs(s.avg_latency_ms, dict, locale) },
       ]}
     />
   );

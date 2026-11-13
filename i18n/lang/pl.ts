@@ -782,6 +782,7 @@ export const dictPl = {
   plannerAdminStatUniqueIps: "Adresy IP",
   plannerAdminStatErrors: "Odpowiedzi z błędem ({share})",
   plannerAdminStatP95: "Czas odpowiedzi p95",
+  plannerAdminStatAvg: "Średni czas odpowiedzi",
   plannerAdminStatRateLimited: "Przekroczony limit (429)",
   plannerAdminStatClientErrors: "Błędy klienta (4xx)",
   plannerAdminPendingChanges:
@@ -851,6 +852,8 @@ export const dictPl = {
   plannerAdminSubmission: "Zgłoszenie w katalogu",
   plannerAdminSubmissionHint:
     "Zmień, gdy organizacja zgłosiła feed od nowa. Identyfikatory w planerze zostają bez zmian.",
+  plannerAdminRentalSubmissionHint:
+    "Do wyboru są opublikowane feedy GBFS, z których planer jeszcze nie korzysta, także innych organizacji. Sieć w planerze zostaje bez zmian.",
   plannerAdminIncludeInBuild: "Uwzględnij w budowaniu grafu",
   plannerAdminRemoveFromPlanner: "Usuń z planera",
   plannerAdminRemoveFeedConfirm:
@@ -1015,10 +1018,13 @@ export const dictPl = {
     "24h": "24 godziny",
     "7d": "7 dni",
     "30d": "30 dni",
+    "90d": "90 dni",
   },
   plannerAdminEndpointFilter: "Endpoint: {name}",
   plannerAdminClearFilter: "Usuń filtr",
   plannerAdminEndpointHint: "Kliknij endpoint, aby zawęzić statystyki.",
+  plannerAdminHistoryNote:
+    "Wykres i liczby za 90 dni pochodzą z podsumowań dziennych, które nie zawierają adresów IP, p95 ani podziału na endpointy. Tabele poniżej obejmują ostatnie 30 dni, bo tyle przechowywany jest log zapytań.",
   plannerAdminChartTitleHour: "Zapytania na godzinę",
   plannerAdminChartTitleDay: "Zapytania na dzień",
   plannerAdminChartSplit: "Podział",
