@@ -38,27 +38,26 @@ import {
 } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
 import {
+  BUILDS_MAX,
   nextScheduledBuild,
   plannerAdminPaths,
   type BuildSchedule,
   type GraphBuild,
   type OsmDownload,
 } from "@/lib/api/plannerAdmin";
-import { formatBytes, formatDateTime, formatTime } from "@/lib/format";
+import { formatBytes, formatDateTime, formatNumber, formatTime } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
 import { DefinitionRows } from "@/components/layout/DefinitionRows";
 import { fill } from "@/lib/i18n/fill";
 
 /**
- * Only the served graph and the newest other one are kept, so only that one can come back.
- * A rollback build reuses an older graph and has none of its own.
+ * The backend keeps the served graph and the newest other succeeded build's graph, rollbacks
+ * included (a rollback's graph is its target's), so only that build can come back
+ * (`_remove_unused_graphs` in the backend's `planner/pipeline.py`). `builds` is newest first.
  */
 export function restorableBuildId(builds: GraphBuild[]): number | null {
-  return (
-    builds.find((b) => b.status === "succeeded" && !b.is_active && b.rollback_of === null)?.id ??
-    null
-  );
+  return builds.find((b) => b.status === "succeeded" && !b.is_active)?.id ?? null;
 }
 
 export function PlannerBuildsTab({ ctx }: { ctx: PlannerAdminContext }) {
@@ -77,6 +76,7 @@ function BuildHistoryCard({ ctx }: { ctx: PlannerAdminContext }) {
   const { core, dict, locale } = ctx;
   const running = core.status.running_build;
   const open = (b: GraphBuild) => ctx.openDrawer({ type: "build", id: b.id });
+  const [loadingMore, setLoadingMore] = React.useState(false);
   return (
     <Card component="section" aria-labelledby="planner-builds-title" sx={{ minWidth: 0 }}>
       <CardHeading
@@ -161,6 +161,39 @@ function BuildHistoryCard({ ctx }: { ctx: PlannerAdminContext }) {
           </Table>
         </TableContainer>
       )}
+      {core.builds.length < core.buildsCount ? (
+        <CardContent
+          sx={{
+            py: 1.5,
+            borderTop: 1,
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1.5,
+            flexWrap: "wrap",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {fill(dict.plannerAdminBuildsShown, {
+              shown: formatNumber(core.builds.length, locale),
+              total: formatNumber(core.buildsCount, locale),
+            })}
+          </Typography>
+          {core.builds.length < BUILDS_MAX ? (
+            <Button
+              size="small"
+              disabled={loadingMore}
+              onClick={() => {
+                setLoadingMore(true);
+                void ctx.showMoreBuilds().finally(() => setLoadingMore(false));
+              }}
+            >
+              {dict.plannerAdminBuildsShowMore}
+            </Button>
+          ) : null}
+        </CardContent>
+      ) : null}
     </Card>
   );
 }
@@ -185,6 +218,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
     draft.enabled !== saved.enabled ||
     draft.time_utc !== saved.time_utc ||
     [...draft.weekdays].sort().join() !== [...saved.weekdays].sort().join();
+  // The backend refuses an empty list even while the schedule is off.
   const noDays = draft.weekdays.length === 0;
   const local = polishTimes(draft.time_utc, locale);
   const next = nextScheduledBuild(saved);
@@ -233,7 +267,8 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
               value={draft.weekdays}
               onChange={(_, weekdays: number[]) => setDraft((d) => ({ ...d, weekdays }))}
               aria-labelledby="planner-schedule-days"
-              disabled={!draft.enabled}
+              // Left enabled while empty, so a schedule switched off can still be saved.
+              disabled={!draft.enabled && !noDays}
               sx={{ flexWrap: "wrap" }}
             >
               {WEEKDAYS.map((d) => (
@@ -247,7 +282,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
-            {draft.enabled && noDays ? (
+            {noDays ? (
               <Typography variant="caption" color="error" component="p" sx={{ mt: 0.5 }}>
                 {dict.plannerAdminScheduleNoDays}
               </Typography>
@@ -268,7 +303,7 @@ function ScheduleCard({ ctx }: { ctx: PlannerAdminContext }) {
         <Stack direction="row" sx={{ mt: 2, gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
           <Button
             variant="contained"
-            disabled={!dirty || saving || (draft.enabled && noDays)}
+            disabled={!dirty || saving || noDays}
             onClick={() => void submit()}
           >
             {dict.plannerAdminScheduleSave}

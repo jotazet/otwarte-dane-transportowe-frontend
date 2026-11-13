@@ -16,7 +16,7 @@ import { FormSection } from "@/components/layout/FormSection";
 import { LoadingBlock } from "@/components/layout/LoadingBlock";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { formatApiError } from "@/lib/formatApiError";
-import { useAuth } from "@/lib/auth/AuthContext";
+import { useAuth, type Tokens } from "@/lib/auth/AuthContext";
 import {
   USER_ME,
   USER_ME_CHANGE_EMAIL,
@@ -28,7 +28,7 @@ import {
 import { formatRole } from "@/lib/auth/roleLabels";
 
 export function AccountSettings({ dict }: { dict: Dictionary }) {
-  const { apiJson } = useAuth();
+  const { apiJson, storeTokens } = useAuth();
   const [profile, setProfile] = React.useState<MeProfile | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -102,7 +102,12 @@ export function AccountSettings({ dict }: { dict: Dictionary }) {
         current_password: currentPassword,
         new_password: newPassword,
       };
-      await apiJson("POST", USER_ME_CHANGE_PASSWORD, body);
+      // The backend ends every session and returns a new pair for this one;
+      // keeping the old, blacklisted refresh token would sign the user out.
+      const tokens = await apiJson<Partial<Tokens>>("POST", USER_ME_CHANGE_PASSWORD, body);
+      if (typeof tokens.access === "string" && typeof tokens.refresh === "string") {
+        storeTokens({ access: tokens.access, refresh: tokens.refresh });
+      }
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
