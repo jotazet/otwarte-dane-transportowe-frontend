@@ -207,8 +207,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = React.useCallback(() => {
+    // Blacklist the refresh token so a copy of it stops working. The local
+    // session ends whether or not the request succeeds.
+    const refresh = readStoredTokens()?.refresh;
+    if (refresh) postJson("/api/auth/logout/", { refresh }).catch(() => {});
     clearAuth();
   }, [clearAuth]);
+
+  // Sign-in, refresh and sign-out in another tab change the stored tokens;
+  // follow them so this tab does not look signed in after a sign-out there.
+  React.useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      // A null key means the whole storage was cleared.
+      if (e.key !== STORAGE_KEY && e.key !== null) return;
+      const tokens = readStoredTokens();
+      if (tokens) {
+        setState({ status: "authenticated", tokens, user: userFromAccess(tokens.access) });
+      } else {
+        setState({ status: "anonymous", user: null, tokens: null });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const getAccessToken = React.useCallback(() => {
     if (state.status !== "authenticated") return null;
