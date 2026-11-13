@@ -29,8 +29,15 @@ export type UserRecord = {
   first_name: string;
   last_name: string;
   is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
   roles: string[];
 };
+
+/** Superuser or staff: only a superuser may edit, delete it or reset its password. */
+export function isProtectedAccount(user: Pick<UserRecord, "is_staff" | "is_superuser">) {
+  return user.is_staff || user.is_superuser;
+}
 
 export type UserDetail = UserRecord;
 

@@ -443,6 +443,9 @@ export const dictBg: Dictionary = {
   addUser: "Добави потребител",
   userActive: "Активен",
   userInactive: "Неактивен",
+  userProtectedAccount: "Защитен акаунт",
+  userProtectedAccountNotice:
+    "Този акаунт има достъп до административния панел на Django. Само суперпотребител може да го редактира, изтрива или да нулира паролата му.",
   userRoles: "Роли",
   email: "Имейл",
   accountStatus: "Статус на акаунта",

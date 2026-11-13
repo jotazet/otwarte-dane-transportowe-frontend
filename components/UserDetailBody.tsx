@@ -20,8 +20,11 @@ import { UserForm } from "@/components/UserForm";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
+  isProtectedAccount,
+  USER_ME,
   userDetailPath,
   userResetPasswordPath,
+  type MeProfile,
   type UserDetail,
   type UserWithGeneratedPassword,
 } from "@/lib/api/users";
@@ -57,6 +60,7 @@ export function UserDetailBody({
   const p = paths(locale);
   const { confirm, confirmDialog } = useConfirm({ confirm: dict.yes, cancel: dict.cancel });
   const [user, setUser] = React.useState<UserDetail | null>(null);
+  const [canManage, setCanManage] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [pending, setPending] = React.useState(false);
@@ -68,7 +72,11 @@ export function UserDetailBody({
     setError(null);
     try {
       const data = await auth.apiJson<UserDetail>("GET", userDetailPath(userId));
+      // The token does not say whether the caller is a superuser; /me does.
+      const manage =
+        !isProtectedAccount(data) || (await auth.apiJson<MeProfile>("GET", USER_ME)).is_superuser;
       setUser(data);
+      setCanManage(manage);
     } catch (err) {
       setError(formatApiError(err, dict));
       setUser(null);
@@ -195,6 +203,9 @@ export function UserDetailBody({
                     color={user.is_active ? "success" : "error"}
                     label={user.is_active ? dict.userActive : dict.userInactive}
                   />
+                  {isProtectedAccount(user) ? (
+                    <Chip size="small" variant="outlined" label={dict.userProtectedAccount} />
+                  ) : null}
                 </DetailChips>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -210,37 +221,43 @@ export function UserDetailBody({
           </CardContent>
         </Card>
 
-        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
-          <Button variant="outlined" onClick={() => void resetPassword()} disabled={pending}>
-            {dict.resetPassword}
-          </Button>
-          {!isSelf ? (
-            <Button
-              color="error"
-              variant="outlined"
-              onClick={() => void remove()}
-              disabled={pending}
-            >
-              {dict.delete}
-            </Button>
-          ) : null}
-        </Stack>
+        {!canManage ? <Alert severity="info">{dict.userProtectedAccountNotice}</Alert> : null}
 
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-              {dict.edit}
-            </Typography>
-            <UserForm
-              locale={locale}
-              dict={dict}
-              userId={userId}
-              initial={user}
-              cancelHref={p.users}
-              onSaved={() => void load()}
-            />
-          </CardContent>
-        </Card>
+        {canManage ? (
+          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
+            <Button variant="outlined" onClick={() => void resetPassword()} disabled={pending}>
+              {dict.resetPassword}
+            </Button>
+            {!isSelf ? (
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={() => void remove()}
+                disabled={pending}
+              >
+                {dict.delete}
+              </Button>
+            ) : null}
+          </Stack>
+        ) : null}
+
+        {canManage ? (
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                {dict.edit}
+              </Typography>
+              <UserForm
+                locale={locale}
+                dict={dict}
+                userId={userId}
+                initial={user}
+                cancelHref={p.users}
+                onSaved={() => void load()}
+              />
+            </CardContent>
+          </Card>
+        ) : null}
 
         <GeneratedPasswordDialog
           open={passwordDialogOpen}
