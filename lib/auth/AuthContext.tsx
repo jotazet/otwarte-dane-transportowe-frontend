@@ -14,7 +14,7 @@ import { postSession, SESSION_LOGIN, SESSION_LOGOUT, SESSION_REFRESH } from "@/l
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { isJwtExpired } from "@/lib/auth/jwt";
-import { createTokenRefresher, withRefreshLock } from "@/lib/auth/tokenRefresher";
+import { createTokenRefresher, isLastingRefusal, withRefreshLock } from "@/lib/auth/tokenRefresher";
 import { contentDispositionFileName } from "@/lib/download";
 import type { RoleSet } from "@/lib/auth/roles";
 
@@ -139,8 +139,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState({ status: "authenticated", access, user: userFromAccess(access, loginUsername) });
   }, []);
 
+  // Bumped when a session ends or starts, so a refresh in flight from before cannot apply.
+  const epochRef = React.useRef(0);
+
   /** Ends the session in this tab; `keepShared` leaves the flag and username other tabs use. */
   const clearAuth = React.useCallback((keepShared = false) => {
+    epochRef.current += 1;
     accessRef.current = null;
     if (!keepShared) {
       writeStoredUsername(null);
@@ -158,10 +162,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       request: () => postSession<{ access: string }>(SESSION_REFRESH),
       withLock: withRefreshLock,
       apply: (access) => applyAccess(access),
-      // Only the API's answer that there is no session (401) clears what the tabs share. After
-      // a network error or a rate limit another tab may still be signed in, and without the
-      // flag proxy.ts would send it to the login page.
-      clear: (err) => clearAuth(!(err instanceof ApiError && err.status === 401)),
+      // Only a lasting refusal clears what the tabs share. After a passing failure another tab
+      // may still be signed in, and without the flag proxy.ts would send it to the login page.
+      clear: (err) => clearAuth(!isLastingRefusal(err)),
+      epoch: () => epochRef.current,
     });
     return refresherRef.current();
   }, [applyAccess, clearAuth]);
@@ -181,13 +185,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshAccess]);
 
   // Follow sign-in and sign-out in the site's other tabs. They share the refresh cookie, so
-  // after a sign-in this tab gets its own access token through a refresh.
+  // after a sign-in an anonymous tab gets its own access token through a refresh. A tab with a
+  // live access token keeps it: access tokens are never blacklisted (not even by a password
+  // change), and its next refresh uses the new cookie anyway.
   React.useEffect(() => {
     if (typeof BroadcastChannel === "undefined") return;
     const channel = new BroadcastChannel(AUTH_CHANNEL);
     channel.onmessage = (e: MessageEvent<AuthMessage>) => {
       if (e.data === "logout") clearAuth();
-      else if (e.data === "login") void refreshAccess();
+      else if (e.data === "login") {
+        const access = accessRef.current;
+        if (!access || isJwtExpired(access)) void refreshAccess();
+      }
     };
     channelRef.current = channel;
     return () => {
@@ -198,7 +207,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = React.useCallback(
     async (creds: { username: string; password: string }) => {
-      const { access } = await postSession<{ access: string }>(SESSION_LOGIN, creds);
+      // Under the refresh lock: a refresh of an older session in another tab must not
+      // overwrite the cookie this login sets.
+      const { access } = await withRefreshLock(() =>
+        postSession<{ access: string }>(SESSION_LOGIN, creds),
+      );
+      epochRef.current += 1;
       writeStoredUsername(creds.username.trim());
       applyAccess(access, creds.username.trim());
       broadcast("login");

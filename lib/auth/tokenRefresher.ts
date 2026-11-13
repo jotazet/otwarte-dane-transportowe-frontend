@@ -21,7 +21,17 @@ type TokenRefresherDeps = {
   apply: (access: string) => void;
   /** Ends the session in this tab, given the refresh's last error. */
   clear: (err: unknown) => void;
+  /** Changes whenever this tab's session ends or a new one starts (logout, login). */
+  epoch: () => number;
 };
+
+/**
+ * Whether a failed refresh means the session is gone for every tab: no valid cookie (401) or an
+ * origin the API does not allow (`auth.csrf_failed`). A network error, a 429 or a 5xx may pass.
+ */
+export function isLastingRefusal(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 401 || err.code === "auth.csrf_failed");
+}
 
 function isStaleCookie(err: unknown): boolean {
   return err instanceof ApiError && err.code === "auth.refresh_cookie_invalid";
@@ -49,23 +59,25 @@ export function createTokenRefresher(deps: TokenRefresherDeps): () => Promise<st
   return () => {
     // Requests that find the access token expired at the same time share one refresh.
     if (!inFlight) {
-      inFlight = deps
-        .withLock(attempt)
-        .then(
-          ({ access }) => {
-            deps.apply(access);
-            return access;
-          },
-          (err: unknown) => {
-            // The backend keeps the cookie after a failed refresh, so a reload can still
-            // restore a session that failed here for a passing reason (network, 429).
-            deps.clear(err);
-            return null;
-          },
-        )
-        .finally(() => {
-          inFlight = null;
-        });
+      inFlight = (async () => {
+        const epoch = deps.epoch();
+        try {
+          const { access } = await deps.withLock(attempt);
+          // A logout (or a new login) while the refresh waited: its result belongs to a
+          // session that has ended and must not sign the tab back in.
+          if (deps.epoch() !== epoch) return null;
+          deps.apply(access);
+          return access;
+        } catch (err) {
+          if (deps.epoch() !== epoch) return null;
+          // The backend keeps the cookie after a failed refresh, so a reload can still
+          // restore a session that failed here for a passing reason (network, 429).
+          deps.clear(err);
+          return null;
+        }
+      })().finally(() => {
+        inFlight = null;
+      });
     }
     return inFlight;
   };
