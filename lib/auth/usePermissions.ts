@@ -5,6 +5,7 @@ import {
   canAdminEditSourceOnPublishedStages,
   canBlogEditPost,
   canDeleteFeedSubmission,
+  canDeleteTransportOrganization,
   canEditFeedSourceFields,
   canEditFullSource,
   canHelperReviewOnly,
@@ -29,7 +30,6 @@ export function usePermissions() {
           roles: auth.user.roles,
           groups: auth.user.groups,
           isDjangoAdmin: auth.user.isDjangoAdmin,
-          isStaff: auth.user.isStaff,
         }
       : null;
 
@@ -42,17 +42,17 @@ export function usePermissions() {
     hasHelperAccess: () => (user ? hasHelperAccess(user) : false),
     hasDataProviderAccess: () => (user ? hasDataProviderAccess(user) : false),
     hasBlogManageAccess: () => (user ? hasBlogManageAccess(user) : false),
+    canDeleteTransportOrganization: () => (user ? canDeleteTransportOrganization(user) : false),
     canBlogEditPost: (authorId: number | null | undefined) =>
       user ? canBlogEditPost(user, authorId) : false,
     feedSource: (
-      ctx: Omit<FeedSourceEditContext, "isDjangoAdmin" | "isStaff" | "isHelper"> & {
+      ctx: Omit<FeedSourceEditContext, "isDjangoAdmin" | "isHelper"> & {
         isHelper?: boolean;
       },
     ) => {
       const full: FeedSourceEditContext = {
         ...ctx,
         isDjangoAdmin: user?.isDjangoAdmin ?? false,
-        isStaff: user?.isStaff ?? false,
         isHelper: ctx.isHelper ?? (user ? hasHelperAccess(user) : false),
       };
       return {

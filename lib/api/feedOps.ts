@@ -45,14 +45,6 @@ export const PROXY_FEEDS_PAGE_SIZE = 25;
 export const FETCH_ERROR_DAY_OPTIONS = [7, 14, 30, 90, 365] as const;
 export const FETCH_ERRORS_PAGE_SIZE = 25;
 
-export function buildProxyFeedsQuery(params: { page?: number; pageSize?: number }): string {
-  const q = new URLSearchParams();
-  if (params.page) q.set("page", String(params.page));
-  q.set("page_size", String(params.pageSize ?? PROXY_FEEDS_PAGE_SIZE));
-  const s = q.toString();
-  return s ? `?${s}` : "";
-}
-
 export type FetchErrorFilters = {
   days: number;
   page: number;
@@ -101,7 +93,7 @@ export function pauseFetchPath(
     : feedOpsPaths.realtimeResumeFetch(id);
 }
 
-/** Loads all pages (for overview stats). */
+/** Loads all pages: `proxy-feeds/` has no filters, so the overview and the table filter here. */
 export async function fetchAllProxyFeeds(apiJson: ApiJson): Promise<ProxyFeedListItem[]> {
   return await fetchAllPages<ProxyFeedListItem>(
     (p) => apiJson("GET", p),

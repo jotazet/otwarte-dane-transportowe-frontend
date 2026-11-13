@@ -19,6 +19,7 @@ import { MdLock } from "react-icons/md";
 import { PasswordTextField } from "@/components/PasswordTextField";
 import { OdtLogo } from "@/components/OdtLogo";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { loginDestination } from "@/lib/nav/returnUrl";
 
 export function LoginView({
   locale,
@@ -47,7 +48,7 @@ export function LoginView({
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
-  const destination = returnUrl && returnUrl.startsWith(`/${locale}`) ? returnUrl : `/${locale}`;
+  const destination = loginDestination(returnUrl, locale);
 
   React.useEffect(() => {
     if (auth.status === "authenticated") router.replace(destination);

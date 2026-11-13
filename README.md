@@ -24,8 +24,10 @@ npm run dev                  # http://localhost:3000
 Checks (all must pass, CI runs them on every pull request):
 
 ```bash
-npm run lint && npm run typecheck && npm run format:check && npm run build
+npm run lint && npm run typecheck && npm run format:check && npm test && npm run build
 ```
+
+`npm test` runs the Vitest unit tests (`*.test.ts` next to the module they cover) once; `npx vitest` watches. `i18n/errorCodes.test.ts` checks that every error code the backend emits has a translation; its header has the command that regenerates `lib/__fixtures__/backend-error-codes.json`.
 
 ## Documentation
 

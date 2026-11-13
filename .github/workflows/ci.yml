@@ -24,14 +24,14 @@ jobs:
     # A hung build fails here instead of holding the runner for six hours.
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The token stays out of .git/config, where every later step could read it.
           persist-credentials: false
       # npm cache keyed by package-lock.json. A release tag runs without the cache; the
       # image job builds the release image in Docker and takes nothing from this job.
       # zizmor cannot evaluate the expression.
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           # Same major as the Dockerfile.
           node-version: "24"
@@ -40,6 +40,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run format:check
+      - run: npm test
       # No API is reachable here; every page that fetches is rendered on demand.
       - run: npm run build
         env:
@@ -50,7 +51,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # Template injection, unpinned actions, tokens with more rights than a job needs.
@@ -90,7 +91,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # NEXT_PUBLIC_* are inlined into the bundle, so they are public: repository variables,

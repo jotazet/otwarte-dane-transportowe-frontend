@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -15,16 +16,16 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/material": "^9.0.0",
-    "@mui/material-nextjs": "^9.0.0",
-    "@uiw/react-md-editor": "^4.1.1",
+    "@mui/material": "^9.5.0",
+    "@mui/material-nextjs": "^9.5.0",
+    "@uiw/react-md-editor": "^4.2.3",
     "next": "16.4.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-icons": "^5.6.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-icons": "^5.7.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "remove-markdown": "^0.6.4"
+    "remove-markdown": "^0.8.0"
   },
   "devDependencies": {
     "@types/node": "^24",
@@ -33,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "prettier": "3.9.10",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "4.1.12"
   }
 }

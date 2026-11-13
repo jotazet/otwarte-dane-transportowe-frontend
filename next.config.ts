@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
   // The Docker image runs .next/standalone (server.js and only the traced dependencies)
   // instead of `next start` with the whole node_modules (Dockerfile).
   output: "standalone",
+  // The app never uses next/image; with the optimiser off, /_next/image
+  // answers 404 instead of being attack surface with no user.
+  images: { unoptimized: true },
   // Next 16 blocks dev resources (incl. the HMR websocket) for origins other
   // than "localhost". Opening the app via http://127.0.0.1:3000 made HMR fail
   // in a retry loop and left pages stuck on loading states.

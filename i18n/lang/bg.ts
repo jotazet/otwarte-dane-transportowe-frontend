@@ -116,6 +116,9 @@ export const dictBg: Dictionary = {
   original: "Оригинален",
   interval: "Интервал",
   feedDownloadTimes: "Часове на изтегляне (UTC)",
+  feedCachedAt: "Копие на ODT от",
+  feedEntityTypes: "Типове обекти: {types}",
+  feedRealtimePublishedAt: "Фийдът в реално време е публикуван: {date}",
   sourceUpdateInterval: "Актуализация на източниците",
   sourceUpdateIntervalRange:
     "Актуализация на източниците: въведи цяло число от 5 до 120 в секунди.",
@@ -235,6 +238,15 @@ export const dictBg: Dictionary = {
     "blog.reaction_daily_limit": "Достигнахте дневния лимит от 10 реакции. Опитайте отново утре.",
     "blog.too_many_tags": "Публикацията може да има най-много 5 тага.",
     "blog.image_too_large": "Изображението надвишава максималния размер.",
+    "blog.tag_too_long": "Тагът може да има най-много 16 знака.",
+    "fetch.credential_undecryptable":
+      "Сървърът на ODT не може да дешифрира запазените данни за оторизация на източника, затова не е изтеглил фийда. Проблемът е от страна на ODT: екипът на ODT трябва да коригира конфигурацията на ключовете за шифроване.",
+    "gtfs_validation.file_missing": "Файлът на фийда не е наличен на сървъра на ODT.",
+    "gtfs_validation.validator_unavailable": "GTFS валидаторът не можа да бъде стартиран.",
+    "gtfs_validation.validator_failed": "GTFS валидаторът спря или не върна доклад.",
+    "gtfs_validation.timeout": "Валидирането не приключи в определеното време.",
+    "gtfs_validation.credential_undecryptable":
+      "Сървърът на ODT не може да дешифрира запазените данни за оторизация на източника, затова не е изтеглил фийда за валидиране.",
   },
   addFeed: "Добави фийд",
   myFeeds: "Моите фийдове",
@@ -293,6 +305,28 @@ export const dictBg: Dictionary = {
   staticSourceFile: "Качи файл",
   chooseFile: "Избери файл",
   noFileSelected: "Не е избран файл",
+  staticSourceResubmitHint:
+    "След запазване на промените в източника заявката се връща към проверка на данните.",
+  staticSourceFileRequired: "Изберете файл за качване.",
+  staticCurrentFile: "Текущ файл: {name}",
+  staticChooseNewFile: "Избери нов файл",
+  submissionFeedStatusSection: "Състояние на фийда",
+  submissionGtfsValidation: "Валидиране на GTFS",
+  submissionValidationStatusLabels: {
+    pending: "В процес",
+    valid: "Без грешки",
+    invalid: "Открити са грешки",
+    error: "Не е извършено",
+  },
+  submissionValidationErrorHint:
+    "Валидирането не можа да се извърши поради проблем от страна на ODT. Екипът на ODT ще го стартира отново.",
+  submissionFetchAutoPausedHint:
+    "Изтеглянето е спряно автоматично след повтарящи се неуспешни опити. Сървърът на ODT опитва отново веднъж на ден и след успешно изтегляне се връща към обичайния график.",
+  submissionFetchManualPausedHint: "Изтеглянето е спряно от екипа на ODT.",
+  submissionFetchErrorsRecent: "Грешки при изтегляне през последните 30 дни",
+  submissionFetchErrorsEmpty: "През последните 30 дни няма грешки при изтегляне.",
+  submissionFetchHttpError: "HTTP грешка {status}",
+  submissionLinkedRealtimeSection: "Свързани заявки в реално време",
   unnamed: "без име",
   tabStaticSubmission: "Статичен фийд",
   tabRealtimeSubmission: "Фийд в реално време",
@@ -328,7 +362,8 @@ export const dictBg: Dictionary = {
   rejected: "Отхвърлено",
   published: "Публикувано",
   rejectionCause: "Причина за отхвърляне",
-  rejectionCauseHint: "По избор - посочи при отхвърляне на заявката.",
+  rejectionCauseHint:
+    "Задължително. Опишете какво трябва да се коригира – подателят ще види този текст.",
   realtimeRejectionReasons: {
     "realtime.static_submission_missing":
       "Фийдът в реално време не е свързан със статична заявка. За GTFS-RT и SIRI изберете публикувана статична заявка.",
@@ -353,6 +388,9 @@ export const dictBg: Dictionary = {
       "Първото копие на данните от ендпойнта „{endpoint}“ не можа да бъде записано на сървъра на ODT. Опитайте отново по-късно.",
   },
   realtimeRejectionReasonUnknown: "Заявката беше отхвърлена при автоматичната проверка.",
+  gtfsValidationNotice: "GTFS валидатор: {code}, брой случаи: {count}",
+  gtfsValidationRejectedGeneric:
+    "Фийдът не премина автоматичното GTFS валидиране или не можа да бъде изтеглен за валидиране. Проверете URL адреса и съдържанието на файла.",
   applyStage: "Приложи етап",
   rejectSubmission: "Отхвърли",
   reviewSubmission: "Проверка на заявката",
@@ -364,7 +402,12 @@ export const dictBg: Dictionary = {
   downloadRealtimeHint:
     "Изтеглянето изисква синхронизиран файл на сървъра - в противен случай няма да е успешно.",
   filteredByOrganization: "Заявки на организация #{id}",
-  confirmDeleteOrganization: "Да се изтрие ли тази организация?",
+  organizationDeleteTitle: "Да се изтрие ли организацията „{name}“?",
+  organizationDeleteConsequence:
+    "Ще бъдат изтрити и всички заявки на тази организация, включително публикуваните фийдове. Техните URL адреси в каталога ще спрат да работят.",
+  organizationDeleteCounts: "Заявки: {submissions}, от тях публикувани: {published}.",
+  organizationDeleteIrreversible: "Това действие не може да бъде отменено.",
+  organizationDeleteConfirm: "Изтрий организацията",
   confirmDeleteStatus: "Да се изтрие ли този статус?",
   confirmDeleteProvider: "Да се изтрие ли този доставчик на данни?",
   confirmDeletePost: "Да се изтрие ли тази публикация?",
@@ -381,12 +424,14 @@ export const dictBg: Dictionary = {
   invalidEmail: "Въведи валиден имейл адрес.",
   invalidUrl: "Въведи валиден URL адрес (http:// или https://).",
   invalidFileType: "Неподдържан тип файл.",
-  fileTooLarge: "Файлът е твърде голям.",
   providerName: "Име на доставчика",
   postTitle: "Заглавие",
   blogPostFormHint:
     "Заглавие до 24 знака, максимум 5 тага по 16 знака. Съдържание във формат Markdown.",
   blogTagsHint: "Тагове, разделени със запетаи.",
+  blogTitleTooLong: "Заглавието може да е най-много 24 знака (в момента: {count}).",
+  blogTagTooLong: "Всеки таг може да е най-много 16 знака. Съкратете: {tags}.",
+  blogImageTooLarge: "Изображението може да е най-много 10 MB. Изберете по-малък файл.",
   postContent: "Съдържание на публикацията",
   blogMarkdownHint: "Поддържа се формат Markdown (заглавия, списъци, линкове, код и др.).",
   staticSubmissionId: "ID на статичната заявка",
@@ -443,6 +488,9 @@ export const dictBg: Dictionary = {
   addUser: "Добави потребител",
   userActive: "Активен",
   userInactive: "Неактивен",
+  userProtectedAccount: "Защитен акаунт",
+  userProtectedAccountNotice:
+    "Този акаунт има достъп до административния панел на Django. Само суперпотребител може да го редактира, изтрива или да нулира паролата му.",
   userRoles: "Роли",
   email: "Имейл",
   accountStatus: "Статус на акаунта",
@@ -505,10 +553,15 @@ export const dictBg: Dictionary = {
   fetchErrorsDays: "Период (дни)",
   fetchErrorType: "Тип грешка",
   fetchErrorSource: "Източник",
-  fetchErrorMessage: "Съобщение",
+  fetchErrorMessage: "Подробности",
   fetchErrorDate: "Дата",
   fetchErrorsEmpty: "Няма грешки при изтегляне в избрания период.",
   fetchErrorsTotal: "Общо грешки: {n}",
+  fetchErrorsEndpointType: "Тип ендпойнт",
+  fetchErrorHttpStatus: "HTTP код на отговора: {status}",
+  fetchPauseAfterFailures: "Последователни неуспешни изтегляния: {n}",
+  technicalDetailsShow: "Покажи техническите подробности",
+  technicalDetailsHide: "Скрий техническите подробности",
   sourceStatic: "Статичен",
   sourceRealtime: "Реално време",
   fetchStatusLabels: {
@@ -522,6 +575,7 @@ export const dictBg: Dictionary = {
     connection_error: "Грешка при връзката",
     http_error: "HTTP грешка",
     invalid_content: "Невалидно съдържание",
+    auth_error: "Грешка в данните за оторизация",
   },
   metaFeedOpsTitle: "Управление на фийдовете – прокси изтегляне",
   metaFeedOpsDescription:
@@ -817,6 +871,20 @@ export const dictBg: Dictionary = {
       "Фийдът няма курсове в периода на графа (от вчера до два месеца напред).",
     "planner.rt_url_blocked":
       "Адресът води към частна мрежа, затова планерът не изтегля данни от него.",
+    "planner.rt_url_unsupported":
+      "Адресът съдържа знаците ${, които OTP чете като променлива, затова планерът не изтегля данни от него.",
+    "planner.feed_other_organization": "Изберете фийд на същата организация.",
+    "planner.feed_not_gtfs": "Изберете GTFS заявка.",
+    "planner.feed_not_gbfs": "Изберете GBFS заявка.",
+    "planner.invalid_feed_id":
+      "Идентификаторът трябва да има от 2 до 32 знака: малки букви, цифри и тирета. Не може да започва с тире.",
+    "planner.feed_id_immutable": "Идентификаторът на фийда не може да бъде променян.",
+    "planner.invalid_network":
+      "Невалидна стойност. Въведете IPv4 или IPv6 адрес или мрежа, а като идентификатор на мрежа – от 2 до 32 знака: малки букви, цифри и тирета.",
+    "planner.network_immutable": "Идентификаторът на мрежата не може да бъде променян.",
+    "planner.invalid_range": "Началото на периода трябва да е преди неговия край.",
+    "planner.too_many_buckets":
+      "Периодът е твърде дълъг за избрания интервал. Изберете по-кратък период или по-дълъг интервал.",
     "planner.rental_source_not_published": "Заявката за GBFS вече не е публикувана.",
     "planner.rental_source_without_gbfs": "Заявката няма ендпойнт gbfs.json.",
     "planner.rental_source_requires_auth":
@@ -870,6 +938,8 @@ export const dictBg: Dictionary = {
   plannerAdminBuildsHint:
     "Полско време. Съхраняват се активният граф и един предишен, затова може да бъде възстановен само предишният.",
   plannerAdminBuildsEmpty: "Графът все още не е изграждан.",
+  plannerAdminBuildsShown: "Показани: {shown} от {total}",
+  plannerAdminBuildsShowMore: "Покажи по-стари изграждания",
   plannerAdminColNumber: "№",
   plannerAdminColState: "Състояние",
   plannerAdminColStart: "Начало",
@@ -1110,6 +1180,22 @@ export const dictBg: Dictionary = {
   plannerAdminBanExpired: "Изтекла: {date}",
   plannerAdminBanAddedBy: "Добавено от: {user}",
   plannerAdminUnban: "Отблокирай",
+  plannerAdminEdit: "Редактирай",
+  plannerAdminKeyEditTitle: "Редактиране на API ключ",
+  plannerAdminKeySave: "Запази ключа",
+  plannerAdminKeySaved: "Ключът „{name}“ е запазен.",
+  plannerAdminKeySaveFailed: "Ключът не можа да бъде запазен. Проверете имейл адреса и лимитите.",
+  plannerAdminKeyReactivate: "Активирай отново",
+  plannerAdminKeyReactivatedToast: "Ключът „{name}“ отново е активен.",
+  plannerAdminBanEditTitle: "Редактиране на блокирането",
+  plannerAdminBanSave: "Запази блокирането",
+  plannerAdminBanSaved: "Блокирането на {network} е запазено.",
+  plannerAdminBanSaveFailed:
+    "Блокирането не можа да бъде запазено. Адресът може да е невалиден или вече блокиран.",
+  plannerAdminBanExpiryKeep: "Без промяна ({date})",
+  plannerAdminBanRenew: "Удължи",
+  plannerAdminBanDelete: "Изтрий",
+  plannerAdminBanDeleted: "Изтеклото блокиране на {network} е изтрито.",
   plannerAdminPublicApiTitle: "Публичен API",
   plannerAdminPublicApiSwitch: "Публичен API на планера",
   plannerAdminPublicApiOnBody: "Ендпойнтите в /api/planner/v1/ отговарят на всички клиенти.",

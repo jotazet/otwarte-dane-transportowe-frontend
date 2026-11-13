@@ -36,7 +36,7 @@ export function OrganizationProvidersPanel({
   locale: string;
   dict: Dictionary;
   organizationId: number;
-  linked: { id?: number; name?: string | null; website?: string; contact_email?: string }[];
+  linked: { id?: number; name?: string | null }[];
 }) {
   const { apiJson } = useAuth();
   const router = useRouter();
@@ -132,12 +132,10 @@ export function OrganizationProvidersPanel({
 
       {linked.some((p) => p.id) ? (
         <TableCard>
-          <Table size="small" sx={{ minWidth: 640 }}>
+          <Table size="small">
             <TableHead>
               <TableRow sx={tableHeadRowSx}>
                 <TableCell>{dict.providers}</TableCell>
-                <TableCell>{dict.website}</TableCell>
-                <TableCell>{dict.contact}</TableCell>
                 <TableCell sx={{ width: 56 }}>{dict.actions}</TableCell>
               </TableRow>
             </TableHead>
@@ -146,8 +144,6 @@ export function OrganizationProvidersPanel({
                 p.id ? (
                   <TableRow key={`${p.id}-${idx}`} hover>
                     <TableCell sx={{ fontWeight: 600 }}>{text(p.name)}</TableCell>
-                    <TableCell>{text(p.website)}</TableCell>
-                    <TableCell>{text(p.contact_email)}</TableCell>
                     <TableCell>
                       <Tooltip title={dict.edit}>
                         <IconButton

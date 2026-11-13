@@ -39,6 +39,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const lang = await requestLocale();
+  // Set by proxy.ts for the Content-Security-Policy; absent on paths the proxy skips.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html lang={lang} className={roboto.variable} suppressHydrationWarning>
@@ -47,10 +49,11 @@ export default async function RootLayout({
           attribute='[data-color-mode="%s"]'
           modeStorageKey={COLOR_MODE_STORAGE_KEY}
           defaultMode="light"
+          nonce={nonce}
         />
       </head>
       <body>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry nonce={nonce}>{children}</ThemeRegistry>
       </body>
     </html>
   );

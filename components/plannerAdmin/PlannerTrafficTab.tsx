@@ -324,7 +324,7 @@ export function PlannerTrafficTab({ ctx }: { ctx: PlannerAdminContext }) {
         <ClientsCard ctx={ctx} range={range} endpoint={endpoint} />
       </Box>
 
-      <ErrorsCard ctx={ctx} range={range} />
+      <ErrorsCard ctx={ctx} range={range} endpoint={endpoint} />
     </Stack>
   );
 }
@@ -362,6 +362,7 @@ function ClientsCard({
       "client_ip" in c ? `${c.client_ip} ${c.user_agent}` : `${c.api_key.name} ${c.api_key.prefix}`;
     return text.toLowerCase().includes(q);
   });
+  const openIp = (ip: string) => () => ctx.openDrawer({ type: "ip", ip });
   const lookup =
     by === "ip" &&
     isIpAddress(query) &&
@@ -451,18 +452,23 @@ function ClientsCard({
               {rows.map((c) =>
                 "client_ip" in c ? (
                   <TableRow
-                    key={c.client_ip}
-                    tabIndex={0}
-                    sx={clickableRowSx}
-                    onClick={() => ctx.openDrawer({ type: "ip", ip: c.client_ip })}
-                    onKeyDown={openOnEnter(() => ctx.openDrawer({ type: "ip", ip: c.client_ip }))}
+                    key={c.client_ip ?? ""}
+                    // Requests logged without an address have no details to open.
+                    {...(c.client_ip === null
+                      ? {}
+                      : {
+                          tabIndex: 0,
+                          sx: clickableRowSx,
+                          onClick: openIp(c.client_ip),
+                          onKeyDown: openOnEnter(openIp(c.client_ip)),
+                        })}
                   >
                     <TableCell sx={{ maxWidth: 260 }}>
                       <Box
                         component="span"
                         sx={{ fontFamily: MONOSPACE_FONT, overflowWrap: "anywhere" }}
                       >
-                        {c.client_ip}
+                        {c.client_ip ?? "-"}
                       </Box>
                       <Typography variant="caption" color="text.secondary" component="div" noWrap>
                         {c.user_agent}
@@ -482,14 +488,14 @@ function ClientsCard({
                       onClick={(e) => e.stopPropagation()}
                       onKeyDown={(e) => e.stopPropagation()}
                     >
-                      {c.banned ? (
+                      {c.client_ip === null ? null : c.banned ? (
                         <StateChip tone="error" label={dict.plannerAdminBanned} />
                       ) : (
                         <Button
                           size="small"
                           color="error"
                           startIcon={<MdBlock aria-hidden />}
-                          onClick={() => setBanFor(defaultBanNetwork(c.client_ip))}
+                          onClick={() => c.client_ip && setBanFor(defaultBanNetwork(c.client_ip))}
                         >
                           {dict.plannerAdminBan}
                         </Button>
@@ -561,12 +567,24 @@ function ClientsCard({
   );
 }
 
-function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRange }) {
+function ErrorsCard({
+  ctx,
+  range,
+  endpoint,
+}: {
+  ctx: PlannerAdminContext;
+  range: TrafficRange;
+  endpoint: string;
+}) {
   const { apiJson, dict, locale } = ctx;
   const [group, setGroup] = React.useState<ErrorStatusGroup>("all");
   const errors = useApiLoad(
-    React.useCallback(() => fetchRecentErrors(apiJson, group, range), [apiJson, group, range]),
+    React.useCallback(
+      () => fetchRecentErrors(apiJson, group, range, endpoint),
+      [apiJson, group, range, endpoint],
+    ),
   );
+  const openIp = (ip: string) => () => ctx.openDrawer({ type: "ip", ip });
   const codeLabels: Record<string, string> = dict.plannerAdminStatusCodeLabels;
 
   return (
@@ -647,13 +665,17 @@ function ErrorsCard({ ctx, range }: { ctx: PlannerAdminContext; range: TrafficRa
                     {formatMs(e.latency_ms, dict, locale)}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      size="small"
-                      sx={{ fontFamily: MONOSPACE_FONT, fontWeight: 400, minWidth: 0, px: 0.5 }}
-                      onClick={() => ctx.openDrawer({ type: "ip", ip: e.client_ip })}
-                    >
-                      {e.client_ip}
-                    </Button>
+                    {e.client_ip === null ? (
+                      "-"
+                    ) : (
+                      <Button
+                        size="small"
+                        sx={{ fontFamily: MONOSPACE_FONT, fontWeight: 400, minWidth: 0, px: 0.5 }}
+                        onClick={openIp(e.client_ip)}
+                      >
+                        {e.client_ip}
+                      </Button>
+                    )}
                     {e.api_key_name ? (
                       <Typography variant="caption" color="text.secondary" component="div">
                         {e.api_key_name}

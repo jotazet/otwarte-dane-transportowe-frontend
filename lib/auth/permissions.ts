@@ -9,7 +9,6 @@ export type AuthUserClaims = {
   roles: RoleSet;
   groups: string[];
   isDjangoAdmin: boolean;
-  isStaff: boolean;
 };
 
 function groupNames(payload: JwtPayload | null): string[] {
@@ -54,10 +53,6 @@ export function claimsFromAccessToken(
   const roles = normalizeRoles(groups);
   const roleSetMutable = new Set<AppRole>(roles);
 
-  const isStaff =
-    (payload as Record<string, unknown>)?.is_staff === true ||
-    (payload as Record<string, unknown>)?.is_superuser === true;
-
   const isDjangoAdmin =
     groups.some((g) => g.trim().toLowerCase() === "admin") || roleSetMutable.has("Admin");
 
@@ -89,7 +84,6 @@ export function claimsFromAccessToken(
     roles: roleSet,
     groups,
     isDjangoAdmin,
-    isStaff,
   };
 }
 
@@ -120,7 +114,6 @@ export function hasBlogManageAccess(user: Pick<AuthUserClaims, "roles" | "isDjan
 
 export type FeedSourceEditContext = {
   isDjangoAdmin: boolean;
-  isStaff: boolean;
   isHelper: boolean;
   isOwner: boolean;
   currentStage: number;
@@ -196,5 +189,10 @@ export function canViewSubmissionInContext(
 
 /** Backend (07.2026): DELETE zgłoszeń wyłącznie dla roli Admin — właściciel nie może usuwać nawet na etapie 1. */
 export function canDeleteFeedSubmission(user: Pick<AuthUserClaims, "isDjangoAdmin">) {
+  return user.isDjangoAdmin;
+}
+
+/** Backend (2026-11-12): deleting a transport organization, with all its submissions, is Admin only. */
+export function canDeleteTransportOrganization(user: Pick<AuthUserClaims, "isDjangoAdmin">) {
   return user.isDjangoAdmin;
 }
