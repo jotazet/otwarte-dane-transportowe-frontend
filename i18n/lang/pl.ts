@@ -862,6 +862,8 @@ export const dictPl = {
   plannerAdminBuildsHint:
     "Czas polski. Przechowywany jest graf serwowany i jeden poprzedni, więc przywrócić można tylko ten drugi.",
   plannerAdminBuildsEmpty: "Graf nie był jeszcze budowany.",
+  plannerAdminBuildsShown: "Wyświetlone: {shown} z {total}",
+  plannerAdminBuildsShowMore: "Pokaż starsze budowania",
   plannerAdminColNumber: "Nr",
   plannerAdminColState: "Stan",
   plannerAdminColStart: "Start",

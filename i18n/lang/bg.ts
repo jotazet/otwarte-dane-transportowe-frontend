@@ -870,6 +870,8 @@ export const dictBg: Dictionary = {
   plannerAdminBuildsHint:
     "Полско време. Съхраняват се активният граф и един предишен, затова може да бъде възстановен само предишният.",
   plannerAdminBuildsEmpty: "Графът все още не е изграждан.",
+  plannerAdminBuildsShown: "Показани: {shown} от {total}",
+  plannerAdminBuildsShowMore: "Покажи по-стари изграждания",
   plannerAdminColNumber: "№",
   plannerAdminColState: "Състояние",
   plannerAdminColStart: "Начало",

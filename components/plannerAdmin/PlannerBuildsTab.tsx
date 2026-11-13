@@ -38,13 +38,14 @@ import {
 } from "@/components/plannerAdmin/shared";
 import { ApiError } from "@/lib/api/http";
 import {
+  BUILDS_MAX,
   nextScheduledBuild,
   plannerAdminPaths,
   type BuildSchedule,
   type GraphBuild,
   type OsmDownload,
 } from "@/lib/api/plannerAdmin";
-import { formatBytes, formatDateTime, formatTime } from "@/lib/format";
+import { formatBytes, formatDateTime, formatNumber, formatTime } from "@/lib/format";
 import { MONOSPACE_FONT } from "@/lib/ui/codeSx";
 import { clickableRowSx, openOnEnter, tableHeadRowSx } from "@/lib/ui/tableSx";
 import { DefinitionRows } from "@/components/layout/DefinitionRows";
@@ -75,6 +76,7 @@ function BuildHistoryCard({ ctx }: { ctx: PlannerAdminContext }) {
   const { core, dict, locale } = ctx;
   const running = core.status.running_build;
   const open = (b: GraphBuild) => ctx.openDrawer({ type: "build", id: b.id });
+  const [loadingMore, setLoadingMore] = React.useState(false);
   return (
     <Card component="section" aria-labelledby="planner-builds-title" sx={{ minWidth: 0 }}>
       <CardHeading
@@ -159,6 +161,39 @@ function BuildHistoryCard({ ctx }: { ctx: PlannerAdminContext }) {
           </Table>
         </TableContainer>
       )}
+      {core.builds.length < core.buildsCount ? (
+        <CardContent
+          sx={{
+            py: 1.5,
+            borderTop: 1,
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1.5,
+            flexWrap: "wrap",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {fill(dict.plannerAdminBuildsShown, {
+              shown: formatNumber(core.builds.length, locale),
+              total: formatNumber(core.buildsCount, locale),
+            })}
+          </Typography>
+          {core.builds.length < BUILDS_MAX ? (
+            <Button
+              size="small"
+              disabled={loadingMore}
+              onClick={() => {
+                setLoadingMore(true);
+                void ctx.showMoreBuilds().finally(() => setLoadingMore(false));
+              }}
+            >
+              {dict.plannerAdminBuildsShowMore}
+            </Button>
+          ) : null}
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

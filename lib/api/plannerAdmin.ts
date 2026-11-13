@@ -107,6 +107,9 @@ export type RentalCandidate = {
 export type BuildStatus = "queued" | "running" | "succeeded" | "failed";
 export type BuildTrigger = "schedule" | "manual" | "rollback";
 
+/** The backend's `max_page_size`: the build history shows at most this many builds. */
+export const BUILDS_MAX = 200;
+
 export type GraphBuild = {
   id: number;
   status: BuildStatus;

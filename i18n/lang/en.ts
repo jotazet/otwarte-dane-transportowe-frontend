@@ -862,6 +862,8 @@ export const dictEn: Dictionary = {
   plannerAdminBuildsHint:
     "Polish time. The served graph and one previous graph are kept, so only the previous one can be restored.",
   plannerAdminBuildsEmpty: "The graph has not been built yet.",
+  plannerAdminBuildsShown: "Showing {shown} of {total}",
+  plannerAdminBuildsShowMore: "Show older builds",
   plannerAdminColNumber: "No.",
   plannerAdminColState: "Status",
   plannerAdminColStart: "Start",

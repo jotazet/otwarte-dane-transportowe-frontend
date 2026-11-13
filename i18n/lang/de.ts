@@ -890,6 +890,8 @@ export const dictDe: Dictionary = {
   plannerAdminBuildsHint:
     "Polnische Zeit. Gespeichert werden der aktive Graph und ein vorheriger, daher kann nur der vorherige wiederhergestellt werden.",
   plannerAdminBuildsEmpty: "Der Graph wurde noch nicht erstellt.",
+  plannerAdminBuildsShown: "Angezeigt: {shown} von {total}",
+  plannerAdminBuildsShowMore: "Ältere Graph-Erstellungen anzeigen",
   plannerAdminColNumber: "Nr.",
   plannerAdminColState: "Status",
   plannerAdminColStart: "Start",
