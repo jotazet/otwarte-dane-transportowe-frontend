@@ -372,6 +372,8 @@ export const dictDe: Dictionary = {
   submissionStagePendingApprovalNote:
     "{stage} – die Einreichung wartet auf die Entscheidung des ODT-Teams.",
   submissionStagePublishedNote: "{stage} – der Feed ist im Katalog sichtbar.",
+  submissionStageReturnedNote:
+    "{stage} – das ODT-Team hat die Einreichung zur Überarbeitung zurückgegeben. Aktualisieren Sie die Quelle und speichern Sie sie, damit die Einreichung zur Datenprüfung zurückkehrt.",
   status: "Status",
   rejected: "Abgelehnt",
   published: "Veröffentlicht",
@@ -413,7 +415,7 @@ export const dictDe: Dictionary = {
   backToList: "Zurück zur Liste",
   submissionNameAndNoteSection: "Name und Notiz",
   staticEntrySection: "Statische Datei",
-  downloadStatic: "Datei herunterladen (ZIP)",
+  downloadStatic: "Datei herunterladen",
   downloadRealtime: "Realtime-Datei herunterladen",
   downloadRealtimeHint:
     "Erfordert eine synchronisierte Datei auf dem Server - sonst schlägt der Download fehl.",

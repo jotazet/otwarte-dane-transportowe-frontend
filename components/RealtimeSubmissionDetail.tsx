@@ -27,7 +27,7 @@ import { SubmissionDetailAuthGate } from "@/components/submissions/SubmissionDet
 import { FeedFetchHealthPanel } from "@/components/feedOps/FeedFetchHealthPanel";
 import { submissionsPaths } from "@/lib/api/submissions";
 import type { FetchHealthFields, RejectionReason } from "@/lib/api/types";
-import { downloadBlob } from "@/lib/download";
+import { downloadBlob, feedDownloadFileName } from "@/lib/download";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { hasHelperAccess, canViewSubmissionInContext } from "@/lib/auth/permissions";
@@ -291,10 +291,18 @@ export function RealtimeSubmissionDetail({
       return;
     }
     try {
-      const blob = await auth.apiBlob(
+      const { blob, fileName } = await auth.apiBlob(
         submissionsPaths.realtimeDownload(row.static_submission, epPk),
       );
-      downloadBlob(blob, `submission-${row.id}-rt-${epPk}.zip`);
+      downloadBlob(
+        blob,
+        feedDownloadFileName({
+          serverName: fileName,
+          contentType: blob.type,
+          fallbackBase: `submission-${row.id}-rt-${epPk}`,
+          feedFormat: row.protocol,
+        }),
+      );
     } catch (e) {
       setError(formatApiError(e, dict));
     }

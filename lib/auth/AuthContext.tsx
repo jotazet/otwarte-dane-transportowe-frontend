@@ -13,6 +13,7 @@ import {
 import { apiBaseUrl } from "@/lib/config";
 import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissions";
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
+import { contentDispositionFileName } from "@/lib/download";
 import type { RoleSet } from "@/lib/auth/roles";
 
 export type Tokens = {
@@ -43,7 +44,8 @@ type AuthContextValue = AuthState & {
   getAccessToken: () => string | null;
   apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
-  apiBlob: (path: string) => Promise<Blob>;
+  /** `fileName` is null when the API does not expose `Content-Disposition` (CORS). */
+  apiBlob: (path: string) => Promise<{ blob: Blob; fileName: string | null }>;
 };
 
 const STORAGE_KEY = "odt.jwt";
@@ -313,7 +315,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const apiBlob = React.useCallback(
-    async (path: string): Promise<Blob> => {
+    async (path: string): Promise<{ blob: Blob; fileName: string | null }> => {
       const url = `${apiBaseUrl()}${path}`;
       const buildInit = (access: string): RequestInit => ({
         method: "GET",
@@ -334,7 +336,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) {
         throw await apiErrorFrom(res);
       }
-      return res.blob();
+      const fileName = contentDispositionFileName(res.headers.get("Content-Disposition"));
+      return { blob: await res.blob(), fileName };
     },
     [refreshAccess],
   );

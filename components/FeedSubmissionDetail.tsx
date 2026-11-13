@@ -51,7 +51,7 @@ import {
   isHideOriginalLockedByAuth,
   resolveHideOriginal,
 } from "@/lib/data/hideOriginalAuth";
-import { downloadBlob } from "@/lib/download";
+import { downloadBlob, feedDownloadFileName } from "@/lib/download";
 import { fill } from "@/lib/i18n/fill";
 import { formatApiError } from "@/lib/formatApiError";
 import { gtfsRejectionReasons } from "@/lib/gtfsRejection";
@@ -235,6 +235,11 @@ export function FeedSubmissionDetail({
   const showHelperPanel = isHelper || isDjangoAdmin;
   const showAdminSourceTab =
     isDjangoAdmin && row.current_stage >= 2 && row.current_stage <= 4 && !row.is_rejected;
+  // The owner at any stage and an Admin may change the download schedule (backend docs/api/feeds.md).
+  const canEditSchedule =
+    sourcePerms.canEditLimitedMeta ||
+    sourcePerms.canEditFullSource ||
+    sourcePerms.canAdminSourceOnStage2Plus;
 
   // Only GTFS has automatic validation; for other types the status stays "pending".
   const validationStatus =
@@ -308,23 +313,24 @@ export function FeedSubmissionDetail({
         return;
       }
       const static_entry: Record<string, unknown> = {};
-      if (
-        sourcePerms.canEditLimitedMeta ||
-        sourcePerms.canEditFullSource ||
-        sourcePerms.canAdminSourceOnStage2Plus
-      ) {
+      const u = url.trim();
+      const canChangeUrl = sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus;
+      // The Admin tab always edits a URL, so a URL typed there also replaces a file.
+      const switchesToUrl =
+        canChangeUrl && !!u && isFileEntry && (urlMode || (showAdminSourceTab && tab === 1));
+      if (canEditSchedule) {
         static_entry.license = license.trim();
-        // Download times apply to URL sources only; the backend refuses them for a file.
-        if (urlMode && (sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)) {
+        // Download times apply to URL sources only: the backend refuses them for a
+        // file and requires download_time_1 for a URL.
+        if (urlMode || switchesToUrl) {
           static_entry.download_time_1 = dt1.trim() || "02:00:00";
           static_entry.download_time_2 = dt2Enabled && dt2.trim() ? dt2.trim() : null;
         }
       }
-      if (sourcePerms.canEditFullSource || sourcePerms.canAdminSourceOnStage2Plus) {
-        const u = url.trim();
+      if (canChangeUrl) {
         if (u) static_entry.url = u;
         // Switching a file entry to a URL clears the file in the same request.
-        if (u && isFileEntry && urlMode) static_entry.file = null;
+        if (switchesToUrl) static_entry.file = null;
         static_entry.is_original = isOrig;
         static_entry.hide_original = resolveHideOriginal(authType, hideOrig);
         if (authType) {
@@ -382,10 +388,18 @@ export function FeedSubmissionDetail({
   async function downloadStatic() {
     if (!row?.static_entry?.id) return;
     try {
-      const blob = await auth.apiBlob(
+      const { blob, fileName } = await auth.apiBlob(
         submissionsPaths.feedDownloadStatic(row.id, row.static_entry.id),
       );
-      downloadBlob(blob, `submission-${row.id}-static.zip`);
+      downloadBlob(
+        blob,
+        feedDownloadFileName({
+          serverName: fileName,
+          contentType: blob.type,
+          fallbackBase: `submission-${row.id}-static`,
+          feedFormat: row.data_type,
+        }),
+      );
     } catch (e) {
       setError(formatApiError(e, dict));
     }
@@ -411,6 +425,13 @@ export function FeedSubmissionDetail({
         rawCause={isAdmin ? row.rejection_cause : undefined}
         rejectedLabel={dict.rejected}
         fixHint={row.is_rejected ? dict.fixAndResubmit : undefined}
+        // New submissions start at stage 2, so stage 1 without a rejection means a
+        // reviewer sent it back; saving the source moves it on (backend docs/domain/feed-workflow.md).
+        stageNote={
+          isOwner && row.current_stage === 1 && !row.is_rejected
+            ? dict.submissionStageReturnedNote
+            : undefined
+        }
         dict={dict}
       />
 
@@ -574,10 +595,7 @@ export function FeedSubmissionDetail({
                     label={dict.downloadTime1Utc}
                     value={dt1}
                     onChange={(e) => setDt1(e.target.value)}
-                    disabled={
-                      sourceFieldsDisabled ||
-                      !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)
-                    }
+                    disabled={!canEditSchedule}
                   />
                   {dt2Enabled ? (
                     <>
@@ -585,10 +603,7 @@ export function FeedSubmissionDetail({
                         label={dict.downloadTime2UtcOptional}
                         value={dt2}
                         onChange={(e) => setDt2(e.target.value)}
-                        disabled={
-                          sourceFieldsDisabled ||
-                          !(sourcePerms.canEditLimitedMeta || sourcePerms.canEditFullSource)
-                        }
+                        disabled={!canEditSchedule}
                       />
                       <Button
                         type="button"
@@ -597,7 +612,7 @@ export function FeedSubmissionDetail({
                           setDt2Enabled(false);
                           setDt2("");
                         }}
-                        disabled={sourceFieldsDisabled || limitedOnly}
+                        disabled={!canEditSchedule}
                         sx={{ alignSelf: "flex-start", textTransform: "none" }}
                       >
                         {dict.removeSecondDownloadTime}
@@ -608,7 +623,7 @@ export function FeedSubmissionDetail({
                       type="button"
                       variant="text"
                       onClick={() => setDt2Enabled(true)}
-                      disabled={sourceFieldsDisabled || limitedOnly}
+                      disabled={!canEditSchedule}
                       sx={{ alignSelf: "flex-start", textTransform: "none" }}
                     >
                       {dict.addSecondDownloadTime}
