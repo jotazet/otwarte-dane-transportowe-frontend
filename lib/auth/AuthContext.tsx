@@ -15,7 +15,7 @@ import { claimsFromAccessToken, type AuthUserClaims } from "@/lib/auth/permissio
 import { decodeJwt, isJwtExpired } from "@/lib/auth/jwt";
 import type { RoleSet } from "@/lib/auth/roles";
 
-type Tokens = {
+export type Tokens = {
   access: string;
   refresh: string;
 };
@@ -38,6 +38,8 @@ export function isAuthReady(status: AuthStatus): status is "anonymous" | "authen
 type AuthContextValue = AuthState & {
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => void;
+  /** Stores a token pair the API returned outside login and refresh (password change). */
+  storeTokens: (tokens: Tokens) => void;
   getAccessToken: () => string | null;
   apiJson: ApiJson;
   apiForm: <T>(method: string, path: string, form: FormData) => Promise<T>;
@@ -323,12 +325,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
       logout,
+      storeTokens: applyTokens,
       getAccessToken,
       apiJson,
       apiForm,
       apiBlob,
     }),
-    [apiBlob, apiForm, apiJson, getAccessToken, login, logout, state],
+    [apiBlob, apiForm, apiJson, applyTokens, getAccessToken, login, logout, state],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
