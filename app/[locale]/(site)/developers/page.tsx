@@ -100,6 +100,7 @@ export default async function DevelopersPage({ params }: { params: Promise<{ loc
             developersFeedsVersionAt: dict.developersFeedsVersionAt,
             developersFeedOutcomeLabels: dict.developersFeedOutcomeLabels,
             developersFeedsStaleHint: dict.developersFeedsStaleHint,
+            developersFeedsPendingHint: dict.developersFeedsPendingHint,
             developersFeedsEmpty: dict.developersFeedsEmpty,
           }}
         />

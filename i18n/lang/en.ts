@@ -717,9 +717,12 @@ export const dictEn: Dictionary = {
   developersFeedOutcomeLabels: {
     fresh: "Current",
     stale: "Older",
+    pending: "New version pending",
   },
   developersFeedsStaleHint:
     "An older version goes into the planner when the newest one could not be used. It receives no live data.",
+  developersFeedsPendingHint:
+    "When the newest version starts later, the planner uses the version valid today. It receives live data.",
   developersFeedsEmpty: "There are no feeds in the planner yet.",
   plannerAdminTitle: "Journey planner",
   plannerAdminSubtitle:
@@ -763,6 +766,7 @@ export const dictEn: Dictionary = {
   plannerAdminStatusScheduleOff: "schedule off",
   plannerAdminStatusFeedsFresh: "Current feeds",
   plannerAdminStatusFeedsStale: "In an older version",
+  plannerAdminStatusFeedsPending: "New version pending",
   plannerAdminStatusFeedsExcluded: "Not in the graph",
   plannerAdminStatusRentals: "Rental systems in the graph",
   plannerAdminStatusRentalsValue: "{included} of {total}",
@@ -837,13 +841,14 @@ export const dictEn: Dictionary = {
     fresh: "Current",
     stale: "Older version",
     excluded: "Not in the graph",
-    pending: "From the next build",
+    pending: "New version pending",
+    awaiting_build: "From the next build",
     disabled: "Disabled",
   },
   plannerAdminRentalOutcomeLabels: {
     included: "In graph",
     skipped: "Skipped",
-    pending: "From the next build",
+    awaiting_build: "From the next build",
     disabled: "Disabled",
   },
   plannerAdminRealtimePartial: "Some live data skipped",
@@ -896,6 +901,8 @@ export const dictEn: Dictionary = {
     "planner.feed_invalid": "The newest file failed the OTP check.",
     "planner.feed_no_service_in_period":
       "The feed has no trips in the graph window (from yesterday to two months ahead).",
+    "planner.feed_not_started":
+      "The newest file starts later, so the graph holds the version valid today. The new file enters the graph with the first build on or after its start date.",
     "planner.rt_url_blocked":
       "The URL leads to a private network, so the planner does not poll it.",
     "planner.rt_url_unsupported":

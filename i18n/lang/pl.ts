@@ -719,9 +719,12 @@ export const dictPl = {
   developersFeedOutcomeLabels: {
     fresh: "Aktualna",
     stale: "Starsza",
+    pending: "Nowa wersja czeka",
   },
   developersFeedsStaleHint:
     "Starsza wersja trafia do planera, gdy najnowszej nie udało się użyć. Nie otrzymuje danych na żywo.",
+  developersFeedsPendingHint:
+    "Gdy najnowsza wersja zaczyna obowiązywać później, planer korzysta z wersji obowiązującej dziś. Otrzymuje ona dane na żywo.",
   developersFeedsEmpty: "W planerze nie ma jeszcze żadnych feedów.",
   plannerAdminTitle: "Planer podróży",
   plannerAdminSubtitle: "Feedy w grafie OpenTripPlanner, budowanie grafu i publiczne API planera.",
@@ -764,6 +767,7 @@ export const dictPl = {
   plannerAdminStatusScheduleOff: "harmonogram wyłączony",
   plannerAdminStatusFeedsFresh: "Feedy aktualne",
   plannerAdminStatusFeedsStale: "W starszej wersji",
+  plannerAdminStatusFeedsPending: "Nowa wersja czeka",
   plannerAdminStatusFeedsExcluded: "Poza grafem",
   plannerAdminStatusRentals: "Wypożyczalnie w grafie",
   plannerAdminStatusRentalsValue: "{included} z {total}",
@@ -836,13 +840,14 @@ export const dictPl = {
     fresh: "Aktualny",
     stale: "Starsza wersja",
     excluded: "Poza grafem",
-    pending: "Od następnego budowania",
+    pending: "Nowa wersja czeka",
+    awaiting_build: "Od następnego budowania",
     disabled: "Wyłączony",
   },
   plannerAdminRentalOutcomeLabels: {
     included: "W grafie",
     skipped: "Pominięte",
-    pending: "Od następnego budowania",
+    awaiting_build: "Od następnego budowania",
     disabled: "Wyłączone",
   },
   plannerAdminRealtimePartial: "Część danych na żywo pominięta",
@@ -895,6 +900,8 @@ export const dictPl = {
     "planner.feed_invalid": "Najnowszy plik nie przeszedł testu OTP.",
     "planner.feed_no_service_in_period":
       "Feed nie ma kursów w oknie grafu (od wczoraj do dwóch miesięcy naprzód).",
+    "planner.feed_not_started":
+      "Najnowszy plik zaczyna obowiązywać później, więc w grafie jest wersja obowiązująca dziś. Nowy plik trafi do grafu przy pierwszym budowaniu od dnia, w którym zacznie obowiązywać.",
     "planner.rt_url_blocked": "Adres prowadzi do sieci prywatnej, więc planer go nie odpytuje.",
     "planner.rt_url_unsupported":
       "Adres zawiera znaki ${, które OTP odczytuje jako zmienną, więc planer go nie odpytuje.",

@@ -722,9 +722,12 @@ export const dictBg: Dictionary = {
   developersFeedOutcomeLabels: {
     fresh: "Актуална",
     stale: "По-стара",
+    pending: "Предстои нова версия",
   },
   developersFeedsStaleHint:
     "По-стара версия влиза в планера, когато най-новата не може да бъде използвана. Тя не получава данни в реално време.",
+  developersFeedsPendingHint:
+    "Когато най-новата версия започва да важи по-късно, планерът използва версията, валидна днес. Тя получава данни в реално време.",
   developersFeedsEmpty: "В планера все още няма фийдове.",
   plannerAdminTitle: "Планер на пътувания",
   plannerAdminSubtitle:
@@ -768,6 +771,7 @@ export const dictBg: Dictionary = {
   plannerAdminStatusScheduleOff: "графикът е изключен",
   plannerAdminStatusFeedsFresh: "Актуални фийдове",
   plannerAdminStatusFeedsStale: "В по-стара версия",
+  plannerAdminStatusFeedsPending: "Предстои нова версия",
   plannerAdminStatusFeedsExcluded: "Извън графа",
   plannerAdminStatusRentals: "Системи за наем в графа",
   plannerAdminStatusRentalsValue: "{included} от {total}",
@@ -842,13 +846,14 @@ export const dictBg: Dictionary = {
     fresh: "Актуален",
     stale: "По-стара версия",
     excluded: "Извън графа",
-    pending: "От следващото изграждане",
+    pending: "Предстои нова версия",
+    awaiting_build: "От следващото изграждане",
     disabled: "Изключен",
   },
   plannerAdminRentalOutcomeLabels: {
     included: "В графа",
     skipped: "Пропуснат",
-    pending: "От следващото изграждане",
+    awaiting_build: "От следващото изграждане",
     disabled: "Изключен",
   },
   plannerAdminRealtimePartial: "Част от данните в реално време са пропуснати",
@@ -901,6 +906,8 @@ export const dictBg: Dictionary = {
     "planner.feed_invalid": "Най-новият файл не премина проверката на OTP.",
     "planner.feed_no_service_in_period":
       "Фийдът няма курсове в периода на графа (от вчера до два месеца напред).",
+    "planner.feed_not_started":
+      "Най-новият файл започва да важи по-късно, затова графът съдържа версията, валидна днес. Новият файл влиза в графа с първото изграждане от датата, от която започва да важи.",
     "planner.rt_url_blocked":
       "Адресът води към частна мрежа, затова планерът не изтегля данни от него.",
     "planner.rt_url_unsupported":

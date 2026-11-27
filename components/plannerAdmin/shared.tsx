@@ -84,30 +84,43 @@ export function StateChip({ tone, label }: { tone: Tone; label: string }) {
   );
 }
 
-export type FeedState = FeedOutcome | "pending" | "disabled";
-export type RentalState = RentalOutcome | "pending" | "disabled";
+export type FeedState = FeedOutcome | "awaiting_build" | "disabled";
+export type RentalState = RentalOutcome | "awaiting_build" | "disabled";
 
 /** The outcome in the served graph, or why there is none yet. */
 export function servedState<O extends string>(item: {
   is_enabled: boolean;
   active_result: { outcome: O } | null;
-}): O | "pending" | "disabled" {
+}): O | "awaiting_build" | "disabled" {
   if (item.active_result) return item.active_result.outcome;
-  return item.is_enabled ? "pending" : "disabled";
+  return item.is_enabled ? "awaiting_build" : "disabled";
 }
 
 const FEED_TONE: Record<FeedState, Tone> = {
   fresh: "ok",
+  pending: "pending",
   stale: "warning",
   excluded: "error",
-  pending: "pending",
+  awaiting_build: "pending",
   disabled: "neutral",
+};
+
+type AlertSeverity = "error" | "warning" | "info";
+
+/** How a feed's error code is shown: `pending` is not a failure, `excluded` leaves it out. */
+export const FEED_ALERT_SEVERITY: Record<FeedState, AlertSeverity> = {
+  fresh: "warning",
+  pending: "info",
+  stale: "warning",
+  excluded: "error",
+  awaiting_build: "warning",
+  disabled: "warning",
 };
 
 const RENTAL_TONE: Record<RentalState, Tone> = {
   included: "ok",
   skipped: "error",
-  pending: "pending",
+  awaiting_build: "pending",
   disabled: "neutral",
 };
 
@@ -140,7 +153,7 @@ export function ErrorCodeAlert({
 }: {
   code: string;
   dict: PlannerAdminDict;
-  severity?: "error" | "warning";
+  severity?: AlertSeverity;
 }) {
   return (
     <Alert severity={severity}>

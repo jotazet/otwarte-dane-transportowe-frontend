@@ -18,7 +18,7 @@ export type PlannerStatusFeed = {
   feed_id: string;
   organization: { id: number; name: string; region: string };
   license: string;
-  outcome: "fresh" | "stale";
+  outcome: "fresh" | "pending" | "stale";
   version_at: string | null;
 };
 

@@ -740,9 +740,12 @@ export const dictDe: Dictionary = {
   developersFeedOutcomeLabels: {
     fresh: "Aktuell",
     stale: "Älter",
+    pending: "Neue Version folgt",
   },
   developersFeedsStaleHint:
     "Eine ältere Version kommt in den Planer, wenn die neueste nicht verwendet werden konnte. Sie erhält keine Echtzeitdaten.",
+  developersFeedsPendingHint:
+    "Beginnt die neueste Version erst später, nutzt der Planer die heute gültige Version. Sie erhält Echtzeitdaten.",
   developersFeedsEmpty: "Im Planer sind noch keine Feeds.",
   plannerAdminTitle: "Reiseplaner",
   plannerAdminSubtitle:
@@ -789,6 +792,7 @@ export const dictDe: Dictionary = {
   plannerAdminStatusScheduleOff: "Zeitplan ausgeschaltet",
   plannerAdminStatusFeedsFresh: "Aktuelle Feeds",
   plannerAdminStatusFeedsStale: "In älterer Version",
+  plannerAdminStatusFeedsPending: "Neue Version folgt",
   plannerAdminStatusFeedsExcluded: "Nicht im Graphen",
   plannerAdminStatusRentals: "Verleihsysteme im Graphen",
   plannerAdminStatusRentalsValue: "{included} von {total}",
@@ -864,13 +868,14 @@ export const dictDe: Dictionary = {
     fresh: "Aktuell",
     stale: "Ältere Version",
     excluded: "Nicht im Graphen",
-    pending: "Ab der nächsten Erstellung",
+    pending: "Neue Version folgt",
+    awaiting_build: "Ab der nächsten Erstellung",
     disabled: "Deaktiviert",
   },
   plannerAdminRentalOutcomeLabels: {
     included: "Im Graphen",
     skipped: "Übersprungen",
-    pending: "Ab der nächsten Erstellung",
+    awaiting_build: "Ab der nächsten Erstellung",
     disabled: "Deaktiviert",
   },
   plannerAdminRealtimePartial: "Echtzeitdaten teilweise übersprungen",
@@ -923,6 +928,8 @@ export const dictDe: Dictionary = {
     "planner.feed_invalid": "Die neueste Datei hat die OTP-Prüfung nicht bestanden.",
     "planner.feed_no_service_in_period":
       "Der Feed hat keine Fahrten im Zeitfenster des Graphen (von gestern bis zwei Monate im Voraus).",
+    "planner.feed_not_started":
+      "Die neueste Datei gilt erst später, daher enthält der Graph die heute gültige Version. Die neue Datei kommt mit der ersten Graph-Erstellung ab ihrem Gültigkeitsbeginn in den Graphen.",
     "planner.rt_url_blocked":
       "Die URL führt in ein privates Netz, daher fragt der Planer sie nicht ab.",
     "planner.rt_url_unsupported":
