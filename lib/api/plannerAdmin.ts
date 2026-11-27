@@ -33,7 +33,7 @@ export const plannerAdminPaths = {
 
 export type PlannerOrganization = { id: number; name: string; region: string };
 
-export type FeedOutcome = "fresh" | "stale" | "excluded";
+export type FeedOutcome = "fresh" | "pending" | "stale" | "excluded";
 export type RentalOutcome = "included" | "skipped";
 export type FailurePolicy = "keep_last_good" | "exclude";
 export type RealtimeUpdater = "stop-time-updater" | "vehicle-positions" | "real-time-alerts";

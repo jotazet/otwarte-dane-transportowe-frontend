@@ -30,8 +30,15 @@ type FeedsTableDict = Pick<
   | "developersFeedsVersionAt"
   | "developersFeedOutcomeLabels"
   | "developersFeedsStaleHint"
+  | "developersFeedsPendingHint"
   | "developersFeedsEmpty"
 >;
+
+const OUTCOME_COLOR = {
+  fresh: "success",
+  pending: "info",
+  stale: "warning",
+} as const satisfies Record<PlannerStatusFeed["outcome"], "success" | "info" | "warning">;
 
 export function PlannerFeedsTable({
   feeds,
@@ -57,6 +64,11 @@ export function PlannerFeedsTable({
         {feeds.some((f) => f.outcome === "stale") ? (
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             {dict.developersFeedsStaleHint}
+          </Typography>
+        ) : null}
+        {feeds.some((f) => f.outcome === "pending") ? (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            {dict.developersFeedsPendingHint}
           </Typography>
         ) : null}
         {feeds.length === 0 ? (
@@ -106,7 +118,7 @@ export function PlannerFeedsTable({
                     <Chip
                       size="small"
                       variant="outlined"
-                      color={feed.outcome === "fresh" ? "success" : "warning"}
+                      color={OUTCOME_COLOR[feed.outcome]}
                       label={dict.developersFeedOutcomeLabels[feed.outcome]}
                     />
                   </TableCell>

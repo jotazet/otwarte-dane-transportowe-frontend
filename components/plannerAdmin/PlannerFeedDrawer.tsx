@@ -145,7 +145,7 @@ function FeedDetails({
           <ErrorCodeAlert
             code={result.error_code}
             dict={dict}
-            severity={state === "excluded" ? "error" : "warning"}
+            severity={state === "excluded" ? "error" : state === "pending" ? "info" : "warning"}
           />
         ) : null}
         <OtpLog text={result?.log_excerpt ?? ""} label={dict.plannerAdminOtpLog} />

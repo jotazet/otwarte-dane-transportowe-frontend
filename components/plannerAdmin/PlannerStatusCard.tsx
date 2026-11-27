@@ -83,6 +83,7 @@ export function PlannerStatusCard({ ctx }: { ctx: PlannerAdminContext }) {
                   : dict.plannerAdminStatusScheduleOff,
               },
               { label: dict.plannerAdminStatusFeedsFresh, value: count("fresh") },
+              { label: dict.plannerAdminStatusFeedsPending, value: count("pending") },
               { label: dict.plannerAdminStatusFeedsStale, value: count("stale") },
               { label: dict.plannerAdminStatusFeedsExcluded, value: count("excluded") },
               {
