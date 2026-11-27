@@ -105,6 +105,18 @@ const FEED_TONE: Record<FeedState, Tone> = {
   disabled: "neutral",
 };
 
+type AlertSeverity = "error" | "warning" | "info";
+
+/** How a feed's error code is shown: `pending` is not a failure, `excluded` leaves it out. */
+export const FEED_ALERT_SEVERITY: Record<FeedState, AlertSeverity> = {
+  fresh: "warning",
+  pending: "info",
+  stale: "warning",
+  excluded: "error",
+  awaiting_build: "warning",
+  disabled: "warning",
+};
+
 const RENTAL_TONE: Record<RentalState, Tone> = {
   included: "ok",
   skipped: "error",
@@ -141,7 +153,7 @@ export function ErrorCodeAlert({
 }: {
   code: string;
   dict: PlannerAdminDict;
-  severity?: "error" | "warning" | "info";
+  severity?: AlertSeverity;
 }) {
   return (
     <Alert severity={severity}>

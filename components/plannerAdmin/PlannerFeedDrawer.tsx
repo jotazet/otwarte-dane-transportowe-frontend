@@ -15,6 +15,7 @@ import { DrawerSection, OtpLog, PlannerDrawer } from "@/components/plannerAdmin/
 import {
   codeMessage,
   ErrorCodeAlert,
+  FEED_ALERT_SEVERITY,
   FeedStateChip,
   plannerErrorMessage,
   RentalStateChip,
@@ -145,7 +146,7 @@ function FeedDetails({
           <ErrorCodeAlert
             code={result.error_code}
             dict={dict}
-            severity={state === "excluded" ? "error" : state === "pending" ? "info" : "warning"}
+            severity={FEED_ALERT_SEVERITY[state]}
           />
         ) : null}
         <OtpLog text={result?.log_excerpt ?? ""} label={dict.plannerAdminOtpLog} />
